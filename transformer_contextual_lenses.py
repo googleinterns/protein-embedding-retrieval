@@ -306,7 +306,7 @@ def max_pool(x, padding_mask, rep_size):
 def mean_pool(x, padding_mask, rep_size):
   # Tak average over sequence length
   x = x * padding_mask
-  rep = jnp.mean(x, axis=1)
+  rep = jnp.sum(x*padding_mask, axis=1) / jnp.sum(padding_mask, axis=1)
   return rep
 
 
@@ -482,15 +482,15 @@ language_model, cache_def = create_language_model(init_rng, input_shape, transfo
 logits = language_model(random_seq)
 logits, logits.shape
 
-# mean pool representation
-meanpool_model, cache_def = create_meanpool_model(init_rng, input_shape, transformer_kwargs)
-meanpool_rep = meanpool_model(random_seq)
-meanpool_rep, meanpool_rep.shape
-
 # max pool representation
 maxpool_model, cache_def = create_maxpool_model(init_rng, input_shape, transformer_kwargs)
 maxpool_rep = maxpool_model(random_seq)
 maxpool_rep, maxpool_rep.shape
+
+# mean pool representation
+meanpool_model, cache_def = create_meanpool_model(init_rng, input_shape, transformer_kwargs)
+meanpool_rep = meanpool_model(random_seq)
+meanpool_rep, meanpool_rep.shape
 
 # linear + ReLU + max pool representation
 linearmaxpool_model, cache_def = create_linearmaxpool_model(init_rng, input_shape, transformer_kwargs)
