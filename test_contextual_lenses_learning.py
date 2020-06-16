@@ -17,6 +17,7 @@ import time
 import flax
 from flax import jax_utils
 from flax import nn
+from flax import optim
 
 import jax
 from jax import random
@@ -88,10 +89,6 @@ def linear_mean_pool(x, rep_size=256):
   
   return rep
 
-
-
-
-
 """# Models"""
 
 def create_optimizer(model, learning_rate, weight_decay):
@@ -115,13 +112,13 @@ def train_step(optimizer, X, Y):
 class CNN(nn.Module):
   """A simple CNN model."""
 
-  def apply(self, x, N_layers, N_features, N_kernel_sizes):
+  def apply(self, x, N_layers, N_features, kernel_sizes):
     
     x = jnp.expand_dims(x, axis=2)
 
-    for layer in range(N_layers):
-      features = N_features[layer]
-      kernel_size = (N_kernel_sizes[layer], 1)
+    for i in range(N_layers):
+      features = N_features[i]
+      kernel_size = (kernel_sizes[i], 1)
       x = nn.Conv(x, features=features, kernel_size=kernel_size)
       x = nn.relu(x)
     
@@ -130,8 +127,8 @@ class CNN(nn.Module):
     return x
 
 def cnn_encoder(inputs, **encoder_fn_kwargs):
-  N_layers, N_features, N_kernel_sizes = list(encoder_fn_kwargs.values())
-  cnn_outputs = CNN(inputs, N_layers, N_features, N_kernel_sizes)
+  N_layers, N_features, kernel_sizes = list(encoder_fn_kwargs.values())
+  cnn_outputs = CNN(inputs, N_layers, N_features, kernel_sizes)
   return cnn_outputs
 
 """### Positional embeddings
@@ -228,9 +225,9 @@ def pos_emb_encoder(inputs, **encoder_fn_kwargs):
   return pos_emb
 
 def cnn_pos_emb_encoder(inputs, **encoder_fn_kwargs):
-  N_layers, N_features, N_kernel_sizes, max_len = list(encoder_fn_kwargs.values())
+  N_layers, N_features, kernel_sizes, max_len = list(encoder_fn_kwargs.values())
   pos_emb = pos_emb_encoder(inputs, max_len=max_len)
-  cnn_pos_emb = CNN(pos_emb, N_layers, N_features, N_kernel_sizes)
+  cnn_pos_emb = CNN(pos_emb, N_layers, N_features, kernel_sizes)
   return cnn_pos_emb
 
 """## Representation model"""
@@ -298,19 +295,19 @@ def train_step(optimizer, X, Y):
 ## Data
 """
 
-bs = 10
+bs = 5
 seq_len = 4
-rep_size = 12
+rep_size = 10
 input_data = jnp.array(np.random.normal(scale=5, size=(bs, seq_len, rep_size)))
 output_data = jnp.array(np.random.normal(size=(bs)))
 
 loss_threshold = 1e-4
 
-def compute_train_loss(model, input_data, output_data):
+def compute_train_loss(model, input_data, output_data, lr=1e-3):
   
-  optimizer = create_optimizer(model, learning_rate=1e-2, weight_decay=0.)
+  optimizer = create_optimizer(model, learning_rate=lr, weight_decay=0.)
   
-  epochs = 10000
+  epochs = 150
   for epoch in range(epochs):
     optimizer = train_step(optimizer, input_data, output_data)
 
@@ -332,7 +329,7 @@ def test_mean():
                                            seq_len=seq_len,
                                            rep_size=rep_size)
   
-  train_loss = compute_train_loss(model, input_data, output_data)
+  train_loss = compute_train_loss(model, input_data, output_data, lr=1e-1)
 
   assert train_loss < loss_threshold
 
@@ -346,7 +343,7 @@ def test_max():
                                            seq_len=seq_len,
                                            rep_size=rep_size)
   
-  train_loss = compute_train_loss(model, input_data, output_data)
+  train_loss = compute_train_loss(model, input_data, output_data, lr=1e-1)
 
   assert train_loss < loss_threshold
 
@@ -390,7 +387,7 @@ def test_cnn_mean():
   reduce_fn = mean_pool
   N_layers = 1
   N_features = [128]
-  N_kernel_sizes = [2]
+  kernel_sizes = [2]
 
   model = create_test_representation_model(encoder_fn=encoder_fn,
                                            reduce_fn=reduce_fn,
@@ -398,7 +395,7 @@ def test_cnn_mean():
                                            rep_size=rep_size,
                                            N_layers=N_layers,
                                            N_features=N_features,
-                                           N_kernel_sizes=N_kernel_sizes)
+                                           kernel_sizes=kernel_sizes)
   
   train_loss = compute_train_loss(model, input_data, output_data)
 
@@ -410,7 +407,7 @@ def test_cnn_max():
   reduce_fn = max_pool
   N_layers = 1
   N_features = [128]
-  N_kernel_sizes = [2]
+  kernel_sizes = [2]
 
   model = create_test_representation_model(encoder_fn=encoder_fn,
                                            reduce_fn=reduce_fn,
@@ -418,7 +415,7 @@ def test_cnn_max():
                                            rep_size=rep_size,
                                            N_layers=N_layers,
                                            N_features=N_features,
-                                           N_kernel_sizes=N_kernel_sizes)
+                                           kernel_sizes=kernel_sizes)
   
   train_loss = compute_train_loss(model, input_data, output_data)
 
@@ -430,7 +427,7 @@ def test_cnn_linear_max():
   reduce_fn = linear_max_pool
   N_layers = 1
   N_features = [128]
-  N_kernel_sizes = [2]
+  kernel_sizes = [2]
   linear_rep_size = 256
 
   model = create_test_representation_model(encoder_fn=encoder_fn,
@@ -440,7 +437,7 @@ def test_cnn_linear_max():
                                            linear_rep_size=linear_rep_size,
                                            N_layers=N_layers,
                                            N_features=N_features,
-                                           N_kernel_sizes=N_kernel_sizes)
+                                           kernel_sizes=kernel_sizes)
   
   train_loss = compute_train_loss(model, input_data, output_data)
 
@@ -452,7 +449,7 @@ def test_cnn_linear_mean():
   reduce_fn = linear_mean_pool
   N_layers = 1
   N_features = [128]
-  N_kernel_sizes = [2]
+  kernel_sizes = [2]
   linear_rep_size = 256
 
   model = create_test_representation_model(encoder_fn=encoder_fn,
@@ -462,7 +459,7 @@ def test_cnn_linear_mean():
                                            linear_rep_size=linear_rep_size,
                                            N_layers=N_layers,
                                            N_features=N_features,
-                                           N_kernel_sizes=N_kernel_sizes)
+                                           kernel_sizes=kernel_sizes)
   
   train_loss = compute_train_loss(model, input_data, output_data)
 
@@ -482,7 +479,7 @@ def test_pos_emb_mean():
                                            rep_size=rep_size,
                                            max_len=max_len)
     
-  train_loss = compute_train_loss(model, input_data, output_data)
+  train_loss = compute_train_loss(model, input_data, output_data, lr=1e-1)
 
   assert train_loss < loss_threshold
 
@@ -498,7 +495,7 @@ def test_pos_emb_max():
                                            rep_size=rep_size,
                                            max_len=max_len)
     
-  train_loss = compute_train_loss(model, input_data, output_data)
+  train_loss = compute_train_loss(model, input_data, output_data, lr=1e-1)
 
   assert train_loss < loss_threshold
 
@@ -542,7 +539,7 @@ def test_cnn_pos_emb_mean():
   reduce_fn = mean_pool
   N_layers = 1
   N_features = [128]
-  N_kernel_sizes = [2]
+  kernel_sizes = [2]
   max_len = 512
 
   model = create_test_representation_model(encoder_fn=encoder_fn,
@@ -551,7 +548,7 @@ def test_cnn_pos_emb_mean():
                                            rep_size=rep_size,
                                            N_layers=N_layers,
                                            N_features=N_features,
-                                           N_kernel_sizes=N_kernel_sizes,
+                                           kernel_sizes=kernel_sizes,
                                            max_len=max_len)
   
   train_loss = compute_train_loss(model, input_data, output_data)
@@ -564,7 +561,7 @@ def test_cnn_pos_emb_max():
   reduce_fn = max_pool
   N_layers = 1
   N_features = [128]
-  N_kernel_sizes = [2]
+  kernel_sizes = [2]
   max_len = 512
 
   model = create_test_representation_model(encoder_fn=encoder_fn,
@@ -573,7 +570,7 @@ def test_cnn_pos_emb_max():
                                            rep_size=rep_size,
                                            N_layers=N_layers,
                                            N_features=N_features,
-                                           N_kernel_sizes=N_kernel_sizes,
+                                           kernel_sizes=kernel_sizes,
                                            max_len=max_len)
   
   train_loss = compute_train_loss(model, input_data, output_data)
@@ -588,7 +585,7 @@ def test_cnn_pos_emb_linear_max():
   reduce_fn = linear_max_pool
   N_layers = 1
   N_features = [128]
-  N_kernel_sizes = [2]
+  kernel_sizes = [2]
   max_len = 512
   linear_rep_size = 256
 
@@ -599,7 +596,7 @@ def test_cnn_pos_emb_linear_max():
                                            linear_rep_size=linear_rep_size,
                                            N_layers=N_layers,
                                            N_features=N_features,
-                                           N_kernel_sizes=N_kernel_sizes,
+                                           kernel_sizes=kernel_sizes,
                                            max_len=max_len)
   
   train_loss = compute_train_loss(model, input_data, output_data)
@@ -612,7 +609,7 @@ def test_cnn_pos_emb_linear_mean():
   reduce_fn = linear_mean_pool
   N_layers = 1
   N_features = [128]
-  N_kernel_sizes = [2]
+  kernel_sizes = [2]
   max_len = 512
   linear_rep_size = 256
 
@@ -623,7 +620,7 @@ def test_cnn_pos_emb_linear_mean():
                                            linear_rep_size=linear_rep_size,
                                            N_layers=N_layers,
                                            N_features=N_features,
-                                           N_kernel_sizes=N_kernel_sizes,
+                                           kernel_sizes=kernel_sizes,
                                            max_len=max_len)
   
   train_loss = compute_train_loss(model, input_data, output_data)
