@@ -310,7 +310,7 @@ def compute_train_loss(model, input_data, output_data):
   
   optimizer = create_optimizer(model, learning_rate=1e-2, weight_decay=0.)
   
-  epochs = 100000
+  epochs = 10000
   for epoch in range(epochs):
     optimizer = train_step(optimizer, input_data, output_data)
 
