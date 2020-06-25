@@ -46,9 +46,11 @@ def train(model, input_data, output_data, learning_rate=1e-3, epochs=1000):
   """Fits model to training data and returns train loss."""
 
   optimizer = create_optimizer(model, learning_rate=learning_rate, weight_decay=0)
+    
+  loss_fn_kwargs={}
 
   for epoch in range(epochs):
-    optimizer = train_step(optimizer, input_data, output_data, mse_loss)
+    optimizer = train_step(optimizer, input_data, output_data, mse_loss, loss_fn_kwargs)
 
   preds = jnp.squeeze(optimizer.target(input_data), axis=1)
 
@@ -130,10 +132,10 @@ test5 = {
           'reduce_fn': gated_conv,
           'reduce_fn_kwargs': {
               'rep_size': 256,
-              'M_layers': 3,
-              'M_features': [[512, 512], [512, 512]],
-              'M_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
-              'zero_rep_size': 256
+              'm_layers': 3,
+              'm_features': [[512, 512], [512, 512]],
+              'm_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
+              'conv_rep_size': 256
           },
           'learning_rate': 1e-3,
           'epochs': 100,
@@ -146,9 +148,9 @@ test6 = {
           'testcase_name': 'cnn_max_pool',
           'encoder_fn': cnn_one_hot_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [256],
-              'N_kernel_sizes': [3]
+              'n_layers': 1,
+              'n_features': [256],
+              'n_kernel_sizes': [3]
           },
           'reduce_fn': max_pool,
           'reduce_fn_kwargs': {
@@ -164,9 +166,9 @@ test7 = {
           'testcase_name': 'cnn_mean_pool',
           'encoder_fn': cnn_one_hot_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [512],
-              'N_kernel_sizes': [5]
+              'n_layers': 1,
+              'n_features': [512],
+              'n_kernel_sizes': [5]
           },
           'reduce_fn': mean_pool,
           'reduce_fn_kwargs': {
@@ -182,9 +184,9 @@ test8 = {
           'testcase_name': 'cnn_linear_max_pool',
           'encoder_fn': cnn_one_hot_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [32],
-              'N_kernel_sizes': [3]
+              'n_layers': 1,
+              'n_features': [32],
+              'n_kernel_sizes': [3]
           },
           'reduce_fn': linear_max_pool,
           'reduce_fn_kwargs': {
@@ -200,9 +202,9 @@ test9 = {
           'testcase_name': 'cnn_linear_mean_pool',
           'encoder_fn': cnn_one_hot_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [512],
-              'N_kernel_sizes': [5]
+              'n_layers': 1,
+              'n_features': [512],
+              'n_kernel_sizes': [5]
           },
           'reduce_fn': linear_mean_pool,
           'reduce_fn_kwargs': {
@@ -218,17 +220,17 @@ test10 = {
           'testcase_name': 'cnn_gated_conv',
           'encoder_fn': cnn_one_hot_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [32],
-              'N_kernel_sizes': [3]
+              'n_layers': 1,
+              'n_features': [32],
+              'n_kernel_sizes': [3]
           },
           'reduce_fn': gated_conv,
           'reduce_fn_kwargs': {
               'rep_size': 256,
-              'M_layers': 3,
-              'M_features': [[512, 512], [512, 512]],
-              'M_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
-              'zero_rep_size': 256
+              'm_layers': 3,
+              'm_features': [[512, 512], [512, 512]],
+              'm_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
+              'conv_rep_size': 256
           },
           'learning_rate': 1e-3,
           'epochs': 100,
@@ -312,10 +314,10 @@ test15 = {
           'reduce_fn': gated_conv,
           'reduce_fn_kwargs': {
               'rep_size': 256,
-              'M_layers': 3,
-              'M_features': [[512, 512], [512, 512]],
-              'M_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
-              'zero_rep_size': 256
+              'm_layers': 3,
+              'm_features': [[512, 512], [512, 512]],
+              'm_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
+              'conv_rep_size': 256
           },
           'learning_rate': 1e-3,
           'epochs': 100,
@@ -328,9 +330,9 @@ test16 = {
           'testcase_name': 'cnn_pos_emb_max_pool',
           'encoder_fn': cnn_one_hot_pos_emb_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [256],
-              'N_kernel_sizes': [3],
+              'n_layers': 1,
+              'n_features': [256],
+              'n_kernel_sizes': [3],
               'max_len': 512,
               'posemb_init': nn.initializers.normal(stddev=1e-6)
           },
@@ -348,9 +350,9 @@ test17 = {
           'testcase_name': 'cnn_pos_emb_mean_pool',
           'encoder_fn': cnn_one_hot_pos_emb_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [512],
-              'N_kernel_sizes': [5],
+              'n_layers': 1,
+              'n_features': [512],
+              'n_kernel_sizes': [5],
               'max_len': 512,
               'posemb_init': nn.initializers.normal(stddev=1e-6)
           },
@@ -368,9 +370,9 @@ test18 = {
           'testcase_name': 'cnn_pos_emb_linear_max_pool',
           'encoder_fn': cnn_one_hot_pos_emb_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [32],
-              'N_kernel_sizes': [3],
+              'n_layers': 1,
+              'n_features': [32],
+              'n_kernel_sizes': [3],
               'max_len': 512,
               'posemb_init': nn.initializers.normal(stddev=1e-6)
           },
@@ -388,9 +390,9 @@ test19 = {
           'testcase_name': 'cnn_pos_emb_linear_mean_pool',
           'encoder_fn': cnn_one_hot_pos_emb_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [512],
-              'N_kernel_sizes': [5],
+              'n_layers': 1,
+              'n_features': [512],
+              'n_kernel_sizes': [5],
               'max_len': 512,
               'posemb_init': nn.initializers.normal(stddev=1e-6)
           },
@@ -408,19 +410,19 @@ test20 = {
           'testcase_name': 'cnn_pos_emb_gated_conv',
           'encoder_fn': cnn_one_hot_pos_emb_encoder,
           'encoder_fn_kwargs': {
-              'N_layers': 1,
-              'N_features': [32],
-              'N_kernel_sizes': [3],
+              'n_layers': 1,
+              'n_features': [32],
+              'n_kernel_sizes': [3],
               'max_len': 512,
               'posemb_init': nn.initializers.normal(stddev=1e-6)
           },
           'reduce_fn': gated_conv,
           'reduce_fn_kwargs': {
               'rep_size': 256,
-              'M_layers': 3,
-              'M_features': [[512, 512], [512, 512]],
-              'M_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
-              'zero_rep_size': 256
+              'm_layers': 3,
+              'm_features': [[512, 512], [512, 512]],
+              'm_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
+              'conv_rep_size': 256
           },
           'learning_rate': 1e-3,
           'epochs': 100,
@@ -464,7 +466,8 @@ class TestLearning(parameterized.TestCase):
                                         encoder_fn_kwargs=encoder_fn_kwargs,
                                         reduce_fn=reduce_fn,
                                         reduce_fn_kwargs=reduce_fn_kwargs,
-                                        num_categories=21)
+                                        num_categories=21,
+                                        output_features=1)
   
     train_loss = train(model, input_data, output_data,
                        learning_rate=learning_rate, epochs=epochs)
