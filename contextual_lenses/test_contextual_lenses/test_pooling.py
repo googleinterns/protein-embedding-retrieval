@@ -12,9 +12,8 @@ from absl.testing import absltest
 from contextual_lenses import mean_pool, max_pool
 
 
-# Test cases.
+# Test cases:
 test1 = {
-          'testcase_name': 'test1',
           'x': jnp.array([[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]],
                           [[0, -1, 2, -3], [4, -5, 6, -7], [8, -9, 10, -11]]]),
           'padding_mask' : None,
@@ -25,7 +24,6 @@ test1 = {
       }
 
 test2 = {
-          'testcase_name': 'test2',
           'x': jnp.array([[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]],
                           [[0, -1, 2, -3], [4, -5, 6, -7], [8, -9, 10, -11]]]),
           'padding_mask' : jnp.array([[[1], [1], [1]]
@@ -37,7 +35,6 @@ test2 = {
       }
 
 test3 = {
-          'testcase_name': 'test3',
           'x': jnp.array([[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]],
                           [[0, -1, 2, -3], [4, -5, 6, -7], [8, -9, 10, -11]]]),
           'padding_mask' : jnp.array([[[1], [1], [1]], 
@@ -49,7 +46,6 @@ test3 = {
       }
 
 test4 = {
-          'testcase_name': 'test4',
           'x': jnp.array([[[0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11]],
                           [[0, -1, 2, -3], [4, -5, 6, -7], [8, -9, 10, -11]]]),
           'padding_mask' : jnp.array([[[1], [0], [1]], 
@@ -61,7 +57,6 @@ test4 = {
       }
 
 test5 = {
-          'testcase_name': 'test5',
           'x': jnp.array([[[5, 2, -5], [1, -3, 4], [-3, -8, 1]],
                           [[-2, -7, 4], [9, -4, 5], [-1, 2, -3]]]),
           'padding_mask' : None,
@@ -72,7 +67,6 @@ test5 = {
       }
 
 test6 = {
-          'testcase_name': 'test6',
           'x': jnp.array([[[5, 2, -5], [1, -3, 4], [-3, -8, 1]],
                           [[-2, -7, 4], [9, -4, 5], [-1, 2, -3]]]),
           'padding_mask' : jnp.array([[[1], [1], [1]], 
@@ -84,7 +78,6 @@ test6 = {
       }
 
 test7 = {
-          'testcase_name': 'test7',
           'x': jnp.array([[[6, 2, -5], [1, -2, 4], [-3, -8, 0]],
                           [[-2, -7, 4], [10, -4, 5], [-1, 3, -3]]]),
           'padding_mask' : jnp.array([[[0], [1], [1]], 
@@ -96,7 +89,6 @@ test7 = {
       }
 
 test8 = {
-          'testcase_name': 'test8',
           'x': jnp.array([[[6, 2, -5], [1, -2, 4], [-3, -8, 0]],
                           [[-2, -7, 4], [10, -4, 5], [-1, 3, -3]]]),
           'padding_mask' : jnp.array([[[1], [0], [1]], 
@@ -119,19 +111,19 @@ tests = (test1,
 
 class TestPooling(parameterized.TestCase):
   """Abstract method for testing mean and max pool reduce functions."""
-  @parameterized.named_parameters(
+  @parameterized.parameters(
       *tests
   )
   def test_mean_pool(self, x, padding_mask, mean_pool_rep, **unused_kwargs):
     self.assertTrue(jnp.array_equal(mean_pool(x, padding_mask), mean_pool_rep))
 
-  @parameterized.named_parameters(
+  @parameterized.parameters(
       *tests
   )
   def test_max_pool(self, x, padding_mask, max_pool_rep, **unused_kwargs):
     self.assertTrue(jnp.array_equal(max_pool(x, padding_mask), max_pool_rep))
   
-  @parameterized.named_parameters(
+  @parameterized.parameters(
       *tests
   )
   def test_max_pool_greater_than_mean_pool(self, x, padding_mask, **unused_kwargs):

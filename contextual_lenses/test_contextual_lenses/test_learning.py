@@ -24,19 +24,25 @@ one_hot_pos_emb_encoder, cnn_one_hot_pos_emb_encoder
 from loss_fns import mse_loss
 
 
-def generate_random_sequences(bs=3, seq_len=12, num_categories=21):
-  """Generates bs many random sequences of length seq_len from num_categories indices."""
+def generate_random_sequences(batch_size=3, seq_len=12, num_categories=21):
+  """Generates batch_size many random sequences of length seq_len from num_categories indices."""
 
   np.random.seed(0)
-  input_data = jnp.array(np.random.randint(0, num_categories-1, size=(bs, seq_len)))
-  
+  input_data = jnp.array(np.random.randint(0, num_categories-1, size=(batch_size, seq_len)))
+
+  return input_data
+
+
+def generate_random_targets(batch_size=3):
+  """Generates batch_size many scalar targets."""
+
   np.random.seed(0)
-  output_data = jnp.array(np.random.normal(size=(bs)))
+  output_data = jnp.array(np.random.normal(size=(batch_size,)))
 
-  return input_data, output_data
+  return output_data
 
 
-def compute_train_loss(model, input_data, output_data, learning_rate=1e-3, epochs=1000):
+def train(model, input_data, output_data, learning_rate=1e-3, epochs=1000):
   """Fits model to training data and returns train loss."""
 
   optimizer = create_optimizer(model, learning_rate=learning_rate, weight_decay=0)
@@ -136,7 +142,6 @@ test5 = {
 
 
 # CNN + one-hot:
-
 test6 = {
           'testcase_name': 'cnn_max_pool',
           'encoder_fn': cnn_one_hot_encoder,
@@ -319,7 +324,6 @@ test15 = {
 
 
 # CNN + one-hot + positional embeddings:
-
 test16 = {
           'testcase_name': 'cnn_pos_emb_max_pool',
           'encoder_fn': cnn_one_hot_pos_emb_encoder,
@@ -453,7 +457,8 @@ class TestLearning(parameterized.TestCase):
   def test_learning(self, encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs,
                     learning_rate=1e-3, epochs=1000, loss_threshold=1e-4):
     
-    input_data, output_data = generate_random_sequences(bs=3, seq_len=12, num_categories=21)
+    input_data = generate_random_sequences(batch_size=3, seq_len=12, num_categories=21)
+    output_data = generate_random_targets(batch_size=3)
 
     model = create_representation_model(encoder_fn=encoder_fn,
                                         encoder_fn_kwargs=encoder_fn_kwargs,
@@ -461,8 +466,8 @@ class TestLearning(parameterized.TestCase):
                                         reduce_fn_kwargs=reduce_fn_kwargs,
                                         num_categories=21)
   
-    train_loss = compute_train_loss(model, input_data, output_data,
-                                    learning_rate=learning_rate, epochs=epochs)
+    train_loss = train(model, input_data, output_data,
+                       learning_rate=learning_rate, epochs=epochs)
 
     self.assertTrue(train_loss < loss_threshold)
 

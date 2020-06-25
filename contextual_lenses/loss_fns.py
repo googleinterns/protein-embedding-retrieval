@@ -19,10 +19,12 @@ def mse_loss(Y, Y_hat, **loss_fn_kwargs):
 
 def cross_entropy_loss(Y, Y_hat, **loss_fn_kwargs):
     
-    num_categories = list(loss_fn_kwargs.values())[0]
+    num_classes = loss_fn_kwargs['num_classes']
     
-    Y = jax.nn.one_hot(Y, num_classes=num_categories)
+    Y_hat = jax.nn.log_softmax(Y_hat)
     
-    loss = jnp.sum(Y * Y_lhat)
+    Y = jax.nn.one_hot(Y, num_classes=num_classes)
+    
+    loss = - jnp.sum(Y * Y_hat)
     
     return loss

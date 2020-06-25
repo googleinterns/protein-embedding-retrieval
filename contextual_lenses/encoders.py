@@ -13,6 +13,8 @@ import jax.numpy as jnp
 
 import numpy as np
 
+from operator import itemgetter
+
 
 def one_hot_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
   """Applies one-hot encoding from jax.nn."""
@@ -25,13 +27,13 @@ def one_hot_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
 class CNN(nn.Module):
   """A simple 1D CNN model."""
 
-  def apply(self, x, N_layers, N_features, N_kernel_sizes):
+  def apply(self, x, n_layers, n_features, n_kernel_sizes):
     
     x = jnp.expand_dims(x, axis=2)
 
-    for layer in range(N_layers):
-      features = N_features[layer]
-      kernel_size = (N_kernel_sizes[layer], 1)
+    for layer in range(n_layers):
+      features = n_features[layer]
+      kernel_size = (n_kernel_sizes[layer], 1)
       x = nn.Conv(x, features=features, kernel_size=kernel_size)
       x = nn.relu(x)
     
@@ -43,9 +45,11 @@ class CNN(nn.Module):
 def cnn_one_hot_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
   """Applies one-hot encoding followed by 1D CNN."""
 
+  n_layers, n_features, n_kernel_sizes = \
+    itemgetter('n_layers', 'n_features', 'n_kernel_sizes')(encoder_fn_kwargs)
+
   one_hots = one_hot_encoder(batch_inds, num_categories, **encoder_fn_kwargs)
-  N_layers, N_features, N_kernel_sizes = list(encoder_fn_kwargs.values())
-  cnn_one_hots = CNN(one_hots, N_layers, N_features, N_kernel_sizes)
+  cnn_one_hots = CNN(one_hots, n_layers, n_features, n_kernel_sizes)
   
   return cnn_one_hots
 
@@ -141,7 +145,8 @@ class AddPositionEmbs(nn.Module):
 def one_hot_pos_emb_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
   """Applies one-hot encoding with positional embeddings."""
   
-  max_len, posemb_init = list(encoder_fn_kwargs.values())
+  max_len, posemb_init = itemgetter('max_len', 'posemb_init')(encoder_fn_kwargs)
+
   one_hots = jax.nn.one_hot(batch_inds, num_classes=num_categories)
   one_hots_pos_emb = AddPositionEmbs(one_hots, max_len=max_len, posemb_init=posemb_init)
   
@@ -149,10 +154,12 @@ def one_hot_pos_emb_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
 
 
 def cnn_one_hot_pos_emb_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
-  """Applies one-hot encoding with opsitional embeddings followed by CNN."""
+  """Applies one-hot encoding with positional embeddings followed by CNN."""
 
-  N_layers, N_features, N_kernel_sizes, max_len, posemb_init = list(encoder_fn_kwargs.values())
+  n_layers, n_features, n_kernel_sizes, max_len, posemb_init = \
+    itemgetter('n_layers', 'n_features', 'n_kernel_sizes', 'max_len', 'posemb_init')(encoder_fn_kwargs)
+
   one_hots_pos_emb = one_hot_pos_emb_encoder(batch_inds, num_categories, max_len=max_len, posemb_init=posemb_init)
-  cnn_one_hots_pos_emb = CNN(one_hots_pos_emb, N_layers, N_features, N_kernel_sizes)
+  cnn_one_hots_pos_emb = CNN(one_hots_pos_emb, n_layers, n_features, n_kernel_sizes)
   
   return cnn_one_hots_pos_emb
