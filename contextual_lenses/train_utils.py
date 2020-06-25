@@ -6,6 +6,8 @@ General tools for instantiating and training models."""
 import flax
 from flax import nn
 from flax import optim
+from flax.training import checkpoints
+from flax.training import common_utils
 
 import jax
 from jax import random
@@ -42,15 +44,49 @@ def train_step(optimizer, X, Y, loss_fn, loss_fn_kwargs):
   return optimizer
 
 
-def train(model, train_data, loss_fn, loss_fn_kwargs, learning_rate=1e-4, weight_decay=0.1):
+def train(model, train_data, loss_fn, loss_fn_kwargs, learning_rate=1e-4, weight_decay=0.1,
+          restore_dir=None, save_dir=None):
   """Instantiates optimizer, applies train_step over training data.""" 
   
   optimizer = create_optimizer(model, learning_rate=learning_rate, weight_decay=weight_decay)
+
+  if restore_dir is not None:
+    optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
     
   for batch in iter(train_data):
     X, Y = batch
     optimizer = train_step(optimizer, X, Y, loss_fn, loss_fn_kwargs)
   
+  if save_dir is not None:
+    checkpoints.save_checkpoint(ckpt_dir=save_dir, target=optimizer, step=optimizer.state.step)
+
+  return optimizer
+
+
+p_train_step = jax.pmap(train_step, axis_name='batch', static_broadcasted_argnums=(3, 4))
+
+
+def p_train(model, train_data, loss_fn, loss_fn_kwargs, learning_rate=1e-4, weight_decay=0.1,
+            restore_dir = None, save_dir=None):
+  """Instantiates optimizer, applies p_train_step over training data.""" 
+  
+  optimizer = create_optimizer(model, learning_rate=learning_rate, weight_decay=weight_decay)
+  
+  if restore_dir is not None:
+    optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
+    
+  optimizer = optimizer.replicate()
+
+  for batch in iter(train_data):
+    X, Y = batch
+    X, Y = common_utils.shard(X), common_utils.shard(Y)
+    optimizer = p_train_step(optimizer, X, Y, loss_fn, loss_fn_kwargs)
+  
+  optimizer = optimizer.unreplicate()
+  
+  if save_dir is not None:
+    checkpoints.save_checkpoint(ckpt_dir=save_dir, target=optimizer, step=optimizer.state.step)
+
   return optimizer
 
 

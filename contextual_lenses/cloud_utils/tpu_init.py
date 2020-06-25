@@ -26,4 +26,3 @@ def connect_tpu(tpu_name=None):
         config.FLAGS.jax_backend_target = "grpc://" + ip_address + ':' + port
         
         print('Successfully connected to TPU named \"' + tpu_name + '\"!')
-        print()

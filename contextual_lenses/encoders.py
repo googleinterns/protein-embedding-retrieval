@@ -16,7 +16,7 @@ import numpy as np
 from operator import itemgetter
 
 
-def one_hot_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
+def one_hot_encoder(batch_inds, num_categories):
   """Applies one-hot encoding from jax.nn."""
 
   one_hots = jax.nn.one_hot(batch_inds, num_classes=num_categories)
@@ -42,13 +42,10 @@ class CNN(nn.Module):
     return x
 
 
-def cnn_one_hot_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
+def cnn_one_hot_encoder(batch_inds, num_categories, n_layers, n_features, n_kernel_sizes):
   """Applies one-hot encoding followed by 1D CNN."""
 
-  n_layers, n_features, n_kernel_sizes = \
-    itemgetter('n_layers', 'n_features', 'n_kernel_sizes')(encoder_fn_kwargs)
-
-  one_hots = one_hot_encoder(batch_inds, num_categories, **encoder_fn_kwargs)
+  one_hots = one_hot_encoder(batch_inds, num_categories)
   cnn_one_hots = CNN(one_hots, n_layers, n_features, n_kernel_sizes)
   
   return cnn_one_hots
@@ -142,22 +139,17 @@ class AddPositionEmbs(nn.Module):
       return inputs + jnp.take(pe[0], inputs_positions, axis=0)
 
 
-def one_hot_pos_emb_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
+def one_hot_pos_emb_encoder(batch_inds, num_categories, max_len, posemb_init):
   """Applies one-hot encoding with positional embeddings."""
   
-  max_len, posemb_init = itemgetter('max_len', 'posemb_init')(encoder_fn_kwargs)
-
   one_hots = jax.nn.one_hot(batch_inds, num_classes=num_categories)
   one_hots_pos_emb = AddPositionEmbs(one_hots, max_len=max_len, posemb_init=posemb_init)
   
   return one_hots_pos_emb
 
 
-def cnn_one_hot_pos_emb_encoder(batch_inds, num_categories=21, **encoder_fn_kwargs):
+def cnn_one_hot_pos_emb_encoder(batch_inds, num_categories, n_layers, n_features, n_kernel_sizes, max_len, posemb_init):
   """Applies one-hot encoding with positional embeddings followed by CNN."""
-
-  n_layers, n_features, n_kernel_sizes, max_len, posemb_init = \
-    itemgetter('n_layers', 'n_features', 'n_kernel_sizes', 'max_len', 'posemb_init')(encoder_fn_kwargs)
 
   one_hots_pos_emb = one_hot_pos_emb_encoder(batch_inds, num_categories, max_len=max_len, posemb_init=posemb_init)
   cnn_one_hots_pos_emb = CNN(one_hots_pos_emb, n_layers, n_features, n_kernel_sizes)

@@ -10,6 +10,7 @@ tpu_name, save_dir, restore_dir = parse_args()
 from cloud_utils.tpu_init import connect_tpu
 connect_tpu(tpu_name=tpu_name)
 
+
 import functools
 import itertools
 import os
@@ -39,7 +40,7 @@ import seaborn as sns
 from contextual_lenses import mean_pool, max_pool, \
 linear_max_pool, linear_mean_pool, gated_conv 
 
-from train_utils import create_optimizer, train, \
+from train_utils import create_optimizer, p_train, \
 create_representation_model
 
 from encoders import one_hot_encoder, cnn_one_hot_encoder, \
@@ -178,7 +179,7 @@ def evaluate(predict_fn, test_data, true_indexes, title, loss_fn_kwargs):
 
 """Experiments."""
 epochs = 1
-train_batches = create_data_iterator(train_df, batch_size=512, epochs=epochs)
+train_batches = create_data_iterator(train_df, batch_size=128*8, epochs=epochs, drop_remainder=True)
 test_batches = create_data_iterator(test_df, batch_size=512, buffer_size=1)
 lr = 1e-3
 wd = 0.
@@ -202,7 +203,7 @@ cnn_max_pool_model = create_representation_model(encoder_fn=encoder_fn,
                                                  num_categories=num_categories,
                                                  output_features=num_families)
 
-cnn_max_pool_optimizer = train(model=cnn_max_pool_model,
+cnn_max_pool_optimizer = p_train(model=cnn_max_pool_model,
                                train_data=train_batches,
                                loss_fn=cross_entropy_loss,
                                loss_fn_kwargs=loss_fn_kwargs,

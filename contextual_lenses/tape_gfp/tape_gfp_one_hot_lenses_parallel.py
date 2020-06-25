@@ -37,7 +37,7 @@ import seaborn as sns
 from contextual_lenses import mean_pool, max_pool, \
 linear_max_pool, linear_mean_pool, gated_conv 
 
-from train_utils import create_optimizer, train,\
+from train_utils import create_optimizer, p_train, \
 create_representation_model
 
 from encoders import one_hot_encoder, cnn_one_hot_encoder, \
@@ -173,7 +173,7 @@ def evaluate(predict_fn, test_data, true_fluorescences, plot_title):
 
 """One-hot + positional embeddings + CNN + GatedConv lens."""
 epochs = 50
-train_batches = create_data_iterator(train_df, batch_size=256, epochs=epochs)
+train_batches = create_data_iterator(train_df, batch_size=64*8, epochs=epochs, drop_remainder=True)
 test_batches = create_data_iterator(test_df, batch_size=256, buffer_size=1)
 lr = 1e-3
 wd = 0.
@@ -203,14 +203,14 @@ cnn_pos_emb_gated_conv_model = create_representation_model(encoder_fn=encoder_fn
                                                            num_categories=21,
                                                            output_features=1)
 
-cnn_pos_emb_gated_conv_optimizer = train(model=cnn_pos_emb_gated_conv_model,
-                                         train_data=train_batches,
-                                         loss_fn=mse_loss,
-                                         loss_fn_kwargs=loss_fn_kwargs,
-                                         learning_rate=lr,
-                                         weight_decay=wd,
-                                         restore_dir=restore_dir,
-                                         save_dir=save_dir)
+cnn_pos_emb_gated_conv_optimizer = p_train(model=cnn_pos_emb_gated_conv_model,
+                                           train_data=train_batches,
+                                           loss_fn=mse_loss,
+                                           loss_fn_kwargs=loss_fn_kwargs,
+                                           learning_rate=lr,
+                                           weight_decay=wd,
+                                           restore_dir=restore_dir,
+                                           save_dir=save_dir)
 
 del cnn_pos_emb_gated_conv_model
 

@@ -16,7 +16,7 @@ import numpy as np
 from operator import itemgetter
 
 
-def max_pool(x, padding_mask=None, **reduce_fn_kwargs):
+def max_pool(x, padding_mask=None):
   """Apply padding, take maximum over sequence length axis."""
 
   if padding_mask is not None:
@@ -29,7 +29,7 @@ def max_pool(x, padding_mask=None, **reduce_fn_kwargs):
   return rep
 
 
-def mean_pool(x, padding_mask=None, **reduce_fn_kwargs):
+def mean_pool(x, padding_mask=None):
   """Apply padding, take mean over sequence length axis."""
 
   if padding_mask is not None:
@@ -41,12 +41,10 @@ def mean_pool(x, padding_mask=None, **reduce_fn_kwargs):
   return rep
 
 
-def linear_max_pool(x, padding_mask=None, **reduce_fn_kwargs):
+def linear_max_pool(x, rep_size, padding_mask=None):
   """Apply linear transformation + ReLU, apply padding,
      take maximum over sequence length."""
   
-  rep_size = reduce_fn_kwargs['rep_size']
-
   x = nn.Dense(
         x,
         rep_size,
@@ -60,12 +58,10 @@ def linear_max_pool(x, padding_mask=None, **reduce_fn_kwargs):
   return rep
 
 
-def linear_mean_pool(x, padding_mask=None, **reduce_fn_kwargs):
+def linear_mean_pool(x, rep_size, padding_mask=None):
   """Apply linear transformation + ReLU, apply padding,
      take mean over sequence length."""
-  
-  rep_size = reduce_fn_kwargs['rep_size']
-  
+    
   x = nn.Dense(
         x,
         rep_size,
@@ -83,7 +79,7 @@ class GatedConv(nn.Module):
   """Gated Convolutional lens followed by max pooling,
      see original paper for details."""
 
-  def apply(self, x, rep_size, m_layers, m_kernel_sizes, conv_rep_size, padding_mask=None):
+  def apply(self, x, rep_size, m_layers, m_features, m_kernel_sizes, conv_rep_size, padding_mask=None):
         
     H_0 = nn.relu(nn.Dense(x, conv_rep_size))
     G_0 = nn.relu(nn.Dense(x, conv_rep_size))
@@ -117,13 +113,10 @@ class GatedConv(nn.Module):
     return rep
 
 
-def gated_conv(x, padding_mask=None, **reduce_fn_kwargs):
+def gated_conv(x, rep_size, m_layers, m_features, m_kernel_sizes, conv_rep_size, padding_mask=None):
   """Calls GatedConv method for use as a lens."""
 
-  rep_size, m_layers, m_features, m_kernel_sizes, conv_rep_size = \
-      itemgetter('rep_size', 'm_layers', 'm_features', 'm_kernel_sizes', 'conv_rep_size')(reduce_fn_kwargs)
-
-  rep = GatedConv(x, rep_size=rep_size, m_layers=m_layers, m_kernel_sizes=m_kernel_sizes, 
+  rep = GatedConv(x, rep_size=rep_size, m_features=m_features, m_layers=m_layers, m_kernel_sizes=m_kernel_sizes, 
                   conv_rep_size=conv_rep_size, padding_mask=padding_mask)
   
   return rep
