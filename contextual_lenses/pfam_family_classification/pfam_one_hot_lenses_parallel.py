@@ -178,7 +178,7 @@ def evaluate(predict_fn, test_data, true_indexes, title, loss_fn_kwargs):
 
 
 """Experiments."""
-epochs = 1
+epochs = 100
 train_batches = create_data_iterator(train_df, batch_size=128*8, epochs=epochs, drop_remainder=True)
 test_batches = create_data_iterator(test_df, batch_size=512, buffer_size=1)
 lr = 1e-3
