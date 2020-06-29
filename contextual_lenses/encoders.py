@@ -1,6 +1,7 @@
 """Encoder functions
 
-Fixed and learnable transformations for embedding sequences."""
+Fixed and learnable transformations for embedding sequences.
+"""
 
 
 import flax
@@ -51,8 +52,8 @@ def cnn_one_hot_encoder(batch_inds, num_categories, n_layers, n_features, n_kern
   return cnn_one_hots
 
 
-"""Positional embeddings
-Code source: https://github.com/google/flax/blob/aff10f032e892e28a1acf4dd4ee9dcc6cd39a606/examples/wmt/models.py."""
+# Positional embeddings
+# Code source: https://github.com/google/flax/blob/aff10f032e892e28a1acf4dd4ee9dcc6cd39a606/examples/wmt/models.py.
 def sinusoidal_init(max_len=2048,
                     min_scale=1.0,
                     max_scale=10000.0):

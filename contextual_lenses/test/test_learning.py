@@ -453,6 +453,8 @@ tests = (test1,
 
 
 class TestLearning(parameterized.TestCase):
+  """Abstract method for testing synthetic learning of encoders and lenses."""
+
   @parameterized.named_parameters(
       *tests
   )

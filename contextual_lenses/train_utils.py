@@ -1,6 +1,7 @@
 """Train utils
 
-General tools for instantiating and training models."""
+General tools for instantiating and training models.
+"""
 
 
 import flax
@@ -14,9 +15,30 @@ from jax import random
 import jax.nn
 import jax.numpy as jnp
 
+import tensorflow as tf
+
 import numpy as np
 
 import functools
+
+
+
+# Data batching.
+def create_data_iterator(df, input_col, output_col, batch_size, epochs=1, buffer_size=None, seed=0, drop_remainder=False):
+
+  if buffer_size is None:
+    buffer_size = len(df)
+
+  inputs = list(df[input_col].values)
+  inputs = tf.data.Dataset.from_tensor_slices(inputs)
+
+  outputs = df[output_col].values
+  outputs = tf.data.Dataset.from_tensor_slices(outputs)
+
+  batches = tf.data.Dataset.zip((inputs, outputs)).shuffle(buffer_size=buffer_size, seed=seed)
+  batches = batches.repeat(epochs).batch(batch_size=batch_size, drop_remainder=drop_remainder).as_numpy_iterator()
+
+  return batches
 
 
 def create_optimizer(model, learning_rate, weight_decay):
@@ -44,45 +66,38 @@ def train_step(optimizer, X, Y, loss_fn, loss_fn_kwargs):
   return optimizer
 
 
+def get_p_train_step():
+    """Wraps train_step with jax.pmap."""
+    
+    p_train_step = jax.pmap(train_step, axis_name='batch', static_broadcasted_argnums=(3, 4))
+    
+    return p_train_step
+
+
 def train(model, train_data, loss_fn, loss_fn_kwargs, learning_rate=1e-4, weight_decay=0.1,
-          restore_dir=None, save_dir=None):
-  """Instantiates optimizer, applies train_step over training data.""" 
+          restore_dir=None, save_dir=None, use_pmap=False):
+  """Instantiates optimizer, applies train_step/p_train_step over training data.""" 
   
   optimizer = create_optimizer(model, learning_rate=learning_rate, weight_decay=weight_decay)
 
   if restore_dir is not None:
     optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
-    
-  for batch in iter(train_data):
-    X, Y = batch
-    optimizer = train_step(optimizer, X, Y, loss_fn, loss_fn_kwargs)
+
+  if use_pmap:
+    p_train_step = get_p_train_step()
+    optimizer = optimizer.replicate()
+
+    for batch in iter(train_data):
+      X, Y = batch
+      X, Y = common_utils.shard(X), common_utils.shard(Y)
+      optimizer = p_train_step(optimizer, X, Y, loss_fn, loss_fn_kwargs)
+
+    optimizer = optimizer.unreplicate()
   
-  if save_dir is not None:
-    checkpoints.save_checkpoint(ckpt_dir=save_dir, target=optimizer, step=optimizer.state.step)
-
-  return optimizer
-
-
-p_train_step = jax.pmap(train_step, axis_name='batch', static_broadcasted_argnums=(3, 4))
-
-
-def p_train(model, train_data, loss_fn, loss_fn_kwargs, learning_rate=1e-4, weight_decay=0.1,
-            restore_dir = None, save_dir=None):
-  """Instantiates optimizer, applies p_train_step over training data.""" 
-  
-  optimizer = create_optimizer(model, learning_rate=learning_rate, weight_decay=weight_decay)
-  
-  if restore_dir is not None:
-    optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
-    
-  optimizer = optimizer.replicate()
-
-  for batch in iter(train_data):
-    X, Y = batch
-    X, Y = common_utils.shard(X), common_utils.shard(Y)
-    optimizer = p_train_step(optimizer, X, Y, loss_fn, loss_fn_kwargs)
-  
-  optimizer = optimizer.unreplicate()
+  else: 
+    for batch in iter(train_data):
+      X, Y = batch
+      optimizer = train_step(optimizer, X, Y, loss_fn, loss_fn_kwargs)
   
   if save_dir is not None:
     checkpoints.save_checkpoint(ckpt_dir=save_dir, target=optimizer, step=optimizer.state.step)
@@ -95,7 +110,8 @@ class RepresentationModel(nn.Module):
   def apply(self, x, encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs,
             num_categories, output_features):
     """Computes padding mask, encodes indices using embeddings, 
-       applies lensing operation, predicts scalar value."""
+       applies lensing operation, predicts scalar value.
+    """
 
     padding_mask = jnp.expand_dims(jnp.where(x < num_categories-1, 1, 0), axis=2)
 
@@ -123,13 +139,13 @@ def create_representation_model(encoder_fn, encoder_fn_kwargs, reduce_fn, reduce
                                        output_features=output_features)
   
   _, initial_params = RepresentationModel.init_by_shape(key,
-                                                     input_specs=[((1, 1), jnp.float32)],
-                                                     encoder_fn=encoder_fn,
-                                                     encoder_fn_kwargs=encoder_fn_kwargs,
-                                                     reduce_fn=reduce_fn,
-                                                     reduce_fn_kwargs=reduce_fn_kwargs,
-                                                     num_categories=num_categories,
-                                                     output_features=output_features)
+                                                        input_specs=[((1, 1), jnp.float32)],
+                                                        encoder_fn=encoder_fn,
+                                                        encoder_fn_kwargs=encoder_fn_kwargs,
+                                                        reduce_fn=reduce_fn,
+                                                        reduce_fn_kwargs=reduce_fn_kwargs,
+                                                        num_categories=num_categories,
+                                                        output_features=output_features)
   
   model = nn.Model(module, initial_params)
   

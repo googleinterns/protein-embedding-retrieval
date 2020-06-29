@@ -1,7 +1,8 @@
 """Contextual lenses
-
+    
 Creates sequence length independent representation of embedded sequences
-Original paper: https://arxiv.org/pdf/2002.08866.pdf."""
+Original paper: https://arxiv.org/pdf/2002.08866.pdf.
+"""
 
 
 import flax
@@ -16,12 +17,12 @@ import numpy as np
 from operator import itemgetter
 
 
-def max_pool(x, padding_mask=None):
+def max_pool(x, padding_mask=None, pad_constant=1e8):
   """Apply padding, take maximum over sequence length axis."""
 
   if padding_mask is not None:
     x = x * padding_mask
-    neg_mask = - 999999. * (1 - padding_mask)
+    neg_mask = - pad_constant * (1 - padding_mask)
     x = x + neg_mask
    
   rep = jnp.max(x, axis=-2)
@@ -43,7 +44,8 @@ def mean_pool(x, padding_mask=None):
 
 def linear_max_pool(x, rep_size, padding_mask=None):
   """Apply linear transformation + ReLU, apply padding,
-     take maximum over sequence length."""
+     take maximum over sequence length.
+  """
   
   x = nn.Dense(
         x,
@@ -60,7 +62,8 @@ def linear_max_pool(x, rep_size, padding_mask=None):
 
 def linear_mean_pool(x, rep_size, padding_mask=None):
   """Apply linear transformation + ReLU, apply padding,
-     take mean over sequence length."""
+     take mean over sequence length.
+  """
     
   x = nn.Dense(
         x,
@@ -77,7 +80,8 @@ def linear_mean_pool(x, rep_size, padding_mask=None):
 
 class GatedConv(nn.Module):
   """Gated Convolutional lens followed by max pooling,
-     see original paper for details."""
+     see original paper for details.
+  """
 
   def apply(self, x, rep_size, m_layers, m_features, m_kernel_sizes, conv_rep_size, padding_mask=None):
         

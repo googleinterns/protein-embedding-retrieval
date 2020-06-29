@@ -1,4 +1,4 @@
-"""Tests for contextual_lenses.py."""
+"""Tests for mean and max pool reduce functions."""
 
 
 import jax
@@ -111,6 +111,7 @@ tests = (test1,
 
 class TestPooling(parameterized.TestCase):
   """Abstract method for testing mean and max pool reduce functions."""
+  
   @parameterized.parameters(
       *tests
   )
