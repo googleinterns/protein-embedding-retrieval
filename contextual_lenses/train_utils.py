@@ -108,7 +108,7 @@ def train(model, train_data, loss_fn, loss_fn_kwargs, learning_rate=1e-4, weight
 class RepresentationModel(nn.Module):
 
   def apply(self, x, encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs,
-            num_categories, output_features):
+            num_categories, output_features, embed=False):
     """Computes padding mask, encodes indices using embeddings, 
        applies lensing operation, predicts scalar value.
     """
@@ -119,6 +119,9 @@ class RepresentationModel(nn.Module):
 
     rep = reduce_fn(x, padding_mask=padding_mask, **reduce_fn_kwargs)
 
+    if embed:
+      return rep
+    
     out = nn.Dense(rep,
                    output_features,
                    kernel_init=nn.initializers.xavier_uniform(),
@@ -128,7 +131,7 @@ class RepresentationModel(nn.Module):
 
 
 def create_representation_model(encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs,
-                                num_categories, output_features, key=random.PRNGKey(0)):
+                                num_categories, output_features, embed=False, key=random.PRNGKey(0)):
   """Instantiates a RepresentationModel object."""
 
   module = RepresentationModel.partial(encoder_fn=encoder_fn,
@@ -136,7 +139,8 @@ def create_representation_model(encoder_fn, encoder_fn_kwargs, reduce_fn, reduce
                                        reduce_fn=reduce_fn,
                                        reduce_fn_kwargs=reduce_fn_kwargs,
                                        num_categories=num_categories,
-                                       output_features=output_features)
+                                       output_features=output_features,
+                                       embed=embed)
   
   _, initial_params = RepresentationModel.init_by_shape(key,
                                                         input_specs=[((1, 1), jnp.float32)],
@@ -145,7 +149,8 @@ def create_representation_model(encoder_fn, encoder_fn_kwargs, reduce_fn, reduce
                                                         reduce_fn=reduce_fn,
                                                         reduce_fn_kwargs=reduce_fn_kwargs,
                                                         num_categories=num_categories,
-                                                        output_features=output_features)
+                                                        output_features=output_features,
+                                                        embed=embed)
   
   model = nn.Model(module, initial_params)
   

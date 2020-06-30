@@ -22,10 +22,12 @@ from loss_fns import cross_entropy_loss
 from pfam_utils import create_train_batches, evaluate
 
 
-# Global variables.
+# Load family IDs.
 family_ids = open('pfam_family_ids.txt', 'r').readlines()
 num_families = len(family_ids)
 
+
+# Specify families for lens training.
 train_family_accessions = []
 test_family_accessions = []
 for i in range(1, 101):
@@ -36,14 +38,14 @@ for i in range(1, 101):
 
 # CNN + max pool.
 epochs = 100
-train_batches = create_train_batches(train_family_accessions=train_family_accessions, batch_size=256,
+train_batches = create_train_batches(train_family_accessions=train_family_accessions, batch_size=512,
                                      epochs=epochs, drop_remainder=True)
 lr = 1e-3
 wd = 0.
 encoder_fn = cnn_one_hot_encoder
 encoder_fn_kwargs = {
     'n_layers': 1,
-    'n_features': [512],
+    'n_features': [1024],
     'n_kernel_sizes': [12]
 }
 reduce_fn = max_pool

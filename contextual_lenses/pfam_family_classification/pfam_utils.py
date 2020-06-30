@@ -1,4 +1,4 @@
-"""Utils for TAPE GFP experiments."""
+"""Utils for Pfam family classification experiments."""
 
 import os 
 
@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import scipy.stats
 
 import sklearn.metrics
+from sklearn.neighbors import KNeighborsClassifier as knn
 
 from train_utils import create_data_iterator
 
@@ -147,4 +148,46 @@ def evaluate(predict_fn, test_family_accessions, title, loss_fn_kwargs, batch_si
   }
 
   return results, pred_indexes
+
+
+def compute_embeddings(encoder, data_batches):
+  """Computes sequence embeddings according to a specified encoder."""
+
+  vectors = []
+  for batch in iter(data_batches):
+    X, Y = batch
+    X_embedded = encoder(X)
+    for vec in np.array(X_embedded):
+      vectors.append(vec)
+  vectors = np.array(vectors)
+
+  return vectors
+
+
+def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test_family_accessions, 
+                                          batch_size=512, n_neighbors=1):
+  """Nearest neighbors classification on Pfam families using specified encoder."""
+
+  train_df = create_train_df(train_family_accessions)
+  train_indexes = train_df['index'].values
+  train_batches = create_train_batches(train_family_accessions, batch_size=batch_size, buffer_size=1)
+  
+  test_df = create_test_df(test_family_accessions)
+  test_indexes = test_df['index'].values
+  test_batches = create_test_batches(test_family_accessions, batch_size=batch_size)
+
+  train_vectors = compute_embeddings(encoder, train_batches)
+  test_vectors = compute_embeddings(encoder, test_batches)
+
+  knn_classifier = knn(n_neighbors=n_neighbors)
+  knn_classifier.fit(train_vectors, train_indexes)
+  knn_predictions = knn_classifier.predict(test_vectors)
+
+  knn_accuracy = sklearn.metrics.accuracy_score(test_indexes, knn_predictions)
+
+  results = {
+    str(n_neighbors)+"-nn accuracy": knn_accuracy
+  }
+
+  return results, knn_predictions, knn_classifier
 
