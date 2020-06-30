@@ -69,7 +69,7 @@ if restore_dir is not None:
   optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
 
 
-# Lens training: PF00001 - PF00100, NN training: PF00001 - PF00100
+# Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00100
 train_family_accessions = []
 test_family_accessions = []
 for i in range(1, 101):
@@ -79,14 +79,15 @@ for i in range(1, 101):
 
 results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
 											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions)[0]
+											    test_family_accessions=test_family_accessions,
+                                                train_samples=1)[0]
 
-print("Lens training: PF00001 - PF00100, NN training: PF00001 - PF00100")
+print("Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00100")
 print(results)
 print()
 
 
-# Lens training: PF00001 - PF00100, NN training: PF00101 - PF00200
+# Lens training: PF00001 - PF00100, restricted NN training: PF00101 - PF00200
 train_family_accessions = []
 test_family_accessions = []
 for i in range(101, 201):
@@ -96,14 +97,15 @@ for i in range(101, 201):
 
 results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
 											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions)[0]
+											    test_family_accessions=test_family_accessions,
+                                                train_samples=1)[0]
 
-print("Lens training: PF00001 - PF00100, NN training: PF00101 - PF00200")
+print("Lens training: PF00001 - PF00100, restricted NN training: PF00101 - PF00200")
 print(results)
 print()
 
 
-# Lens training: PF00001 - PF00100, NN training: PF00001 - PF00200
+# Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00200
 train_family_accessions = []
 test_family_accessions = []
 for i in range(1, 201):
@@ -113,14 +115,15 @@ for i in range(1, 201):
 
 results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
 											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions)[0]
+											    test_family_accessions=test_family_accessions,
+                                                train_samples=1)[0]
 
-print("Lens training: PF00001 - PF00100, NN training: PF00001 - PF00200")
+print("Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00200")
 print(results)
 print()
 
 
-# Lens training: PF00001 - PF00100, NN training: PF00001 - PF00400
+# Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00400
 train_family_accessions = []
 test_family_accessions = []
 for i in range(1, 401):
@@ -130,8 +133,9 @@ for i in range(1, 401):
 
 results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
 											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions)[0]
+											    test_family_accessions=test_family_accessions,
+                                                train_samples=1)[0]
 
-print("Lens training: PF00001 - PF00100, NN training: PF00001 - PF00400")
+print("Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00400")
 print(results)
 print()

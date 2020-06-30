@@ -1,4 +1,4 @@
-"""Contextual lenses on Pfam family classification dataset."""
+"""Contextual lenses on Pfam family classification dataset (first 100 families)."""
 
 
 # Parse command line arguments.
@@ -19,15 +19,13 @@ one_hot_pos_emb_encoder, cnn_one_hot_pos_emb_encoder
 
 from loss_fns import cross_entropy_loss
 
-from pfam_utils import create_train_batches, evaluate
+from pfam_utils import create_pfam_batches, pfam_evaluate
 
 
-# Load family IDs.
+# Global variables.
 family_ids = open('pfam_family_ids.txt', 'r').readlines()
 num_families = len(family_ids)
 
-
-# Specify families for lens training.
 train_family_accessions = []
 test_family_accessions = []
 for i in range(1, 101):
@@ -38,8 +36,8 @@ for i in range(1, 101):
 
 # CNN + max pool.
 epochs = 100
-train_batches = create_train_batches(train_family_accessions=train_family_accessions, batch_size=512,
-                                     epochs=epochs, drop_remainder=True)
+train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=512, 
+                                                   epochs=epochs, drop_remainder=True)
 lr = 1e-3
 wd = 0.
 encoder_fn = cnn_one_hot_encoder
@@ -72,10 +70,10 @@ cnn_max_pool_optimizer = train(model=cnn_max_pool_model,
                                save_dir=save_dir,
                                use_pmap=use_pmap)
 
-cnn_max_pool_results, cnn_max_pool_preds = evaluate(predict_fn=cnn_max_pool_optimizer.target,
-                                                    test_family_accessions=test_family_accessions,
-                                                    title='CNN + Max Pool',
-                                                    loss_fn_kwargs=loss_fn_kwargs,
-                                                    batch_size=512)
+cnn_max_pool_results, cnn_max_pool_preds = pfam_evaluate(predict_fn=cnn_max_pool_optimizer.target,
+                                                         test_family_accessions=test_family_accessions,
+                                                         title='CNN + Max Pool',
+                                                         loss_fn_kwargs=loss_fn_kwargs,
+                                                         batch_size=512)
 
 print(cnn_max_pool_results)

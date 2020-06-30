@@ -68,59 +68,48 @@ family_id_to_index = {}
 for i, family_id in enumerate(family_ids):
   family_id_to_index[family_id.replace('\n', '')] = i
 
-def create_train_df(train_family_accessions):
-  """Processes train data into a featurized dataframe."""
 
-  train_df = read_all_shards('train')
-  train_df['mod_family_accession'] = train_df.family_accession.apply(lambda x: mod_family_accession(x))
-  train_df = train_df[train_df.mod_family_accession.isin(train_family_accessions)]
-  train_df['index'] = train_df.family_id.apply(lambda x: family_id_to_index[x])
-  train_df['one_hot_inds'] = train_df.sequence.apply(lambda x: residues_to_one_hot_inds(pad_seq(x)))
+def create_pfam_df(family_accessions, test=False):
+  """Processes Pfam data into a featurized dataframe."""
 
-  return train_df
+  if test:
+    pfam_df = read_all_shards('test')
+  else:
+    pfam_df = read_all_shards('train')
 
-def create_test_df(test_family_accessions):
-  """Processes test data into a featurized dataframe."""
+  pfam_df['mod_family_accession'] = pfam_df.family_accession.apply(lambda x: mod_family_accession(x))
+  pfam_df = pfam_df[pfam_df.mod_family_accession.isin(family_accessions)]
+  pfam_df['index'] = pfam_df.family_id.apply(lambda x: family_id_to_index[x])
+  pfam_df['one_hot_inds'] = pfam_df.sequence.apply(lambda x: residues_to_one_hot_inds(pad_seq(x)))
 
-  test_df = read_all_shards('test')
-  test_df['mod_family_accession'] = test_df.family_accession.apply(lambda x: mod_family_accession(x))
-  test_df = test_df[test_df.mod_family_accession.isin(test_family_accessions)]
-  test_df['index'] = test_df.family_id.apply(lambda x: family_id_to_index[x])
-  test_df['one_hot_inds'] = test_df.sequence.apply(lambda x: residues_to_one_hot_inds(pad_seq(x)))
-
-  return test_df
-
-def create_train_batches(train_family_accessions, batch_size, epochs=1, buffer_size=None, seed=0, drop_remainder=False):
-  """Creates iterable object of train batches."""
-
-  train_df = create_train_df(train_family_accessions)
-
-  train_batches = create_data_iterator(df=train_df, input_col='one_hot_inds', output_col='index',
-	  								   batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
-	  								   seed=seed, drop_remainder=drop_remainder)
-
-  return train_batches
+  return pfam_df
 
 
-def create_test_batches(test_family_accessions, batch_size, epochs=1, buffer_size=1, seed=0, drop_remainder=False):
-  """Creates iterable object of test batches."""
+def create_pfam_batches(family_accessions, batch_size, test=False, samples=None, epochs=1,
+                        drop_remainder=False, buffer_size=None, seed=0, random_state=0):
+  """Creates iterable object of Pfam data batches."""
 
-  test_df = create_test_df(test_family_accessions)
+  pfam_df = create_pfam_df(family_accessions, test=test)
+    
+  if samples is not None:
+    pfam_df = pfam_df.sample(frac=1, replace=False, random_state=random_state)
+    pfam_df = pfam_df.groupby('mod_family_accession').head(samples).reset_index()
+  
+  pfam_indexes = pfam_df['index'].values
 
-  test_batches = create_data_iterator(df=test_df, input_col='one_hot_inds', output_col='index',
-	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size,
+  pfam_batches = create_data_iterator(df=pfam_df, input_col='one_hot_inds', output_col='index',
+	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
 	  								  seed=seed, drop_remainder=drop_remainder)
 
-  return test_batches
+  return pfam_batches, pfam_indexes
 
 
 # Model evaluation.
-def evaluate(predict_fn, test_family_accessions, title, loss_fn_kwargs, batch_size=512):
+def pfam_evaluate(predict_fn, test_family_accessions, title, loss_fn_kwargs, batch_size=512):
   """Computes predicted family ids and measures performance in cross entropy and accuracy."""
 
-  test_df = create_test_df(test_family_accessions)
-  test_indexes = test_df['index'].values
-  test_batches = create_test_batches(test_family_accessions=test_family_accessions, batch_size=batch_size)
+  test_batches, test_indexes = create_pfam_batches(family_accessions=test_family_accessions, 
+                                                   batch_size=batch_size, test=True, buffer_size=1)
 
   pred_indexes = []
   cross_entropy = 0.
@@ -164,17 +153,14 @@ def compute_embeddings(encoder, data_batches):
   return vectors
 
 
-def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test_family_accessions, 
-                                          batch_size=512, n_neighbors=1):
+def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test_family_accessions, batch_size=512, 
+                                          n_neighbors=1, train_samples=None, test_samples=None, restricted=False):
   """Nearest neighbors classification on Pfam families using specified encoder."""
 
-  train_df = create_train_df(train_family_accessions)
-  train_indexes = train_df['index'].values
-  train_batches = create_train_batches(train_family_accessions, batch_size=batch_size, buffer_size=1)
-  
-  test_df = create_test_df(test_family_accessions)
-  test_indexes = test_df['index'].values
-  test_batches = create_test_batches(test_family_accessions, batch_size=batch_size)
+  train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=batch_size,
+                                                     samples=train_samples, buffer_size=1)
+  test_batches, test_indexes = create_pfam_batches(family_accessions=test_family_accessions, batch_size=batch_size, 
+                                                   test=True, samples=test_samples, buffer_size=1)
 
   train_vectors = compute_embeddings(encoder, train_batches)
   test_vectors = compute_embeddings(encoder, test_batches)
