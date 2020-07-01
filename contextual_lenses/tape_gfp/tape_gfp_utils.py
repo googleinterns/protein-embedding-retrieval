@@ -99,38 +99,41 @@ def gfp_evaluate(predict_fn, title, batch_size=256):
   
   spearmanr = scipy.stats.spearmanr(test_fluorescences, pred_fluorescences).correlation
   mse = sklearn.metrics.mean_squared_error(test_fluorescences, pred_fluorescences)
-  plt.scatter(test_fluorescences, pred_fluorescences)
+  plt.scatter(test_fluorescences, pred_fluorescences, s=1, alpha=0.5)
   plt.xlabel('True Fluorescences')
   plt.ylabel('Predicted Fluorescences')
   plt.title(title)
-  plt.savefig('figures/' + title.replace(' ', '').replace('+', ''))
+  plt.savefig('tape_gfp_figures/' + title.replace(' ', '').replace('+', ''))
   plt.show()
+  plt.clf()
 
   bright_inds = np.where(test_fluorescences > 2.5)
   bright_test_fluorescences = test_fluorescences[bright_inds]
   bright_pred_fluorescences = pred_fluorescences[bright_inds]
   bright_spearmanr = scipy.stats.spearmanr(bright_test_fluorescences, bright_pred_fluorescences).correlation
   bright_mse = sklearn.metrics.mean_squared_error(bright_test_fluorescences, bright_pred_fluorescences)
-  plt.scatter(bright_test_fluorescences, bright_pred_fluorescences)
+  plt.scatter(bright_test_fluorescences, bright_pred_fluorescences, s=1, alpha=0.5)
   plt.xlabel('True Fluorescences')
   plt.ylabel('Predicted Fluorescences')
   bright_title = title + ' (Bright)'
   plt.title(bright_title)
-  plt.savefig('figures/' + bright_title.replace(' ', '').replace('+', ''))
+  plt.savefig('tape_gfp_figures/' + bright_title.replace(' ', '').replace('+', ''))
   plt.show()
+  plt.clf()
 
   dark_inds = np.where(test_fluorescences < 2.5)
   dark_test_fluorescences = test_fluorescences[dark_inds]
   dark_pred_fluorescences = pred_fluorescences[dark_inds]
   dark_spearmanr = scipy.stats.spearmanr(dark_test_fluorescences, dark_pred_fluorescences).correlation
   dark_mse = sklearn.metrics.mean_squared_error(dark_test_fluorescences, dark_pred_fluorescences)
-  plt.scatter(dark_test_fluorescences, dark_pred_fluorescences)
+  plt.scatter(dark_test_fluorescences, dark_pred_fluorescences, s=1, alpha=0.5)
   plt.xlabel('True Fluorescences')
   plt.ylabel('Predicted Fluorescences')
   dark_title = title + ' (Dark)'
   plt.title(dark_title)
-  plt.savefig('figures/' + dark_title.replace(' ', '').replace('+', ''))
+  plt.savefig('tape_gfp_figures/' + dark_title.replace(' ', '').replace('+', ''))
   plt.show()
+  plt.clf()
 
   results = {
       'title': title,

@@ -64,6 +64,74 @@ cnn_max_pool_model = create_representation_model(encoder_fn=encoder_fn,
 optimizer = create_optimizer(cnn_max_pool_model, learning_rate=0., weight_decay=0.)
 
 
+# Lens training: None, NN training: PF00001 - PF00100
+train_family_accessions = []
+test_family_accessions = []
+for i in range(1, 101):
+  family_name = 'PF%05d' % i
+  train_family_accessions.append(family_name)
+  test_family_accessions.append(family_name)
+
+results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
+											    train_family_accessions=train_family_accessions, 
+											    test_family_accessions=test_family_accessions)[0]
+
+print("Lens training: None, NN training: PF00001 - PF00100")
+print(results)
+print()
+
+
+# Lens training: None, NN training: PF00101 - PF00200
+train_family_accessions = []
+test_family_accessions = []
+for i in range(101, 201):
+  family_name = 'PF%05d' % i
+  train_family_accessions.append(family_name)
+  test_family_accessions.append(family_name)
+
+results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
+											    train_family_accessions=train_family_accessions, 
+											    test_family_accessions=test_family_accessions)[0]
+
+print("Lens training: None, NN training: PF00101 - PF00200")
+print(results)
+print()
+
+
+# Lens training: None, NN training: PF00001 - PF00200
+train_family_accessions = []
+test_family_accessions = []
+for i in range(1, 201):
+  family_name = 'PF%05d' % i
+  train_family_accessions.append(family_name)
+  test_family_accessions.append(family_name)
+
+results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
+											    train_family_accessions=train_family_accessions, 
+											    test_family_accessions=test_family_accessions)[0]
+
+print("Lens training: None, NN training: PF00001 - PF00200")
+print(results)
+print()
+
+
+# Lens training: None, NN training: PF00001 - PF00400
+train_family_accessions = []
+test_family_accessions = []
+for i in range(1, 401):
+  family_name = 'PF%05d' % i
+  train_family_accessions.append(family_name)
+  test_family_accessions.append(family_name)
+
+results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
+											    train_family_accessions=train_family_accessions, 
+											    test_family_accessions=test_family_accessions)[0]
+
+print("Lens training: None, NN training: PF00001 - PF00400")
+print(results)
+print()
+
+
 # Restore optimizer from checkpoint. 
 if restore_dir is not None:
   optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)

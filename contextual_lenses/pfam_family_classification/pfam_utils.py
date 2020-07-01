@@ -172,7 +172,9 @@ def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test
   knn_accuracy = sklearn.metrics.accuracy_score(test_indexes, knn_predictions)
 
   results = {
-    str(n_neighbors)+"-nn accuracy": knn_accuracy
+    str(n_neighbors)+"-nn accuracy": knn_accuracy,
+    'train_samples': train_samples,
+    'test_samples': test_samples
   }
 
   return results, knn_predictions, knn_classifier
