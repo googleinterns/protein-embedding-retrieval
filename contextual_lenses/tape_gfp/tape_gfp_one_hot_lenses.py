@@ -21,12 +21,12 @@ one_hot_pos_emb_encoder, cnn_one_hot_pos_emb_encoder
 
 from loss_fns import mse_loss
 
-from tape_gfp_utils import create_train_batches, evaluate
+from tape_gfp_utils import create_gfp_batches, gfp_evaluate
 
 
 # One-hot + positional embeddings + CNN + GatedConv lens.
 epochs = 50
-train_batches = create_train_batches(batch_size=256, epochs=epochs, drop_remainder=True)
+train_batches, train_fluorescences = create_gfp_batches(batch_size=256, epochs=epochs, drop_remainder=True)
 lr = 1e-3
 wd = 0.
 encoder_fn = cnn_one_hot_pos_emb_encoder
@@ -66,8 +66,9 @@ cnn_pos_emb_gated_conv_optimizer = train(model=cnn_pos_emb_gated_conv_model,
                                          use_pmap=use_pmap)
 
 cnn_pos_emb_gated_conv_results, cnn_pos_emb_gated_conv_pred_fluorescences = \
-  evaluate(predict_fn=cnn_pos_emb_gated_conv_optimizer.target,
-           title='OneHot + PosEmb + CNN + GatedConv',
-           batch_size=256)
+  gfp_evaluate(predict_fn=cnn_pos_emb_gated_conv_optimizer.target,
+               title='OneHot + PosEmb + CNN + GatedConv',
+               batch_size=256)
 
 print(cnn_pos_emb_gated_conv_results)
+
