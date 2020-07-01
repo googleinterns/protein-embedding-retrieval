@@ -20,11 +20,13 @@ from tape.tape.datasets import LMDBDataset
 
 # Data processing.
 def dataset_to_df(in_name):
-  """Uses TAPE LMDBDataset module to convert data set to pandas dataframe."""
+  """Uses TAPE LMDBDataset module to convert dataset to pandas dataframe."""
 
   dataset = LMDBDataset(in_name)
+  
   df = pd.DataFrame(list(dataset)[:])
   df['log_fluorescence'] = df.log_fluorescence.apply(lambda x: x[0])
+  
   return df
 
 
@@ -49,54 +51,43 @@ def residues_to_one_hot_inds(amino_acid_residues):
   
   return one_hot_inds
 
-def create_train_df():
-  """Processes train data into a featurized dataframe."""
 
-  train_df = dataset_to_df('tape/fluorescence/fluorescence_train.lmdb')
-  train_df['padded_primary'] = train_df.primary.apply(lambda x: pad_seq(x))
-  train_df['one_hot_inds'] = train_df.padded_primary.apply(lambda x: residues_to_one_hot_inds(x))
+def create_gfp_df(test=False):
+  """Processes GFP data into a featurized dataframe."""
+  
+  if test:
+    gfp_df = dataset_to_df('tape/fluorescence/fluorescence_test.lmdb')
+  else:
+    gfp_df = dataset_to_df('tape/fluorescence/fluorescence_train.lmdb')
+  
+  gfp_df['padded_primary'] = gfp_df.primary.apply(lambda x: pad_seq(x))
+  gfp_df['one_hot_inds'] = gfp_df.padded_primary.apply(lambda x: residues_to_one_hot_inds(x))
 
-  return train_df
+  return gfp_df
 
-def create_test_df():
-  """Processes test data into a featurized dataframe."""
 
-  test_df = dataset_to_df('tape/fluorescence/fluorescence_test.lmdb')
-  test_df['padded_primary'] = test_df.primary.apply(lambda x: pad_seq(x))
-  test_df['one_hot_inds'] = test_df.padded_primary.apply(lambda x: residues_to_one_hot_inds(x))
+def create_gfp_batches(batch_size, epochs=1, test=False, buffer_size=None, seed=0, drop_remainder=False):
+  """Creates iterable object of GFP batches."""
+  
+  if test:
+    buffer_size = 1
+  
+  gfp_df = create_gfp_df(test=test)
+    
+  fluorescences = gfp_df['log_fluorescence'].values
 
-  return test_df
+  gfp_batches = create_data_iterator(df=gfp_df, input_col='one_hot_inds', output_col='log_fluorescence',
+	  								 batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
+	  								 seed=seed, drop_remainder=drop_remainder)
 
-def create_train_batches(batch_size, epochs=1, buffer_size=None, seed=0, drop_remainder=False):
-  """Creates iterable object of train batches."""
-
-  train_df = create_train_df()
-
-  train_batches = create_data_iterator(df=train_df, input_col='one_hot_inds', output_col='log_fluorescence',
-	  								   batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
-	  								   seed=seed, drop_remainder=drop_remainder)
-
-  return train_batches
-
-def create_test_batches(batch_size, epochs=1, buffer_size=1, seed=0, drop_remainder=False):
-  """Creates iterable object of test batches."""
-
-  test_df = create_test_df()
-
-  test_batches = create_data_iterator(df=test_df, input_col='one_hot_inds', output_col='log_fluorescence',
-	  									batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
-	  									seed=seed, drop_remainder=drop_remainder)
-
-  return test_batches
+  return gfp_batches, fluorescences
 
 
 # Model evaluation.
-def evaluate(predict_fn, title, batch_size=256):
+def gfp_evaluate(predict_fn, title, batch_size=256):
   """Computes predicted fluorescences and measures performance in MSE and spearman correlation."""
-
-  test_df = create_test_df()
-  test_fluorescences = test_df['log_fluorescence'].values
-  test_batches = create_test_batches(batch_size=batch_size)
+  
+  test_batches, test_fluorescences = create_gfp_batches(batch_size=batch_size, test=True, buffer_size=1)
 
   pred_fluorescences = []
   for batch in iter(test_batches):
