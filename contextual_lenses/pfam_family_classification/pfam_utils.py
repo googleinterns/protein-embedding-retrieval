@@ -154,7 +154,7 @@ def compute_embeddings(encoder, data_batches):
 
 
 def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test_family_accessions, batch_size=512, 
-                                          n_neighbors=1, train_samples=None, test_samples=None, restricted=False):
+                                          n_neighbors=1, train_samples=None, test_samples=None):
   """Nearest neighbors classification on Pfam families using specified encoder."""
 
   train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=batch_size,
@@ -178,4 +178,26 @@ def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test
   }
 
   return results, knn_predictions, knn_classifier
+
+
+def train_and_test_knn_pfam_families(encoder, start, end, batch_size=512, n_neighbors=1,
+                                     train_samples=None, test_samples=None):
+  """Trains and tests k-NN on Pfam families with accession number >= start and <= end."""
+
+  train_family_accessions = []
+  test_family_accessions = []
+  for i in range(start, end+1):
+    family_name = 'PF%05d' % i
+    train_family_accessions.append(family_name)
+    test_family_accessions.append(family_name)
+
+  results = pfam_nearest_neighbors_classification(encoder=encoder, 
+              train_family_accessions=train_family_accessions, 
+              test_family_accessions=test_family_accessions,
+              batch_size=batch_size,
+              n_neighbors=n_neighbors,
+              train_samples=train_samples,
+              test_samples=test_samples)[0]
+  
+  return results
 

@@ -6,8 +6,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-df = pd.read_csv('samples_sweep.csv')
-
 def sweep_plot(df, families):
 
   df = df[df['families']==families]
@@ -33,9 +31,15 @@ def sweep_plot(df, families):
   plt.savefig('pfam_figures/accuracy_on_families_' + families)
   plt.show()
 
-sweep_plot(df, '1-100')
 
-sweep_plot(df, '101-200')
+def main():
 
-sweep_plot(df, '1-200')
+  df = pd.read_csv('samples_sweep.csv')
 
+  family_names = ['1-100', '101-200', '1-200']
+  for families in family_names:
+    sweep_plot(df, families)
+
+
+if __name__ == "__main__":
+  main()

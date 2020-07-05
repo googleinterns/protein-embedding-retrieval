@@ -69,7 +69,7 @@ cnn_max_pool_model = create_representation_model(encoder_fn=encoder_fn,
 optimizer = create_optimizer(cnn_max_pool_model, learning_rate=0., weight_decay=0.)
 
 
-sweep_data = [['families', 'train_samples', 'pretrain', 'accuracy']]
+sweep_data = []
 
 named_family_accessions = {}
 named_family_accessions[0] = ('1-100', ['PF%05d' % i for i in range(1, 101)])
@@ -77,7 +77,6 @@ named_family_accessions[1] = ('101-200', ['PF%05d' % i for i in range(101, 201)]
 named_family_accessions[2] = ('1-200', ['PF%05d' % i for i in range(1, 201)])
 
 train_samples_sweep = [i for i in range(1, 6)] + [5*i for i in range(2, 6)] + [25*i for i in range(2, 5)] + [None]
-
 for train_samples in train_samples_sweep:
     pretrain = 0
     for i in range(3):
@@ -87,7 +86,12 @@ for train_samples in train_samples_sweep:
 											            test_family_accessions=family_accessions,
                                                         train_samples=train_samples)[0]
         accuracy = results['1-nn accuracy']
-        datum = [families, train_samples, pretrain, accuracy]
+        datum = {
+                 'families': families,
+                 'train_samples': train_samples,
+                 'pretrain': pretrain,
+                 'accuracy': accuracy
+                 }
         print(datum)
         sweep_data.append(datum)
         
@@ -96,7 +100,7 @@ for train_samples in train_samples_sweep:
 if restore_dir is not None:
   optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
 
-
+train_samples_sweep = [i for i in range(1, 6)] + [5*i for i in range(2, 6)] + [25*i for i in range(2, 5)] + [None]
 for train_samples in train_samples_sweep:
     pretrain = 1
     for i in range(3):
@@ -106,13 +110,17 @@ for train_samples in train_samples_sweep:
 											            test_family_accessions=family_accessions,
                                                         train_samples=train_samples)[0]
         accuracy = results['1-nn accuracy']
-        datum = [families, train_samples, pretrain, accuracy]
+        datum = {
+                 'families': families,
+                 'train_samples': train_samples,
+                 'pretrain': pretrain,
+                 'accuracy': accuracy
+                 }        
         print(datum)
         sweep_data.append(datum)
 
 
-sweep_data = np.array(sweep_data)
-sweep_df = pd.DataFrame(sweep_data[1:], columns=sweep_data[0])
+sweep_df = pd.DataFrame(sweep_data)
 sweep_df.to_csv('samples_sweep.csv')
 
         

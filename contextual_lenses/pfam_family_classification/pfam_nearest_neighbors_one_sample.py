@@ -31,7 +31,7 @@ one_hot_pos_emb_encoder, cnn_one_hot_pos_emb_encoder
 
 from loss_fns import cross_entropy_loss
 
-from pfam_utils import pfam_nearest_neighbors_classification
+from pfam_utils import train_and_test_knn_pfam_families
 
 
 # Load family IDs
@@ -64,150 +64,27 @@ cnn_max_pool_model = create_representation_model(encoder_fn=encoder_fn,
 optimizer = create_optimizer(cnn_max_pool_model, learning_rate=0., weight_decay=0.)
 
 
-# Lens training: None, restricted NN training: PF00001 - PF00100
-train_family_accessions = []
-test_family_accessions = []
-for i in range(1, 101):
-  family_name = 'PF%05d' % i
-  train_family_accessions.append(family_name)
-  test_family_accessions.append(family_name)
-
-results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions,
-                                                train_samples=1)[0]
-
-print("Lens training: None, restricted NN training: PF00001 - PF00100")
-print(results)
-print()
-
-
-# Lens training: None, restricted NN training: PF00101 - PF00200
-train_family_accessions = []
-test_family_accessions = []
-for i in range(101, 201):
-  family_name = 'PF%05d' % i
-  train_family_accessions.append(family_name)
-  test_family_accessions.append(family_name)
-
-results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions,
-                                                train_samples=1)[0]
-
-print("Lens training: None, restricted NN training: PF00101 - PF00200")
-print(results)
-print()
-
-
-# Lens training: None, restricted NN training: PF00001 - PF00200
-train_family_accessions = []
-test_family_accessions = []
-for i in range(1, 201):
-  family_name = 'PF%05d' % i
-  train_family_accessions.append(family_name)
-  test_family_accessions.append(family_name)
-
-results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions,
-                                                train_samples=1)[0]
-
-print("Lens training: None, restricted NN training: PF00001 - PF00200")
-print(results)
-print()
-
-
-# Lens training: None, restricted NN training: PF00001 - PF00400
-train_family_accessions = []
-test_family_accessions = []
-for i in range(1, 401):
-  family_name = 'PF%05d' % i
-  train_family_accessions.append(family_name)
-  test_family_accessions.append(family_name)
-
-results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions,
-                                                train_samples=1)[0]
-
-print("Lens training: None, restricted NN training: PF00001 - PF00400")
-print(results)
-print()
+family_ranges = [(1, 100), (101, 200). (1, 200), (1, 400)]
+for family_range in family_ranges:
+  start, end = family_range
+  results = train_and_test_knn_pfam_families(encoder=optimizer.target, start=start, end=end, train_samples=1)
+  print('Lens training: None, k-NN training: ' + 'PF%05d' % start + ' - ' + 'PF%05d' % end)
+  print(results)
+  print()
 
 
 # Restore optimizer from checkpoint. 
 if restore_dir is not None:
   optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
 
+  family_ranges = [(1, 100), (101, 200). (1, 200), (1, 400)]
+  for family_range in family_ranges:
+    start, end = family_range
+    results = train_and_test_knn_pfam_families(encoder=optimizer.target, start=start, end=end, train_samples=1)
+    print('Lens training: ' + 'PF%05d' % 1 + ' - ' + 'PF%05d' % 100 + ', k-NN training: ' + 'PF%05d' % start + ' - ' + 'PF%05d' % end)
+    print(results)
+    print()
+else:
+  print('Please specify restore_dir for loading optimizer.')
 
-# Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00100
-train_family_accessions = []
-test_family_accessions = []
-for i in range(1, 101):
-  family_name = 'PF%05d' % i
-  train_family_accessions.append(family_name)
-  test_family_accessions.append(family_name)
-
-results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions,
-                                                train_samples=1)[0]
-
-print("Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00100")
-print(results)
-print()
-
-
-# Lens training: PF00001 - PF00100, restricted NN training: PF00101 - PF00200
-train_family_accessions = []
-test_family_accessions = []
-for i in range(101, 201):
-  family_name = 'PF%05d' % i
-  train_family_accessions.append(family_name)
-  test_family_accessions.append(family_name)
-
-results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions,
-                                                train_samples=1)[0]
-
-print("Lens training: PF00001 - PF00100, restricted NN training: PF00101 - PF00200")
-print(results)
-print()
-
-
-# Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00200
-train_family_accessions = []
-test_family_accessions = []
-for i in range(1, 201):
-  family_name = 'PF%05d' % i
-  train_family_accessions.append(family_name)
-  test_family_accessions.append(family_name)
-
-results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions,
-                                                train_samples=1)[0]
-
-print("Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00200")
-print(results)
-print()
-
-
-# Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00400
-train_family_accessions = []
-test_family_accessions = []
-for i in range(1, 401):
-  family_name = 'PF%05d' % i
-  train_family_accessions.append(family_name)
-  test_family_accessions.append(family_name)
-
-results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											    train_family_accessions=train_family_accessions, 
-											    test_family_accessions=test_family_accessions,
-                                                train_samples=1)[0]
-
-print("Lens training: PF00001 - PF00100, restricted NN training: PF00001 - PF00400")
-print(results)
-print()
+  
