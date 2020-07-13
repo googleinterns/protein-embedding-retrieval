@@ -21,6 +21,9 @@ import numpy as np
 
 import functools
 
+import copy
+
+from protein_lm import models
 
 
 # Data batching.
@@ -108,14 +111,17 @@ def train(model, train_data, loss_fn, loss_fn_kwargs, learning_rate=1e-4, weight
 class RepresentationModel(nn.Module):
 
   def apply(self, x, encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs,
-            num_categories, output_features, embed=False):
+            num_categories, output_features, embed=False, use_transformer=False):
     """Computes padding mask, encodes indices using embeddings, 
        applies lensing operation, predicts scalar value.
     """
 
     padding_mask = jnp.expand_dims(jnp.where(x < num_categories-1, 1, 0), axis=2)
 
-    x = encoder_fn(x, num_categories=num_categories, **encoder_fn_kwargs)
+    if not use_transformer:
+      x = encoder_fn(x, num_categories=num_categories, **encoder_fn_kwargs)
+    else:
+      x = encoder_fn(x)
 
     rep = reduce_fn(x, padding_mask=padding_mask, **reduce_fn_kwargs)
 
@@ -130,8 +136,44 @@ class RepresentationModel(nn.Module):
     return out
 
 
+def load_params(params, encoder_fn_params=None, reduce_fn_params=None, predict_fn_params=None):
+  """Updates randomly initialized parameters using loaded parameters."""
+
+  loaded_params = copy.deepcopy(params) 
+  fn_names = list(loaded_params.keys())
+
+  if encoder_fn_params is not None:
+    encoder_fn_ind = '_0'
+    reduce_fn_ind = '_1'
+  else:
+    reduce_fn_ind = '_0'
+ 
+  if predict_fn_params is not None:
+    for fn_name in fn_names:
+      if '_' + str(len(fn_names)-1) in fn_name:
+        predict_fn_name = fn_name
+    loaded_params[predict_fn_name] = predict_fn_params
+    
+  if encoder_fn_params is not None:
+    assert(len(loaded_params.keys()) > 1), 'Model does not have learnable encoder!'
+    for fn_name in fn_names:
+        if encoder_fn_ind in fn_name:
+            encoder_fn_name = fn_name
+    loaded_params[encoder_fn_name] = encoder_fn_params
+
+  if reduce_fn_params is not None:
+    assert(len(loaded_params.keys()) > 2), 'Model does not have learnable lens!'
+    for fn_name in fn_names:
+        if reduce_fn_ind in fn_name:
+            reduce_fn_name = fn_name
+    loaded_params[reduce_fn_name] = reduce_fn_params
+
+  return loaded_params
+
+
 def create_representation_model(encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs,
-                                num_categories, output_features, embed=False, key=random.PRNGKey(0)):
+                                num_categories, output_features, embed=False, key=random.PRNGKey(0),
+                                encoder_fn_params=None, reduce_fn_params=None, predict_fn_params=None):
   """Instantiates a RepresentationModel object."""
 
   module = RepresentationModel.partial(encoder_fn=encoder_fn,
@@ -140,7 +182,8 @@ def create_representation_model(encoder_fn, encoder_fn_kwargs, reduce_fn, reduce
                                        reduce_fn_kwargs=reduce_fn_kwargs,
                                        num_categories=num_categories,
                                        output_features=output_features,
-                                       embed=embed)
+                                       embed=embed,
+                                       use_transformer=False)
   
   _, initial_params = RepresentationModel.init_by_shape(key,
                                                         input_specs=[((1, 1), jnp.float32)],
@@ -150,8 +193,53 @@ def create_representation_model(encoder_fn, encoder_fn_kwargs, reduce_fn, reduce
                                                         reduce_fn_kwargs=reduce_fn_kwargs,
                                                         num_categories=num_categories,
                                                         output_features=output_features,
-                                                        embed=embed)
+                                                        embed=embed,
+                                                        use_transformer=False)
+
+  loaded_params = load_params(initial_params, encoder_fn_params, reduce_fn_params, predict_fn_params)
   
-  model = nn.Model(module, initial_params)
+  model = nn.Model(module, loaded_params)
   
   return model
+
+
+def create_transformer_representation_model(transformer_kwargs, reduce_fn, reduce_fn_kwargs, 
+                                            num_categories, output_features, bidirectional=False, 
+                                            embed=False, key=random.PRNGKey(0), encoder_fn_params=None, 
+                                            reduce_fn_params=None, predict_fn_params=None):
+  """Instantiates a RepresentationModel object with Transformer encoder."""
+  
+  if not bidirectional:
+    transformer = models.FlaxLM(**transformer_kwargs)
+  else:
+    transformer = models.FlaxBERT(**transformer_kwargs)
+  transformer_optimizer = transformer._optimizer
+  transformer_model = models.jax_utils.unreplicate(transformer_optimizer.target)
+  transformer_encoder = transformer_model.module.partial(output_head='output_emb')
+
+  module = RepresentationModel.partial(encoder_fn=transformer_encoder,
+                                       encoder_fn_kwargs={}, 
+                                       reduce_fn=reduce_fn,
+                                       reduce_fn_kwargs=reduce_fn_kwargs,
+                                       num_categories=num_categories,
+                                       output_features=output_features,
+                                       embed=embed,
+                                       use_transformer=True)
+  
+  _, initial_params = RepresentationModel.init_by_shape(key,
+                                                        input_specs=[((1, 1), jnp.float32)],
+                                                        encoder_fn=transformer_encoder,
+                                                        encoder_fn_kwargs={},
+                                                        reduce_fn=reduce_fn,
+                                                        reduce_fn_kwargs=reduce_fn_kwargs,
+                                                        num_categories=num_categories,
+                                                        output_features=output_features,
+                                                        embed=embed,
+                                                        use_transformer=True)
+
+  loaded_params = load_params(initial_params, encoder_fn_params, reduce_fn_params, predict_fn_params)
+  
+  model = nn.Model(module, loaded_params)
+  
+  return model
+

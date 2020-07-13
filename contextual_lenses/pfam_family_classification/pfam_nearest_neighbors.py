@@ -7,7 +7,7 @@ using contextual lens embeddings trained to classify protein families.
 
 # Parse command line arguments.
 from parser import parse_args
-tpu_name, save_dir, restore_dir, use_pmap = parse_args()
+tpu_name, save_dir, restore_dir, use_pmap, restore_transformer_dir, bidirectional = parse_args()
 
 # Connect TPU to VM instance.
 from cloud_utils.tpu_init import connect_tpu
