@@ -64,7 +64,7 @@ cnn_max_pool_model = create_representation_model(encoder_fn=encoder_fn,
 optimizer = create_optimizer(cnn_max_pool_model, learning_rate=0., weight_decay=0.)
 
 
-family_ranges = [(1, 100), (101, 200). (1, 200), (1, 400)]
+family_ranges = [(1, 100), (101, 200), (1, 200), (1, 400)]
 for family_range in family_ranges:
   start, end = family_range
   results = train_and_test_knn_pfam_families(encoder=optimizer.target, start=start, end=end)
@@ -77,7 +77,7 @@ for family_range in family_ranges:
 if restore_dir is not None:
   optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
 
-  family_ranges = [(1, 100), (101, 200). (1, 200), (1, 400)]
+  family_ranges = [(1, 100), (101, 200), (1, 200), (1, 400)]
   for family_range in family_ranges:
     start, end = family_range
     results = train_and_test_knn_pfam_families(encoder=optimizer.target, start=start, end=end)

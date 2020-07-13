@@ -34,7 +34,7 @@ for i in range(1, 101):
   test_family_accessions.append(family_name)
 
 
-# CNN + max pool.
+# CNN + MaxPool.
 epochs = 100
 train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=512, 
                                                    epochs=epochs, drop_remainder=True)

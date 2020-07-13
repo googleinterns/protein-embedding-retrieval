@@ -141,12 +141,18 @@ def load_params(params, encoder_fn_params=None, reduce_fn_params=None, predict_f
 
   loaded_params = copy.deepcopy(params) 
   fn_names = list(loaded_params.keys())
-
+  
+  num_learnable_layers = 1
   if encoder_fn_params is not None:
+    num_learnable_layers += 1
     encoder_fn_ind = '_0'
     reduce_fn_ind = '_1'
   else:
     reduce_fn_ind = '_0'
+  if reduce_fn_params is not None:
+    num_learnable_layers += 1
+
+  assert(len(loaded_params.keys()) == num_learnable_layers), 'Model encoder and lens architecture incorrectly specified!'
  
   if predict_fn_params is not None:
     for fn_name in fn_names:
@@ -155,14 +161,12 @@ def load_params(params, encoder_fn_params=None, reduce_fn_params=None, predict_f
     loaded_params[predict_fn_name] = predict_fn_params
     
   if encoder_fn_params is not None:
-    assert(len(loaded_params.keys()) > 1), 'Model does not have learnable encoder!'
     for fn_name in fn_names:
         if encoder_fn_ind in fn_name:
             encoder_fn_name = fn_name
     loaded_params[encoder_fn_name] = encoder_fn_params
 
   if reduce_fn_params is not None:
-    assert(len(loaded_params.keys()) > 2), 'Model does not have learnable lens!'
     for fn_name in fn_names:
         if reduce_fn_ind in fn_name:
             reduce_fn_name = fn_name
