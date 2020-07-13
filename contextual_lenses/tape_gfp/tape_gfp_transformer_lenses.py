@@ -22,7 +22,7 @@ from loss_fns import mse_loss
 
 from tape_gfp_utils import create_gfp_batches, gfp_evaluate
 
-from load_transformer import load_params
+from load_transformer import load_transformer_params
 
 
 # Transformer + MaxPool lens.
@@ -40,7 +40,7 @@ transformer_kwargs = {
   }
 
 if restore_transformer_dir is not None:
-  pretrained_transformer_params = load_params(restore_transformer_dir, models.FlaxLM)
+  pretrained_transformer_params = load_transformer_params(restore_transformer_dir, models.FlaxLM)
 else:
   pretrained_transformer_params = None
 
