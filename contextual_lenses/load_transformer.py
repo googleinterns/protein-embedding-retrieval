@@ -1,4 +1,4 @@
-'''Utils for loading FlaxLM or FlaxBERT models or parameters.'''
+"""Utils for loading FlaxLM or FlaxBERT models or parameters."""
 
 
 import os
