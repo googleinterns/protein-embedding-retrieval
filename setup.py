@@ -1,8 +1,5 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
-
-with open('requirements.txt', 'r') as f:
-	install_requires = f.read()
 
 setup(
    name='contextual_lenses',
@@ -10,6 +7,12 @@ setup(
    description='Protein contextual lenses.',
    author='Amir Shanehsazzadeh',
    author_email='amirshanehsaz@google.com',
-   packages=['contextual_lenses'],
-   install_requires=install_requires,
+   packages=find_packages(exclude('google-research', 'docs')),
+   install_requires=[
+   "jax",
+   "jaxlib",
+   "flax",
+   "tensorflow",
+   "pandas",
+   "numpy"],
 )

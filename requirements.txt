@@ -1,7 +1,0 @@
--e git://github.com/google-research/google-research.git
-jax
-jaxlib
-flax
-tensorflow
-pandas
-numpy
