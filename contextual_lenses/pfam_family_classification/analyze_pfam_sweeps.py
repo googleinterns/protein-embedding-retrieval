@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 def sweep_plot(df, families, title):
 
   df = df[df['families']==families]
-  df_rand = df[df['lens_train']==0]
-  df_lens_train = df[df['lens_train']==1]
+  df_rand = df[~df.lens_train]
+  df_lens_train = df[df.lens_train]
 
   plt.figure(figsize=(8, 6))
 

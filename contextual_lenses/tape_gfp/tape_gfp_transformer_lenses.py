@@ -51,28 +51,27 @@ reduce_fn_kwargs = {
 loss_fn_kwargs = {
     
 }
-transformer_linear_max_pool_model = create_transformer_representation_model(transformer_kwargs=transformer_kwargs,
-                                                                            reduce_fn=reduce_fn,
-                                                                            reduce_fn_kwargs=reduce_fn_kwargs,
-                                                                            num_categories=27,
-                                                                            output_features=1,
-                                                                            bidirectional=bidirectional,
-                                                                            encoder_fn_params=pretrained_transformer_params)
+model = create_transformer_representation_model(transformer_kwargs=transformer_kwargs,
+                                                reduce_fn=reduce_fn,
+                                                reduce_fn_kwargs=reduce_fn_kwargs,
+                                                num_categories=27,
+                                                output_features=1,
+                                                bidirectional=bidirectional,
+                                                encoder_fn_params=pretrained_transformer_params)
 
-transformer_linear_max_pool_optimizer = train(model=transformer_max_pool_model,
-                                              train_data=train_batches,
-                                              loss_fn=mse_loss,
-                                              loss_fn_kwargs=loss_fn_kwargs,
-                                              learning_rate=lr,
-                                              weight_decay=wd,
-                                              restore_dir=restore_dir,
-                                              save_dir=save_dir,
-                                              use_pmap=use_pmap)
+optimizer = train(model=transformer_max_pool_model,
+                  train_data=train_batches,
+                  loss_fn=mse_loss,
+                  loss_fn_kwargs=loss_fn_kwargs,
+                  learning_rate=lr,
+                  weight_decay=wd,
+                  restore_dir=restore_dir,
+                  save_dir=save_dir,
+                  use_pmap=use_pmap)
 
-transformer_linear_max_pool_results, transformer_linear_max_pool_pred_fluorescences = \
-  gfp_evaluate(predict_fn=transformer_linear_max_pool_optimizer.target,
-               title='Transformer + LinearMaxPool',
-               batch_size=256)
+results, pred_fluorescences = gfp_evaluate(predict_fn=optimizer.target,
+                                           title='Transformer + LinearMaxPool',
+                                           batch_size=256)
 
-print(transformer_linear_max_pool_results)
+print(results)
 

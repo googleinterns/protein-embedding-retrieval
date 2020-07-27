@@ -82,7 +82,7 @@ def create_pfam_df(family_accessions, test=False):
   pfam_df = pfam_df[pfam_df.mod_family_accession.isin(family_accessions)]
   pfam_df['index'] = pfam_df.family_id.apply(lambda x: family_id_to_index[x])
 
-  pfam_df['one_hot_inds'] = pfam_df.sequence.apply(lambda x: residues_to_one_hot_inds('M' + x[:511])) # x[:512] # pad_seq(x)
+  pfam_df['one_hot_inds'] = pfam_df.sequence.apply(lambda x: residues_to_one_hot_inds(x[:512]))
 
   return pfam_df
 
@@ -94,6 +94,7 @@ def create_pfam_seq_batches(family_accessions, batch_size, test=False, samples=N
   pfam_df = create_pfam_df(family_accessions, test=test)
     
   if samples is not None:
+    # shuffle data
     pfam_df = pfam_df.sample(frac=1, replace=False, random_state=random_state)
     pfam_df = pfam_df.groupby('mod_family_accession').head(samples).reset_index()
   

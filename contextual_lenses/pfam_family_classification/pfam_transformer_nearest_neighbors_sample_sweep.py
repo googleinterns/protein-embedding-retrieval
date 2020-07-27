@@ -107,8 +107,8 @@ for train_samples in train_samples_sweep:
     for key in named_family_accessions.keys():
         families, family_accessions = named_family_accessions[i]
         results = pfam_nearest_neighbors_classification(encoder=optimizer.target, 
-											            train_family_accessions=family_accessions, 
-											            test_family_accessions=family_accessions,
+											                                  train_family_accessions=family_accessions, 
+											                                  test_family_accessions=family_accessions,
                                                         train_samples=train_samples)[0]
         accuracy = results['1-nn accuracy']
         datum = {
@@ -124,27 +124,27 @@ for train_samples in train_samples_sweep:
 # Restore optimizer from checkpoint. 
 if restore_dir is not None:
   loaded_optimizer = checkpoints.restore_checkpoint(ckpt_dir=restore_dir, target=optimizer)
+
+  train_samples_sweep = [i for i in range(1, 6)] + [5*i for i in range(2, 6)] + [25*i for i in range(2, 5)] + [None]
+  for train_samples in train_samples_sweep:
+      lens_train = 1
+      for key in named_family_accessions.keys():
+          families, family_accessions = named_family_accessions[i]
+          results = pfam_nearest_neighbors_classification(encoder=loaded_optimizer.target, 
+                                                          train_family_accessions=family_accessions, 
+                                                          test_family_accessions=family_accessions,
+                                                          train_samples=train_samples)[0]
+          accuracy = results['1-nn accuracy']
+          datum = {
+                   'families': families,
+                   'train_samples': train_samples,
+                   'lens_train': lens_train,
+                   'accuracy': accuracy
+                   }        
+          print(datum)
+          sweep_data.append(datum)
 else:
    print('Specify restore_dir!')
-
-train_samples_sweep = [i for i in range(1, 6)] + [5*i for i in range(2, 6)] + [25*i for i in range(2, 5)] + [None]
-for train_samples in train_samples_sweep:
-    lens_train = 1
-    for key in named_family_accessions.keys():
-        families, family_accessions = named_family_accessions[i]
-        results = pfam_nearest_neighbors_classification(encoder=loaded_optimizer.target, 
-											            train_family_accessions=family_accessions, 
-											            test_family_accessions=family_accessions,
-                                                        train_samples=train_samples)[0]
-        accuracy = results['1-nn accuracy']
-        datum = {
-                 'families': families,
-                 'train_samples': train_samples,
-                 'lens_train': lens_train,
-                 'accuracy': accuracy
-                 }        
-        print(datum)
-        sweep_data.append(datum)
 
 
 sweep_df = pd.DataFrame(sweep_data)
@@ -152,5 +152,3 @@ if restore_transformer_dir is not None:
   sweep_df.to_csv('transformer_frozen_pretrain_samples_sweep.csv')
 else:
   sweep_df.to_csv('transformer_frozen_no_pretrain_samples_sweep.csv')
-
-        

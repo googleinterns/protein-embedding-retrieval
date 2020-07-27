@@ -53,27 +53,27 @@ reduce_fn_kwargs = {
 loss_fn_kwargs = {
   'num_classes': num_families
 }
-cnn_max_pool_model = create_representation_model(encoder_fn=encoder_fn,
-                                                 encoder_fn_kwargs=encoder_fn_kwargs,
-                                                 reduce_fn=reduce_fn,
-                                                 reduce_fn_kwargs=reduce_fn_kwargs,
-                                                 num_categories=26,
-                                                 output_features=num_families)
+model = create_representation_model(encoder_fn=encoder_fn,
+                                    encoder_fn_kwargs=encoder_fn_kwargs,
+                                    reduce_fn=reduce_fn,
+                                    reduce_fn_kwargs=reduce_fn_kwargs,
+                                    num_categories=27,
+                                    output_features=num_families)
 
-cnn_max_pool_optimizer = train(model=cnn_max_pool_model,
-                               train_data=train_batches,
-                               loss_fn=cross_entropy_loss,
+optimizer = train(model=cnn_max_pool_model,
+                  train_data=train_batches,
+                  loss_fn=cross_entropy_loss,
+                  loss_fn_kwargs=loss_fn_kwargs,
+                  learning_rate=lr,
+                  weight_decay=wd,
+                  restore_dir=restore_dir,
+                  save_dir=save_dir,
+                  use_pmap=use_pmap)
+
+results, preds = pfam_evaluate(predict_fn=cnn_max_pool_optimizer.target,
+                               test_family_accessions=test_family_accessions,
+                               title='CNN + Max Pool',
                                loss_fn_kwargs=loss_fn_kwargs,
-                               learning_rate=lr,
-                               weight_decay=wd,
-                               restore_dir=restore_dir,
-                               save_dir=save_dir,
-                               use_pmap=use_pmap)
+                               batch_size=512)
 
-cnn_max_pool_results, cnn_max_pool_preds = pfam_evaluate(predict_fn=cnn_max_pool_optimizer.target,
-                                                         test_family_accessions=test_family_accessions,
-                                                         title='CNN + Max Pool',
-                                                         loss_fn_kwargs=loss_fn_kwargs,
-                                                         batch_size=512)
-
-print(cnn_max_pool_results)
+print(results)
