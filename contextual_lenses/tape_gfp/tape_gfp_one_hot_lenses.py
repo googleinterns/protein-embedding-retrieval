@@ -3,7 +3,7 @@
 
 # Parse command line arguments.
 from parser import parse_args
-tpu_name, save_dir, restore_dir, use_pmap = parse_args()
+tpu_name, save_dir, restore_dir, use_pmap, restore_transformer_dir, bidirectional = parse_args()
 
 # Connect TPU to VM instance.
 from cloud_utils.tpu_init import connect_tpu
@@ -48,27 +48,26 @@ reduce_fn_kwargs = {
 loss_fn_kwargs = {
 
 }
-cnn_pos_emb_gated_conv_model = create_representation_model(encoder_fn=encoder_fn,
-                                                           encoder_fn_kwargs=encoder_fn_kwargs,
-                                                           reduce_fn=reduce_fn,
-                                                           reduce_fn_kwargs=reduce_fn_kwargs,
-                                                           num_categories=21,
-                                                           output_features=1)
+model = create_representation_model(encoder_fn=encoder_fn,
+                                    encoder_fn_kwargs=encoder_fn_kwargs,
+                                    reduce_fn=reduce_fn,
+                                    reduce_fn_kwargs=reduce_fn_kwargs,
+                                    num_categories=27,
+                                    output_features=1)
 
-cnn_pos_emb_gated_conv_optimizer = train(model=cnn_pos_emb_gated_conv_model,
-                                         train_data=train_batches,
-                                         loss_fn=mse_loss,
-                                         loss_fn_kwargs=loss_fn_kwargs,
-                                         learning_rate=lr,
-                                         weight_decay=wd,
-                                         restore_dir=restore_dir,
-                                         save_dir=save_dir,
-                                         use_pmap=use_pmap)
+optimizer = train(model=cnn_pos_emb_gated_conv_model,
+                  train_data=train_batches,
+                  loss_fn=mse_loss,
+                  loss_fn_kwargs=loss_fn_kwargs,
+                  learning_rate=lr,
+                  weight_decay=wd,
+                  restore_dir=restore_dir,
+                  save_dir=save_dir,
+                  use_pmap=use_pmap)
 
-cnn_pos_emb_gated_conv_results, cnn_pos_emb_gated_conv_pred_fluorescences = \
-  gfp_evaluate(predict_fn=cnn_pos_emb_gated_conv_optimizer.target,
-               title='OneHot + PosEmb + CNN + GatedConv',
-               batch_size=256)
+results, pred_fluorescences = gfp_evaluate(predict_fn=optimizer.target,
+                                           title='OneHot + PosEmb + CNN + GatedConv',
+                                           batch_size=256)
 
-print(cnn_pos_emb_gated_conv_results)
+print(results)
 

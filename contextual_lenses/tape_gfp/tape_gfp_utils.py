@@ -13,6 +13,8 @@ import scipy.stats
 
 import sklearn.metrics
 
+from protein_lm import domains
+
 from train_utils import create_data_iterator
 
 from tape.tape.datasets import LMDBDataset
@@ -31,26 +33,23 @@ def dataset_to_df(in_name):
 
 
 # Padding.
-def pad_seq(seq, pad_char='-'):
-  """Pads all sequenes to a length of 237."""
+gfp_protein_domain = domains.VariableLengthDiscreteDomain(
+  vocab=domains.ProteinVocab(
+    include_anomalous_amino_acids=True,
+    include_bos=True,
+    include_eos=True,
+    include_pad=True,
+    include_mask=True),
+  length=237)
 
-  SEQ_LEN = 237
-  padded_seq = seq + pad_char*(SEQ_LEN-len(seq))
+gfp_num_categories = 27
 
-  return padded_seq
-
-# Open train/test data and add one-hots.
-AMINO_ACID_VOCABULARY = [
-	    'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R',
-	    'S', 'T', 'V', 'W', 'Y', '-'
-]
-def residues_to_one_hot_inds(amino_acid_residues):
+def residues_to_one_hot_inds(seq):
   """Converts amino acid residues to one hot indices."""
 
-  one_hot_inds = np.array([AMINO_ACID_VOCABULARY.index(char) for char in amino_acid_residues])
-  
+  one_hot_inds = gfp_protein_domain.encode([seq])[0]
+    
   return one_hot_inds
-
 
 def create_gfp_df(test=False):
   """Processes GFP data into a featurized dataframe."""
@@ -60,8 +59,7 @@ def create_gfp_df(test=False):
   else:
     gfp_df = dataset_to_df('tape/fluorescence/fluorescence_train.lmdb')
   
-  gfp_df['padded_primary'] = gfp_df.primary.apply(lambda x: pad_seq(x))
-  gfp_df['one_hot_inds'] = gfp_df.padded_primary.apply(lambda x: residues_to_one_hot_inds(x))
+  gfp_df['one_hot_inds'] = gfp_df.primary.apply(lambda x: residues_to_one_hot_inds(x[:237]))
 
   return gfp_df
 
@@ -99,38 +97,41 @@ def gfp_evaluate(predict_fn, title, batch_size=256):
   
   spearmanr = scipy.stats.spearmanr(test_fluorescences, pred_fluorescences).correlation
   mse = sklearn.metrics.mean_squared_error(test_fluorescences, pred_fluorescences)
-  plt.scatter(test_fluorescences, pred_fluorescences)
+  plt.scatter(test_fluorescences, pred_fluorescences, s=1, alpha=0.5)
   plt.xlabel('True Fluorescences')
   plt.ylabel('Predicted Fluorescences')
   plt.title(title)
-  plt.savefig('figures/' + title.replace(' ', '').replace('+', ''))
+  plt.savefig('tape_gfp_figures/' + title.replace(' ', '').replace('+', ''))
   plt.show()
+  plt.clf()
 
   bright_inds = np.where(test_fluorescences > 2.5)
   bright_test_fluorescences = test_fluorescences[bright_inds]
   bright_pred_fluorescences = pred_fluorescences[bright_inds]
   bright_spearmanr = scipy.stats.spearmanr(bright_test_fluorescences, bright_pred_fluorescences).correlation
   bright_mse = sklearn.metrics.mean_squared_error(bright_test_fluorescences, bright_pred_fluorescences)
-  plt.scatter(bright_test_fluorescences, bright_pred_fluorescences)
+  plt.scatter(bright_test_fluorescences, bright_pred_fluorescences, s=1, alpha=0.5)
   plt.xlabel('True Fluorescences')
   plt.ylabel('Predicted Fluorescences')
   bright_title = title + ' (Bright)'
   plt.title(bright_title)
-  plt.savefig('figures/' + bright_title.replace(' ', '').replace('+', ''))
+  plt.savefig('tape_gfp_figures/' + bright_title.replace(' ', '').replace('+', ''))
   plt.show()
+  plt.clf()
 
   dark_inds = np.where(test_fluorescences < 2.5)
   dark_test_fluorescences = test_fluorescences[dark_inds]
   dark_pred_fluorescences = pred_fluorescences[dark_inds]
   dark_spearmanr = scipy.stats.spearmanr(dark_test_fluorescences, dark_pred_fluorescences).correlation
   dark_mse = sklearn.metrics.mean_squared_error(dark_test_fluorescences, dark_pred_fluorescences)
-  plt.scatter(dark_test_fluorescences, dark_pred_fluorescences)
+  plt.scatter(dark_test_fluorescences, dark_pred_fluorescences, s=1, alpha=0.5)
   plt.xlabel('True Fluorescences')
   plt.ylabel('Predicted Fluorescences')
   dark_title = title + ' (Dark)'
   plt.title(dark_title)
-  plt.savefig('figures/' + dark_title.replace(' ', '').replace('+', ''))
+  plt.savefig('tape_gfp_figures/' + dark_title.replace(' ', '').replace('+', ''))
   plt.show()
+  plt.clf()
 
   results = {
       'title': title,

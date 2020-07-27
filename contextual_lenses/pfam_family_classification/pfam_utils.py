@@ -15,8 +15,10 @@ import matplotlib.pyplot as plt
 
 import scipy.stats
 
-import sklearn.metrics
+import sklearn.metrics as metrics
 from sklearn.neighbors import KNeighborsClassifier as knn
+
+from protein_lm import domains
 
 from train_utils import create_data_iterator
 
@@ -42,25 +44,24 @@ def mod_family_accession(family_accession):
   return family_accession[:family_accession.index('.')]
 
 # Padding.
-def pad_seq(seq, pad_char='-'):
-  """Pads all sequenes to a length of 237."""
+pfam_protein_domain = domains.VariableLengthDiscreteDomain(
+  vocab=domains.ProteinVocab(
+    include_anomalous_amino_acids=True,
+    include_bos=True,
+    include_eos=True,
+    include_pad=True,
+    include_mask=True),
+  length=512)
 
-  SEQ_LEN = 512
-  seq = seq[:SEQ_LEN]
-  padded_seq = seq + pad_char*(SEQ_LEN-len(seq))
-  return padded_seq
+pfam_num_categories = 27
 
-# Add one-hots.
-AMINO_ACID_VOCABULARY = [
-    'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R',
-    'S', 'T', 'V', 'W', 'Y', 'X', 'U', 'B', 'O', 'Z', '-'
-]
-def residues_to_one_hot_inds(amino_acid_residues):
+def residues_to_one_hot_inds(seq):
   """Converts amino acid residues to one hot indices."""
 
-  one_hot_inds = np.array([AMINO_ACID_VOCABULARY.index(char) for char in amino_acid_residues])
-
+  one_hot_inds = pfam_protein_domain.encode([seq])[0]
+    
   return one_hot_inds
+
 
 # Dictionary mapping family id to index.
 family_ids = open('pfam_family_ids.txt', 'r').readlines()
@@ -80,9 +81,28 @@ def create_pfam_df(family_accessions, test=False):
   pfam_df['mod_family_accession'] = pfam_df.family_accession.apply(lambda x: mod_family_accession(x))
   pfam_df = pfam_df[pfam_df.mod_family_accession.isin(family_accessions)]
   pfam_df['index'] = pfam_df.family_id.apply(lambda x: family_id_to_index[x])
-  pfam_df['one_hot_inds'] = pfam_df.sequence.apply(lambda x: residues_to_one_hot_inds(pad_seq(x)))
+
+  pfam_df['one_hot_inds'] = pfam_df.sequence.apply(lambda x: residues_to_one_hot_inds(x[:512]))
 
   return pfam_df
+
+
+def create_pfam_seq_batches(family_accessions, batch_size, test=False, samples=None, epochs=1,
+                            drop_remainder=False, buffer_size=None, seed=0, random_state=0):
+  """Creates iterable object of Pfam data batches."""
+
+  pfam_df = create_pfam_df(family_accessions, test=test)
+    
+  if samples is not None:
+    # shuffle data
+    pfam_df = pfam_df.sample(frac=1, replace=False, random_state=random_state)
+    pfam_df = pfam_df.groupby('mod_family_accession').head(samples).reset_index()
+  
+  pfam_batches = create_data_iterator(df=pfam_df, input_col='one_hot_inds', output_col='index',
+	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
+	  								  seed=seed, drop_remainder=drop_remainder, add_outputs=False, as_numpy=False)
+
+  return pfam_batches
 
 
 def create_pfam_batches(family_accessions, batch_size, test=False, samples=None, epochs=1,
@@ -128,7 +148,7 @@ def pfam_evaluate(predict_fn, test_family_accessions, title, loss_fn_kwargs, bat
   
   pred_indexes = np.array(pred_indexes)
   
-  acc = sklearn.metrics.accuracy_score(test_indexes, pred_indexes)
+  acc = metrics.accuracy_score(test_indexes, pred_indexes)
   
   results = {
       'title': title,
@@ -154,7 +174,7 @@ def compute_embeddings(encoder, data_batches):
 
 
 def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test_family_accessions, batch_size=512, 
-                                          n_neighbors=1, train_samples=None, test_samples=None, restricted=False):
+                                          n_neighbors=1, train_samples=None, test_samples=None):
   """Nearest neighbors classification on Pfam families using specified encoder."""
 
   train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=batch_size,
@@ -164,16 +184,40 @@ def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test
 
   train_vectors = compute_embeddings(encoder, train_batches)
   test_vectors = compute_embeddings(encoder, test_batches)
-
+  
   knn_classifier = knn(n_neighbors=n_neighbors)
   knn_classifier.fit(train_vectors, train_indexes)
   knn_predictions = knn_classifier.predict(test_vectors)
 
-  knn_accuracy = sklearn.metrics.accuracy_score(test_indexes, knn_predictions)
+  knn_accuracy = metrics.accuracy_score(test_indexes, knn_predictions)
 
   results = {
-    str(n_neighbors)+"-nn accuracy": knn_accuracy
+    str(n_neighbors)+"-nn accuracy": knn_accuracy,
+    'train_samples': train_samples,
+    'test_samples': test_samples
   }
 
   return results, knn_predictions, knn_classifier
+
+
+def train_and_test_knn_pfam_families(encoder, start, end, batch_size=512, n_neighbors=1,
+                                     train_samples=None, test_samples=None):
+  """Trains and tests k-NN on Pfam families with accession number >= start and <= end."""
+
+  train_family_accessions = []
+  test_family_accessions = []
+  for i in range(start, end+1):
+    family_name = 'PF%05d' % i
+    train_family_accessions.append(family_name)
+    test_family_accessions.append(family_name)
+
+  results = pfam_nearest_neighbors_classification(encoder=encoder, 
+              train_family_accessions=train_family_accessions, 
+              test_family_accessions=test_family_accessions,
+              batch_size=batch_size,
+              n_neighbors=n_neighbors,
+              train_samples=train_samples,
+              test_samples=test_samples)[0]
+  
+  return results
 

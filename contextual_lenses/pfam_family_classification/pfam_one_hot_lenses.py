@@ -3,7 +3,7 @@
 
 # Parse command line arguments.
 from parser import parse_args
-tpu_name, save_dir, restore_dir, use_pmap = parse_args()
+tpu_name, save_dir, restore_dir, use_pmap, restore_transformer_dir, bidirectional = parse_args()
 
 # Connect TPU to VM instance.
 from cloud_utils.tpu_init import connect_tpu
@@ -34,7 +34,7 @@ for i in range(1, 101):
   test_family_accessions.append(family_name)
 
 
-# CNN + max pool.
+# CNN + MaxPool.
 epochs = 100
 train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=512, 
                                                    epochs=epochs, drop_remainder=True)
@@ -53,27 +53,27 @@ reduce_fn_kwargs = {
 loss_fn_kwargs = {
   'num_classes': num_families
 }
-cnn_max_pool_model = create_representation_model(encoder_fn=encoder_fn,
-                                                 encoder_fn_kwargs=encoder_fn_kwargs,
-                                                 reduce_fn=reduce_fn,
-                                                 reduce_fn_kwargs=reduce_fn_kwargs,
-                                                 num_categories=26,
-                                                 output_features=num_families)
+model = create_representation_model(encoder_fn=encoder_fn,
+                                    encoder_fn_kwargs=encoder_fn_kwargs,
+                                    reduce_fn=reduce_fn,
+                                    reduce_fn_kwargs=reduce_fn_kwargs,
+                                    num_categories=27,
+                                    output_features=num_families)
 
-cnn_max_pool_optimizer = train(model=cnn_max_pool_model,
-                               train_data=train_batches,
-                               loss_fn=cross_entropy_loss,
+optimizer = train(model=cnn_max_pool_model,
+                  train_data=train_batches,
+                  loss_fn=cross_entropy_loss,
+                  loss_fn_kwargs=loss_fn_kwargs,
+                  learning_rate=lr,
+                  weight_decay=wd,
+                  restore_dir=restore_dir,
+                  save_dir=save_dir,
+                  use_pmap=use_pmap)
+
+results, preds = pfam_evaluate(predict_fn=cnn_max_pool_optimizer.target,
+                               test_family_accessions=test_family_accessions,
+                               title='CNN + Max Pool',
                                loss_fn_kwargs=loss_fn_kwargs,
-                               learning_rate=lr,
-                               weight_decay=wd,
-                               restore_dir=restore_dir,
-                               save_dir=save_dir,
-                               use_pmap=use_pmap)
+                               batch_size=512)
 
-cnn_max_pool_results, cnn_max_pool_preds = pfam_evaluate(predict_fn=cnn_max_pool_optimizer.target,
-                                                         test_family_accessions=test_family_accessions,
-                                                         title='CNN + Max Pool',
-                                                         loss_fn_kwargs=loss_fn_kwargs,
-                                                         batch_size=512)
-
-print(cnn_max_pool_results)
+print(results)
