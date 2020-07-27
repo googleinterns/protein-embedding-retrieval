@@ -7,7 +7,7 @@ setup(
    description='Protein contextual lenses.',
    author='Amir Shanehsazzadeh',
    author_email='amirshanehsaz@google.com',
-   packages=find_packages(exclude('google-research', 'docs')),
+   packages=find_packages(exclude=('google-research', 'docs')),
    install_requires=[
    "jax",
    "jaxlib",
