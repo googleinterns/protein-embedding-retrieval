@@ -40,7 +40,7 @@ setup(name='contextual_lenses',
       long_description=readme(),
       author='Amir Shanehsazzadeh',
       author_email='amirshanehsaz@google.com',
-      packages=find_packages(exclude=('google-research', 'docs')),
+      packages=find_packages(exclude=('docs')),
       install_requires=REQUIRED_PACKAGES,
       extras_require={
       "cpu": [jax_artifact(JAXLIB_VERSION, gpu=False)],
