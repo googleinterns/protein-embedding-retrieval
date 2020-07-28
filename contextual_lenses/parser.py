@@ -15,6 +15,7 @@ def parse_args():
     parser.add_argument('--use_pmap', action='store_true')
     parser.add_argument('--restore_transformer_dir')
     parser.add_argument('--bidirectional', action='store_true')
+    # parser.add_argument('--use_transformer', action='store_true')
 
     args = parser.parse_args()
     

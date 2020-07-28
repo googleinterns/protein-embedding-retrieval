@@ -27,11 +27,11 @@ JAXLIB_VERSION = "0.1.43"
 JAX_VERSION = "0.1.62"
 
 REQUIRED_PACKAGES = [
-                     f"jax=={JAX_VERSION}",
-                     "flax",
                      "tensorflow",
                      "pandas",
                      "numpy",
+                     f"jax=={JAX_VERSION}",
+                     "flax"
                      ]
 
 setup(name='contextual_lenses',
