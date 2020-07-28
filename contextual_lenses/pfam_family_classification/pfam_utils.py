@@ -18,11 +18,11 @@ import scipy.stats
 import sklearn.metrics as metrics
 from sklearn.neighbors import KNeighborsClassifier as knn
 
-from protein_lm import domains
+from google_research.protein_lm import domains
 
-from train_utils import create_data_iterator
+from contextual_lenses.train_utils import create_data_iterator
 
-from loss_fns import cross_entropy_loss
+from contextual_lenses.loss_fns import cross_entropy_loss
 
 
 # Data preprocessing.

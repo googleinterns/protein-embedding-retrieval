@@ -13,9 +13,9 @@ import scipy.stats
 
 import sklearn.metrics
 
-from protein_lm import domains
+from google_research.protein_lm import domains
 
-from train_utils import create_data_iterator
+from contextual_lenses.train_utils import create_data_iterator
 
 from tape.tape.datasets import LMDBDataset
 

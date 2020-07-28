@@ -30,6 +30,7 @@ REQUIRED_PACKAGES = [
                      "tensorflow",
                      "pandas",
                      "numpy",
+                     "gin",
                      f"jax=={JAX_VERSION}",
                      "flax"
                      ]
