@@ -30,7 +30,9 @@ REQUIRED_PACKAGES = [
                      "tensorflow",
                      "pandas",
                      "numpy",
-                     "gin",
+                     "gin-config",
+                     "sklearn",
+                     "dm-tree",
                      f"jax=={JAX_VERSION}",
                      "flax"
                      ]

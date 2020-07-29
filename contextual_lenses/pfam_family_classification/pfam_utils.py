@@ -18,6 +18,8 @@ import scipy.stats
 import sklearn.metrics as metrics
 from sklearn.neighbors import KNeighborsClassifier as knn
 
+from pkg_resources import resource_filename
+
 from google_research.protein_lm import domains
 
 from contextual_lenses.train_utils import create_data_iterator
@@ -64,7 +66,7 @@ def residues_to_one_hot_inds(seq):
 
 
 # Dictionary mapping family id to index.
-family_ids = open('pfam_family_ids.txt', 'r').readlines()
+family_ids = open(resource_filename('contextual_lenses/resources/', 'pfam_family_ids.txt'), 'r').readlines()
 family_id_to_index = {}
 for i, family_id in enumerate(family_ids):
   family_id_to_index[family_id.replace('\n', '')] = i
