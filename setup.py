@@ -34,6 +34,7 @@ REQUIRED_PACKAGES = [
                      "sklearn",
                      "dm-tree",
                      "fs",
+                     "fs-gcsfs",
                      f"jax=={JAX_VERSION}",
                      "flax"
                      ]
