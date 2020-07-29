@@ -25,6 +25,7 @@ def readme():
 
 JAXLIB_VERSION = "0.1.43"
 JAX_VERSION = "0.1.62"
+FLAX_VERSION = "0.2.0"
 
 REQUIRED_PACKAGES = [
                      "tensorflow",
@@ -36,7 +37,7 @@ REQUIRED_PACKAGES = [
                      "fs",
                      "fs-gcsfs",
                      f"jax=={JAX_VERSION}",
-                     "flax"
+                     f"flax=={FLAX_VERSION}"
                      ]
 
 setup(name='contextual_lenses',
