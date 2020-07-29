@@ -1,4 +1,4 @@
-"""Utils for loading FlaxLM or FlaxBERT models or parameters."""
+'''Utils for loading FlaxLM or FlaxBERT models or parameters.'''
 
 
 import os
@@ -29,3 +29,12 @@ def load_transformer_params(ckpt_dir, model_cls, domain=None):
     params = models.jax_utils.unreplicate(model._optimizer.target).params
     
     return params
+
+
+def load_transformer_encoder(ckpt_dir, model_cls, domain=None):
+    """Returns parameters of a loaded model."""
+    
+    model = load_transformer_model(ckpt_dir, model_cls, domain=domain)
+    encoder = models.jax_utils.unreplicate(model._optimizer.target)
+    
+    return encoder
