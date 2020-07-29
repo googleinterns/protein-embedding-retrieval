@@ -33,6 +33,7 @@ REQUIRED_PACKAGES = [
                      "gin-config",
                      "sklearn",
                      "dm-tree",
+                     "fs",
                      f"jax=={JAX_VERSION}",
                      "flax"
                      ]
