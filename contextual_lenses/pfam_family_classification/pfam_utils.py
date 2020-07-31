@@ -20,6 +20,8 @@ from sklearn.neighbors import KNeighborsClassifier as knn
 
 from pkg_resources import resource_filename
 
+from fs_gcsfs import GCSFS
+
 from google_research.protein_lm import domains
 
 from contextual_lenses.train_utils import create_data_iterator
@@ -29,6 +31,7 @@ from contextual_lenses.loss_fns import cross_entropy_loss
 
 # Data preprocessing.
 # Code source: https://www.kaggle.com/drewbryant/starter-pfam-seed-random-split.
+'''
 data_partitions_dirpath = 'random_split/random_split/'
 
 def read_all_shards(partition='train', data_dir=data_partitions_dirpath):
@@ -39,6 +42,21 @@ def read_all_shards(partition='train', data_dir=data_partitions_dirpath):
     with open(os.path.join(data_dir, partition, fn)) as f:
       shards.append(pd.read_csv(f, index_col=None))
   return pd.concat(shards)
+'''
+data_partitions_dirpath = 'random_split/'
+bucket_name = 'sequin-public'
+
+def read_all_shards(partition='train', data_dir=data_partitions_dirpath, bucket_name=bucket_name):
+  """Combines different CSVs into a single dataframe."""
+
+  gcsfs = GCSFS(bucket_name)
+
+  shards = []
+  for fn in gcsfs.listdir(data_partitions_dirpath + partition):
+    with gcsfs.open(data_partitions_dirpath + partition + '/' + fn) as f:
+      shards.append(pd.read_csv(f, index_col=None))
+  return pd.concat(shards)
+
 
 def mod_family_accession(family_accession):
   """Reduces family accession to everything prior to '.'."""
