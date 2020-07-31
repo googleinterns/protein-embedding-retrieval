@@ -30,19 +30,7 @@ from contextual_lenses.loss_fns import cross_entropy_loss
 
 
 # Data preprocessing.
-# Code source: https://www.kaggle.com/drewbryant/starter-pfam-seed-random-split.
-'''
-data_partitions_dirpath = 'random_split/random_split/'
-
-def read_all_shards(partition='train', data_dir=data_partitions_dirpath):
-  """Combines different CSVs into a single dataframe."""
-
-  shards = []
-  for fn in os.listdir(os.path.join(data_dir, partition)):
-    with open(os.path.join(data_dir, partition, fn)) as f:
-      shards.append(pd.read_csv(f, index_col=None))
-  return pd.concat(shards)
-'''
+# Original code source: https://www.kaggle.com/drewbryant/starter-pfam-seed-random-split.
 data_partitions_dirpath = 'random_split/'
 bucket_name = 'sequin-public'
 
@@ -53,7 +41,7 @@ def read_all_shards(partition='train', data_dir=data_partitions_dirpath, bucket_
 
   shards = []
   for fn in gcsfs.listdir(data_partitions_dirpath + partition):
-    with gcsfs.open(data_partitions_dirpath + partition + '/' + fn) as f:
+    with gcsfs.open(os.path.join(data_partitions_dirpath, partition, fn)) as f:
       shards.append(pd.read_csv(f, index_col=None))
   return pd.concat(shards)
 
