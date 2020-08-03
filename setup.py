@@ -25,7 +25,7 @@ def readme():
 
 JAXLIB_VERSION = "0.1.43"
 JAX_VERSION = "0.1.62"
-FLAX_VERSION = "0.1.0rc2"
+FLAX_VERSION = "0.2.0" # "0.1.0rc2"
 
 REQUIRED_PACKAGES = [
                      "tensorflow",
