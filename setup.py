@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 # https://github.com/google/jax#pip-installation
 PYTHON_VERSION = "cp37"
 CUDA_VERSION = "cuda101" # alternatives: cuda90, cuda92, cuda100, cuda101
-PLATFORM = "linux_x86_64" # alternatives: linux_x86_64
+PLATFORM = "manylinux2010_x86_64" # "linux_x86_64" # alternatives: linux_x86_64
 BASE_URL = "https://storage.googleapis.com/jax-releases"
 
 
@@ -23,7 +23,7 @@ def readme():
     except FileNotFoundError:
         return None
 
-JAXLIB_VERSION = "0.1.51" # "0.1.49" # 0.1.52
+JAXLIB_VERSION = "0.1.52"
 JAX_VERSION = "0.1.75"
 FLAX_VERSION = "0.2.0" # "0.1.0rc2"
 
