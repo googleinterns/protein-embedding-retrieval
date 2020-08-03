@@ -23,7 +23,7 @@ def readme():
     except FileNotFoundError:
         return None
 
-JAXLIB_VERSION = "0.1.51"
+JAXLIB_VERSION = "0.1.50"
 JAX_VERSION = "0.1.75"
 FLAX_VERSION = "0.2.0" # "0.1.0rc2"
 
