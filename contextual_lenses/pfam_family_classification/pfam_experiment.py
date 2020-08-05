@@ -77,11 +77,11 @@ def main(_):
 	for _ in range(1, FLAGS.lens_train_families+1):
   		family_name = 'PF%05d' % _
   		train_family_accessions.append(family_name)
-  	
+
   	test_family_accessions = []
-	for _ in range(15001, 16001):
+  	for _ in range(15001, 16001):
   		family_name = 'PF%05d' % _
-  	test_family_accessions.append(family_name)
+  		test_family_accessions.append(family_name)
 	
 	train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions,
 													   batch_size=64,
@@ -187,12 +187,24 @@ def main(_):
 	test_knn_accuracy = test_knn_results['1-nn accuracy']
 
 	datum = {
+				'encoder_fn_name': FLAGS.encoder_fn_name,
+				'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
+				'reduce_fn_name': FLAGS.reduce_fn_name,
+				'reduce_fn_kwargs_path': FLAGS.reduce_fn_kwargs_path,
+				'epochs': FLAGS.epochs,
+				'learning_rate': FLAGS.learning_rate,
+				'weight_decay': FLAGS.weight_decay,
+				'lens_train_families': FLAGS.lens_train_families,
+				'restore_transformer_dir': FLAGS.restore_transformer_dir,
+				'use_transformer': FLAGS.use_transformer,
+				'use_bert': FLAGS.use_bert,
 				'knn_train_samples': FLAGS.knn_train_samples,
 				'lens_cross_entropy': lens_cross_entropy,
 				'lens_accuracy': lens_accuracy,
 				'train_knn_accuracy': train_knn_accuracy,
 				'test_knn_accuracy': test_knn_accuracy
 			}
+
 	df = pd.DataFrame([datum])
     
     with gcsfs.open(os.path.join('sweep_data', title + '.csv'), 'w') as gcs_file:
