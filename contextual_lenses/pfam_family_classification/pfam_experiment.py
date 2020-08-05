@@ -3,7 +3,7 @@
 
 import sys
 sys.path.insert(1, 'google_research/')
-
+print(sys.path)
 import flax
 from flax import nn
 from flax.training import checkpoints
