@@ -68,13 +68,16 @@ flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train ne
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
+	print('ACCESSING CLOUD BUCKET!')
 	gcsfs = GCSFS('sequin-public')
 
+	print('LOSS_FN_KWARGS')
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
 	  	'num_classes': num_families
 	}
-  
+
+	print('FAMILY_ACCESSIONS')  
 	train_family_accessions = []
 	for _ in range(1, FLAGS.lens_train_families+1):
   		family_name = 'PF%05d' % _
@@ -85,16 +88,19 @@ def main(_):
 		family_name = 'PF%05d' % _
 		test_family_accessions.append(family_name)
 	
+	print('CREATING BATCHES')
 	train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions,
 													   batch_size=64,
 													   epochs=FLAGS.epochs, 
 													   drop_remainder=True)
+	print('BATCHES CREATED')
 
 	encoder_fn = encoder_fn_name_to_fn(FLAGS.encoder_fn_name)
 	encoder_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('encoder_fn_kwargs_resources', FLAGS.encoder_fn_kwargs_path))))
 
 	reduce_fn = reduce_fn_name_to_fn(FLAGS.reduce_fn_name)
 	reduce_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('reduce_fn_kwargs_resources', FLAGS.reduce_fn_kwargs_path))))
+	print('LOADED ARGUMENTS')
 
 	if FLAGS.use_transformer:
 
@@ -141,7 +147,7 @@ def main(_):
 				                                      num_categories=pfam_num_categories,
 				                                      output_features=num_families,
 				                                  	  output='embedding')
-
+	print('CREATED MODEL')
 	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
 
 	print('BEGINNING TRAINING!')
