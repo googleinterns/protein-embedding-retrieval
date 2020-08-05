@@ -59,7 +59,7 @@ flags.DEFINE_list('weight_decay', [0.0, 0.0, 0.0], 'Weight decays for encoder, l
 flags.DEFINE_integer('lens_train_families', 1000, 'Number of famlies used to train lens.')
 
 flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
-flags.DEFINE_boolean('use_transformer', False, 'Whether or not to use transformer encoder')
+flags.DEFINE_boolean('use_transformer', True, 'Whether or not to use transformer encoder')
 flags.DEFINE_boolean('use_bert', True, 'Whether or not to use bidirectional transformer.')
 
 flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train nearest neighbors algorithm.')
