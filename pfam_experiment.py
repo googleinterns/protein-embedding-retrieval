@@ -156,7 +156,7 @@ def main(_):
 			str(FLAGS.lens_train_families) + ' lens_train_families' + '-' + 'transformer: ' + str(FLAGS.use_transformer)
 	
 	if FLAGS.use_transformer:
-		title = title + '-' +  'bert: ' + str(FLAGS.use_bert) + '-' + 'pretrained_dir: ' + str(FLAGS.restore_transformer_dir)
+		title = title + '-' + 'bert: ' + str(FLAGS.use_bert) + '-' + 'pretrained_dir: ' + str(FLAGS.restore_transformer_dir)
 	
 	title = title + '-' + str(FLAGS.knn_train_samples) + ' knn_train_samples'
 
