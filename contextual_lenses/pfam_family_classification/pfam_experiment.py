@@ -101,12 +101,12 @@ def main(_):
 		else:
 			model_cls = models.FlaxLM
 
- 		if FLAGS.restore_transformer_dir is not None:
-  	 		pretrained_transformer_params = load_transformer_params(restore_transformer_dir, model_cls)
-  		else:
-  			pretrained_transformer_params = None
+		if FLAGS.restore_transformer_dir is not None:
+			pretrained_transformer_params = load_transformer_params(restore_transformer_dir, model_cls)
+		else:
+			pretrained_transformer_params = None
 
-  		model = create_transformer_representation_model(transformer_kwargs=encoder_fn_kwargs,
+		model = create_transformer_representation_model(transformer_kwargs=encoder_fn_kwargs,
 	                                                    reduce_fn=reduce_fn,
 	                                                    reduce_fn_kwargs=reduce_fn_kwargs,
 	                                                    num_categories=pfam_num_categories,
@@ -115,7 +115,7 @@ def main(_):
 	                                                    bidirectional=FLAGS.use_bert,
 	                                                    encoder_fn_params=pretrained_transformer_params)
 
-  		embedding_model = create_transformer_representation_model(transformer_kwargs=encoder_fn_kwargs,
+		embedding_model = create_transformer_representation_model(transformer_kwargs=encoder_fn_kwargs,
 	                                                    		  reduce_fn=reduce_fn,
 				                                                  reduce_fn_kwargs=reduce_fn_kwargs,
 				                                                  num_categories=pfam_num_categories,
@@ -123,8 +123,8 @@ def main(_):
 				                                                  output='embedding',
 				                                                  bidirectional=FLAGS.use_bert,
 				                                                  encoder_fn_params=pretrained_transformer_params)
-  	else:
-  		model = create_representation_model(encoder_fn=encoder_fn,
+	else:
+		model = create_representation_model(encoder_fn=encoder_fn,
 		                                    encoder_fn_kwargs=encoder_fn_kwargs,
 		                                    reduce_fn=reduce_fn,
 		                                    reduce_fn_kwargs=reduce_fn_kwargs,
@@ -132,7 +132,7 @@ def main(_):
 		                                    output_features=num_families,
 		                                  	output='prediction')
 
-  		embedding_model = create_representation_model(encoder_fn=encoder_fn,
+		embedding_model = create_representation_model(encoder_fn=encoder_fn,
 				                                      encoder_fn_kwargs=encoder_fn_kwargs,
 				                                      reduce_fn=reduce_fn,
 				                                      reduce_fn_kwargs=reduce_fn_kwargs,
@@ -140,7 +140,7 @@ def main(_):
 				                                      output_features=num_families,
 				                                  	  output='embedding')
 
-  	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
+	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
 
 	optimizer = train(model=model,
                       train_data=train_batches,
@@ -207,8 +207,8 @@ def main(_):
 
 	df = pd.DataFrame([datum])
     
-    with gcsfs.open(os.path.join('sweep_data', title + '.csv'), 'w') as gcs_file:
-        df.to_pickle(gcs_file)
+	with gcsfs.open(os.path.join('sweep_data', title + '.csv'), 'w') as gcs_file:
+		df.to_pickle(gcs_file)
 
 
 if __name__ = '__main__':
