@@ -79,9 +79,9 @@ def main(_):
   		train_family_accessions.append(family_name)
 	
 	test_family_accessions = []
-  	for _ in range(15001, 16001):
-  		family_name = 'PF%05d' % _
-  		test_family_accessions.append(family_name)
+	for _ in range(15001, 16001):
+		family_name = 'PF%05d' % _
+		test_family_accessions.append(family_name)
 	
 	train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions,
 													   batch_size=64,
