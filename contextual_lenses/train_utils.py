@@ -14,6 +14,8 @@ import jax
 from jax import random
 import jax.nn
 import jax.numpy as jnp
+from jax.config import config
+config.enable_omnistaging()
 
 import tensorflow as tf
 
@@ -300,3 +302,46 @@ def create_transformer_representation_model(transformer_kwargs, reduce_fn, reduc
   model = nn.Model(module, loaded_params)
   
   return model
+
+
+def architecture_to_layers(encoder_fn_name, reduce_fn_name):
+
+  layers = []
+
+  no_trainable_encoder = False
+  if encoder_fn_name is None or encoder_fn_name == 'transformer':
+    layers.append('Transformer_0')
+  elif encoder_fn_name == 'one_hot':
+    no_trainable_encoder = True
+  elif encoder_fn_name == 'cnn_one_hot':
+    layers.append('CNN_0')
+  else:
+    raise ValueError('Incorrect encoder name specified.')
+
+  no_trainable_lens = False
+  if reduce_fn_name == 'mean_pool' or reduce_fn_name == 'max_pool':
+    no_trainable_lens = True
+  elif reduce_fn_name == 'linear_mean_pool' or reduce_fn_name == 'linear_max_pool':
+    if no_trainable_encoder:
+      layers.append('Dense_0')
+    else:
+      layers.append('Dense_1')
+  elif reduce_fn_name == 'gated_conv':
+    if no_trainable_encoder:
+      layers.append('GatedConv_0')
+    else:
+      layers.append('GatedConv_1')
+  else:
+    raise ValueError('Incorrect lens name specified.')
+
+  if no_trainable_encoder:
+    if no_trainable_lens:
+      layers.append('Dense_0')
+    else:
+      layers.append('Dense_1')
+  else:
+    if no_trainable_lens:
+      layers.append('Dense_1')
+    else:
+      layers.append('Dense_2')
+

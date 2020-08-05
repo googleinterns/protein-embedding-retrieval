@@ -11,6 +11,8 @@ from flax import nn
 import jax
 import jax.nn
 import jax.numpy as jnp
+from jax.config import config
+config.enable_omnistaging()
 
 import numpy as np
 
@@ -144,4 +146,3 @@ def reduce_fn_name_to_fn(reduce_fn_name):
 
   return reduce_fn
 
-  
