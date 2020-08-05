@@ -156,3 +156,23 @@ def cnn_one_hot_pos_emb_encoder(batch_inds, num_categories, n_layers, n_features
   cnn_one_hots_pos_emb = CNN(one_hots_pos_emb, n_layers, n_features, n_kernel_sizes)
   
   return cnn_one_hots_pos_emb
+
+
+def encoder_fn_name_to_fn(encoder_fn_name):
+  """Returns encoder_fn corresponding to encoder_fn_name."""
+
+  if encoder_fn_name is None:
+    encoder_fn = None
+  elif encoder_fn_name == 'one_hot':
+    encoder_fn = one_hot_encoder
+  elif encoder_fn_name == 'cnn_one_hot':
+    encoder_fn = cnn_one_hot_encoder
+  elif encoder_fn_name == 'one_hot_pos_emb':
+    encoder_fn = one_hot_pos_emb_encoder
+  elif encoder_fn_name == 'cnn_one_hot_pos_emb':
+    encoder_fn = cnn_one_hot_pos_emb_encoder
+  else:
+    raise ValueError('Incorrect encoder name specified.')
+
+  return encoder_fn
+

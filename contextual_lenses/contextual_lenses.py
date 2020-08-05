@@ -124,3 +124,24 @@ def gated_conv(x, rep_size, m_layers, m_features, m_kernel_sizes, conv_rep_size,
                   conv_rep_size=conv_rep_size, padding_mask=padding_mask)
   
   return rep
+
+
+def reduce_fn_name_to_fn(reduce_fn_name):
+  """Returns reduce_fn corresponding to reduce_fn_name."""
+
+  if reduce_fn_name == 'mean_pool':
+    reduce_fn = mean_pool
+  elif reduce_fn_name == 'max_pool':
+    reduce_fn = max_pool
+  elif reduce_fn_name == 'linear_mean_pool':
+    reduce_fn = linear_mean_pool
+  elif reduce_fn_name == 'linear_max_pool':
+    reduce_fn = linear_max_pool
+  elif reduce_fn_name == 'gated_conv':
+    reduce_fn = gated_conv
+  else:
+    raise ValueError('Incorrect lens name specified.')
+
+  return reduce_fn
+
+  
