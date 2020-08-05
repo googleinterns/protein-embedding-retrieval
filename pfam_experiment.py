@@ -143,7 +143,7 @@ def main(_):
 				                                  	  output='embedding')
 
 	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
-
+	
 	optimizer = train(model=model,
                       train_data=train_batches,
                       loss_fn=cross_entropy_loss,
