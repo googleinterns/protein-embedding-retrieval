@@ -144,6 +144,8 @@ def main(_):
 
 	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
 
+	print('BEGINNING TRAINING!')
+
 	optimizer = train(model=model,
                       train_data=train_batches,
                       loss_fn=cross_entropy_loss,
@@ -192,7 +194,7 @@ def main(_):
                                                              train_samples=FLAGS.knn_train_samples)[0]
 	test_knn_accuracy = test_knn_results['1-nn accuracy']
 	print('TEST KNN EVALUATED!')
-	
+
 	datum = {
 				'encoder_fn_name': FLAGS.encoder_fn_name,
 				'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
