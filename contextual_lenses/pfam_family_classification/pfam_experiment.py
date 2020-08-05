@@ -2,7 +2,7 @@
 
 
 import sys
-sys.path.insert(1, '/usr/app/google_research/')
+sys.path.insert(1, '/usr/app/google_research')
 print(sys.path)
 import flax
 from flax import nn
