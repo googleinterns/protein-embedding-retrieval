@@ -2,8 +2,8 @@
 
 
 import sys
-sys.path.insert(1, '/usr/app/google_research')
-print(sys.path)
+sys.path.insert(1, 'google_research/')
+
 import flax
 from flax import nn
 from flax.training import checkpoints
