@@ -143,7 +143,7 @@ def main(_):
 				                                  	  output='embedding')
 
 	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
-	
+
 	optimizer = train(model=model,
                       train_data=train_batches,
                       loss_fn=cross_entropy_loss,
@@ -151,6 +151,8 @@ def main(_):
                       learning_rate=FLAGS.learning_rate,
                       weight_decay=FLAGS.weight_decay,
                       layers=layers)
+
+	print('MODEL TRAINED!')
 
 	title = str(FLAGS.encoder_fn_name) + '-' + FLAGS.encoder_fn_kwargs_path + '-' + FLAGS.reduce_fn_name + '-' + \
 			FLAGS.reduce_fn_kwargs_path + '-' + str(FLAGS.epochs) + ' epochs' + '-' + \
@@ -167,7 +169,8 @@ def main(_):
                                    title=title,
                                    loss_fn_kwargs=loss_fn_kwargs,
                                    batch_size=512)
-	
+	print('MODEL EVALUATED!')
+
 	lens_accuracy = results['accuracy']
 	lens_cross_entropy = results['cross_entropy']
 
@@ -181,13 +184,15 @@ def main(_):
                                                               test_family_accessions=train_family_accessions,
                                                               train_samples=FLAGS.knn_train_samples)[0]
 	train_knn_accuracy = train_knn_results['1-nn accuracy']
+	print('TRAIN KNN EVALUATED!')
 
 	test_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                              train_family_accessions=test_family_accessions, 
                                                              test_family_accessions=test_family_accessions,
                                                              train_samples=FLAGS.knn_train_samples)[0]
 	test_knn_accuracy = test_knn_results['1-nn accuracy']
-
+	print('TEST KNN EVALUATED!')
+	
 	datum = {
 				'encoder_fn_name': FLAGS.encoder_fn_name,
 				'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
