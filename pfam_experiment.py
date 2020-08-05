@@ -1,6 +1,8 @@
 """Lens training + nearest neighbors classification pipeline."""
 
 
+import os
+
 import sys
 sys.path.insert(1, 'google_research/')
 
