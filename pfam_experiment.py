@@ -73,6 +73,9 @@ def main(_):
 	print('ACCESSING CLOUD BUCKET!')
 	gcsfs = GCSFS('sequin-public')
 
+	with gcsfs.open('test_logs.txt', 'w') as f:
+		f.write('TESTING LOGS!')
+
 	print('LOSS_FN_KWARGS')
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
