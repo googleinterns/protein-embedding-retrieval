@@ -166,7 +166,7 @@ def main(_):
 		f.write('MODEL TRAINED!')
 
 	results, preds = pfam_evaluate(predict_fn=optimizer.target,
-                                   test_family_accessions=test_family_accessions,
+                                   test_family_accessions=train_family_accessions,
                                    title=None,
                                    loss_fn_kwargs=loss_fn_kwargs,
                                    batch_size=64)
