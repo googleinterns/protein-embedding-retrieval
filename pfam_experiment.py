@@ -227,5 +227,6 @@ def main(_):
 
 
 if __name__ == '__main__':
+	print('going')
 	app.run(main)
 
