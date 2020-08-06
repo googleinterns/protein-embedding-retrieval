@@ -90,7 +90,7 @@ def main(_):
 		test_family_accessions.append(family_name)
 	
 	train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions,
-													   batch_size=256,
+													   batch_size=128,
 													   epochs=FLAGS.epochs, 
 													   drop_remainder=True)
 
@@ -179,7 +179,7 @@ def main(_):
                                    test_family_accessions=test_family_accessions,
                                    title=title,
                                    loss_fn_kwargs=loss_fn_kwargs,
-                                   batch_size=256)
+                                   batch_size=128)
 	
 	with gcsfs.open('test_eval.txt', 'w') as f:
 		f.write('MODEL EVALUATED!')
@@ -195,7 +195,7 @@ def main(_):
 	train_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                               train_family_accessions=train_family_accessions, 
                                                               test_family_accessions=train_family_accessions,
-                                                              batch_size=256,
+                                                              batch_size=128,
                                                               train_samples=FLAGS.knn_train_samples)[0]
 	train_knn_accuracy = train_knn_results['1-nn accuracy']
 	
@@ -205,7 +205,7 @@ def main(_):
 	test_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                              train_family_accessions=test_family_accessions, 
                                                              test_family_accessions=test_family_accessions,
-                                                             batch_size=256,
+                                                             batch_size=128,
                                                              train_samples=FLAGS.knn_train_samples)[0]
 	test_knn_accuracy = test_knn_results['1-nn accuracy']
 	
