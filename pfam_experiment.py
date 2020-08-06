@@ -57,7 +57,7 @@ flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256.json', 'Path to re
 flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_list('learning_rate', [0.0, 1e-3, 1e-3], 'Learning rates for encoder, lens, and predictor.')
 flags.DEFINE_list('weight_decay', [0.0, 0.0, 0.0], 'Weight decays for encoder, lens, and predictor.')
-flags.DEFINE_integer('lens_train_families', 10000, 'Number of famlies used to train lens.')
+flags.DEFINE_integer('train_families', 10000, 'Number of famlies used to train lens.')
 
 flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 flags.DEFINE_boolean('use_transformer', True, 'Whether or not to use transformer encoder')
@@ -79,17 +79,17 @@ def main(_):
 	  	'num_classes': num_families
 	}
 
-	train_family_accessions = []
-	for _ in range(1, FLAGS.lens_train_families+1):
+	lens_knn_train_family_accessions = []
+	for _ in range(1, FLAGS.train_families+1):
   		family_name = 'PF%05d' % _
-  		train_family_accessions.append(family_name)
+  		lens_knn_train_family_accessions.append(family_name)
 	
-	test_family_accessions = []
+	knn_test_family_accessions = []
 	for _ in range(15001, 16001):
 		family_name = 'PF%05d' % _
-		test_family_accessions.append(family_name)
+		knn_test_family_accessions.append(family_name)
 	
-	train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions,
+	train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
 													   batch_size=64,
 													   epochs=FLAGS.epochs, 
 													   drop_remainder=True)
@@ -166,7 +166,7 @@ def main(_):
 		f.write('MODEL TRAINED!')
 
 	results, preds = pfam_evaluate(predict_fn=optimizer.target,
-                                   test_family_accessions=train_family_accessions,
+                                   test_family_accessions=lens_knn_train_family_accessions,
                                    title=None,
                                    loss_fn_kwargs=loss_fn_kwargs,
                                    batch_size=64)
@@ -183,8 +183,8 @@ def main(_):
 										   layers=layers)
 
 	train_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
-                                                              train_family_accessions=train_family_accessions, 
-                                                              test_family_accessions=train_family_accessions,
+                                                              train_family_accessions=lens_knn_train_family_accessions, 
+                                                              test_family_accessions=lens_knn_train_family_accessions,
                                                               batch_size=64,
                                                               train_samples=FLAGS.knn_train_samples)[0]
 	train_knn_accuracy = train_knn_results['1-nn accuracy']
@@ -193,8 +193,8 @@ def main(_):
 		f.write('TRAIN KNN!')
 
 	test_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
-                                                             train_family_accessions=test_family_accessions, 
-                                                             test_family_accessions=test_family_accessions,
+                                                             train_family_accessions=knn_test_family_accessions, 
+                                                             test_family_accessions=knn_test_family_accessions,
                                                              batch_size=64,
                                                              train_samples=FLAGS.knn_train_samples)[0]
 	test_knn_accuracy = test_knn_results['1-nn accuracy']
