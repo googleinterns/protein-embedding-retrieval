@@ -58,12 +58,12 @@ flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_list('learning_rate', [0.0, 1e-3, 1e-3], 'Learning rates for encoder, lens, and predictor.')
 flags.DEFINE_list('weight_decay', [0.0, 0.0, 0.0], 'Weight decays for encoder, lens, and predictor.')
 flags.DEFINE_integer('train_families', 10000, 'Number of famlies used to train lens.')
+flags.DEFINE_integer('lens_train_samples', 25, 'Number of samples used to train lens.')
+flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train nearest neighbors algorithm.')
 
 flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 flags.DEFINE_boolean('use_transformer', True, 'Whether or not to use transformer encoder')
 flags.DEFINE_boolean('use_bert', True, 'Whether or not to use bidirectional transformer.')
-
-flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train nearest neighbors algorithm.')
 
 
 # Train lens and measure performance of lens and nearest neighbors classifier.
@@ -91,6 +91,7 @@ def main(_):
 	
 	train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
 													   batch_size=64,
+													   samples=FLAGS.lens_train_samples,
 													   epochs=FLAGS.epochs, 
 													   drop_remainder=True)
 
