@@ -38,7 +38,8 @@ from contextual_lenses.encoders import encoder_fn_name_to_fn
 from contextual_lenses.loss_fns import cross_entropy_loss
 
 from contextual_lenses.pfam_family_classification.pfam_utils import family_ids, \
-pfam_num_categories, create_pfam_batches, pfam_nearest_neighbors_classification
+pfam_num_categories, pfam_evaluate, create_pfam_batches, \
+pfam_nearest_neighbors_classification
 
 from contextual_lenses.load_transformer import load_transformer_params
 
@@ -73,7 +74,6 @@ def main(_):
 	with gcsfs.open('test_running.txt', 'w') as f:
 		f.write('RUNNING!')
 
-	print('LOSS_FN_KWARGS')
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
 	  	'num_classes': num_families
