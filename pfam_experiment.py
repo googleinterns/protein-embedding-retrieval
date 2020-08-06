@@ -21,6 +21,8 @@ import pandas as pd
 
 import json
 
+import copy
+
 from pkg_resources import resource_filename
 
 from fs_gcsfs import GCSFS
@@ -71,9 +73,6 @@ def main(_):
 
 	gcsfs = GCSFS('sequin-public')
 
-	with gcsfs.open('test_running.txt', 'w') as f:
-		f.write('RUNNING!')
-
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
 	  	'num_classes': num_families
@@ -100,9 +99,6 @@ def main(_):
 
 	reduce_fn = reduce_fn_name_to_fn(FLAGS.reduce_fn_name)
 	reduce_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('reduce_fn_kwargs_resources', FLAGS.reduce_fn_kwargs_path))))
-
-	with gcsfs.open('test_load.txt', 'w') as f:
-		f.write('LOADED ARGUMENTS!')
 
 	if FLAGS.use_transformer:
 
@@ -171,9 +167,6 @@ def main(_):
                                    title=None,
                                    loss_fn_kwargs=loss_fn_kwargs,
                                    batch_size=64)
-	
-	with gcsfs.open('test_eval.txt', 'w') as f:
-		f.write('MODEL EVALUATED!')
 
 	lens_accuracy = results['accuracy']
 	lens_cross_entropy = float(results['cross_entropy'])
@@ -182,6 +175,10 @@ def main(_):
 										   learning_rate=FLAGS.learning_rate, 
 										   weight_decay=FLAGS.weight_decay, 
 										   layers=layers)
+	print(optimizer.target.params.keys())
+	print(embedding_optimizer.target.params.keys())
+	embedding_optimizer.target.params = copy.deepcopy(optimizer.target.params)
+
 
 	train_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                               train_family_accessions=lens_knn_train_family_accessions, 
@@ -189,9 +186,6 @@ def main(_):
                                                               batch_size=64,
                                                               train_samples=FLAGS.knn_train_samples)[0]
 	train_knn_accuracy = train_knn_results['1-nn accuracy']
-	
-	with gcsfs.open('test_train_knn.txt', 'w') as f:
-		f.write('TRAIN KNN!')
 
 	test_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                              train_family_accessions=knn_test_family_accessions, 
@@ -199,9 +193,6 @@ def main(_):
                                                              batch_size=64,
                                                              train_samples=FLAGS.knn_train_samples)[0]
 	test_knn_accuracy = test_knn_results['1-nn accuracy']
-	
-	with gcsfs.open('test_test_knn.txt', 'w') as f:
-		f.write('TEST KNN!')
 
 	datum = {
 				'encoder_fn_name': FLAGS.encoder_fn_name,
@@ -227,14 +218,9 @@ def main(_):
 			}
 	print(datum)
 	df = pd.DataFrame([datum])
-	print(df)
     
 	with gcsfs.open(os.path.join('sweep_data', 'second_experiment' + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
-
-	with gcsfs.open('test_saving.txt', 'w') as f:
-		f.write('DATUM SAVED!')
-
 
 if __name__ == '__main__':
 	app.run(main)
