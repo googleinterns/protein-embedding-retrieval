@@ -68,10 +68,10 @@ flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train ne
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
+	gcsfs = GCSFS('sequin-public')
+
 	with gcsfs.open('test_running.txt', 'w') as f:
 		f.write('RUNNING!')
-
-	gcsfs = GCSFS('sequin-public')
 
 	print('LOSS_FN_KWARGS')
 	num_families = len(family_ids)
@@ -90,7 +90,7 @@ def main(_):
 		test_family_accessions.append(family_name)
 	
 	train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions,
-													   batch_size=64,
+													   batch_size=512,
 													   epochs=FLAGS.epochs, 
 													   drop_remainder=True)
 
