@@ -233,7 +233,7 @@ def main(_):
 
 	df = pd.DataFrame([datum])
     
-	with gcsfs.open(os.path.join('sweep_data', title + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join('sweep_data', title), 'w') as gcs_file:
 		df.to_pickle(gcs_file)
 
 	with gcsfs.open('test_saving.txt', 'w') as f:
