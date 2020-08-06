@@ -1,6 +1,6 @@
 """Lens training + nearest neighbors classification pipeline."""
 
-
+print(123)
 import os
 
 import sys
@@ -45,9 +45,9 @@ from contextual_lenses.load_transformer import load_transformer_params
 from absl import app, flags
 
 
+# Define flags
 FLAGS = flags.FLAGS
 
-# Define flags
 flags.DEFINE_string('encoder_fn_name', None, 'Name of encoder_fn to use. None if using Transformer.')
 flags.DEFINE_string('encoder_fn_kwargs_path', 'medium_transformer_kwargs.json', 'Path to encoder_fn_kwargs.')
 flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to use.')
