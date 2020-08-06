@@ -214,7 +214,7 @@ def main(_):
 				'encoder_wd': FLAGS.weight_decay[0],
 				'lens_wd': FLAGS.weight_decay[1],
 				'predictor_wd': FLAGS.weight_decay[2],
-				'lens_train_families': FLAGS.lens_train_families,
+				'train_families': FLAGS.train_families,
 				'restore_transformer_dir': FLAGS.restore_transformer_dir,
 				'use_transformer': FLAGS.use_transformer,
 				'use_bert': FLAGS.use_bert,
