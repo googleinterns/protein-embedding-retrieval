@@ -51,7 +51,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('encoder_fn_name', None, 'Name of encoder_fn to use. None if using Transformer.')
 flags.DEFINE_string('encoder_fn_kwargs_path', 'medium_transformer_kwargs.json', 'Path to encoder_fn_kwargs.')
 flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to use.')
-flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_1024.json', 'Path to reduce_fn_kwargs.')
+flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256.json', 'Path to reduce_fn_kwargs.')
 
 flags.DEFINE_integer('epochs', 1, 'Number of epochs for lens training.') # 10
 flags.DEFINE_list('learning_rate', [0.0, 1e-3, 1e-3], 'Learning rates for encoder, lens, and predictor.')
