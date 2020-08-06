@@ -220,8 +220,9 @@ def main(_):
 				'train_knn_accuracy': train_knn_accuracy,
 				'test_knn_accuracy': test_knn_accuracy
 			}
-
+	print(datum)
 	df = pd.DataFrame([datum])
+	print(df)
     
 	with gcsfs.open(os.path.join('sweep_data', 'first_experiment'), 'wb') as gcs_file:
 		df.to_pickle(gcs_file)
