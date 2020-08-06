@@ -54,10 +54,10 @@ flags.DEFINE_string('encoder_fn_kwargs_path', 'medium_transformer_kwargs.json', 
 flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to use.')
 flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256.json', 'Path to reduce_fn_kwargs.')
 
-flags.DEFINE_integer('epochs', 1, 'Number of epochs for lens training.') # 10
+flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_list('learning_rate', [0.0, 1e-3, 1e-3], 'Learning rates for encoder, lens, and predictor.')
 flags.DEFINE_list('weight_decay', [0.0, 0.0, 0.0], 'Weight decays for encoder, lens, and predictor.')
-flags.DEFINE_integer('lens_train_families', 100, 'Number of famlies used to train lens.') # 1000/10000
+flags.DEFINE_integer('lens_train_families', 10000, 'Number of famlies used to train lens.')
 
 flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 flags.DEFINE_boolean('use_transformer', True, 'Whether or not to use transformer encoder')
@@ -85,7 +85,7 @@ def main(_):
   		train_family_accessions.append(family_name)
 	
 	test_family_accessions = []
-	for _ in range(15001, 15101): # 16001
+	for _ in range(15001, 16001):
 		family_name = 'PF%05d' % _
 		test_family_accessions.append(family_name)
 	
@@ -228,7 +228,7 @@ def main(_):
 	df = pd.DataFrame([datum])
 	print(df)
     
-	with gcsfs.open(os.path.join('sweep_data', 'first_experiment' + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join('sweep_data', 'second_experiment' + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
 
 	with gcsfs.open('test_saving.txt', 'w') as f:
