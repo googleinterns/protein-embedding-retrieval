@@ -158,6 +158,7 @@ def main(_):
                       learning_rate=FLAGS.learning_rate,
                       weight_decay=FLAGS.weight_decay,
                       layers=layers)
+	trained_params = copy.deepcopy(optimizer.target.params)
 
 	with gcsfs.open('test_learning.txt', 'w') as f:
 		f.write('MODEL TRAINED!')
@@ -175,8 +176,11 @@ def main(_):
 										   learning_rate=FLAGS.learning_rate, 
 										   weight_decay=FLAGS.weight_decay, 
 										   layers=layers)
-	print(optimizer.target.params.keys())
-	print(embedding_optimizer.target.params.keys())
+	
+	assert(embedding_optimizer.target.keys()==trained_params.keys()), 'Optimizer parameters do not match!'
+	for layer in embedding_optimizer.target.params.keys():
+		embedding_optimizer.target.params[layer] = trained_params[layer]
+
 	embedding_optimizer.target.params = copy.deepcopy(optimizer.target.params)
 
 
