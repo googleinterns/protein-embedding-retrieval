@@ -1,6 +1,6 @@
 """Lens training + nearest neighbors classification pipeline."""
 
-print(123)
+
 import os
 
 import sys
@@ -227,6 +227,5 @@ def main(_):
 
 
 if __name__ == '__main__':
-	print('going')
 	app.run(main)
 
