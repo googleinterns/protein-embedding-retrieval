@@ -176,8 +176,8 @@ def main(_):
 										   learning_rate=FLAGS.learning_rate, 
 										   weight_decay=FLAGS.weight_decay, 
 										   layers=layers)
-	
-	assert(embedding_optimizer.target.keys()==trained_params.keys()), 'Optimizer parameters do not match!'
+
+	assert(embedding_optimizer.target.params.keys()==trained_params.keys()), 'Optimizer parameters do not match!'
 	for layer in embedding_optimizer.target.params.keys():
 		embedding_optimizer.target.params[layer] = trained_params[layer]
 
