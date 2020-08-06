@@ -175,7 +175,7 @@ def main(_):
 		f.write('MODEL EVALUATED!')
 
 	lens_accuracy = results['accuracy']
-	lens_cross_entropy = results['cross_entropy']
+	lens_cross_entropy = float(results['cross_entropy'])
 
 	embedding_optimizer = create_optimizer(embedding_model, 
 										   learning_rate=FLAGS.learning_rate, 
@@ -208,8 +208,12 @@ def main(_):
 				'reduce_fn_name': FLAGS.reduce_fn_name,
 				'reduce_fn_kwargs_path': FLAGS.reduce_fn_kwargs_path,
 				'epochs': FLAGS.epochs,
-				'learning_rate': FLAGS.learning_rate,
-				'weight_decay': FLAGS.weight_decay,
+				'encoder_lr': FLAGS.learning_rate[0],
+				'lens_lr': FLAGS.learning_rate[1],
+				'predictor_lr': FLAGS.learning_rate[2],
+				'encoder_wd': FLAGS.weight_decay[0],
+				'lens_wd': FLAGS.weight_decay[1],
+				'predictor_wd': FLAGS.weight_decay[2],
 				'lens_train_families': FLAGS.lens_train_families,
 				'restore_transformer_dir': FLAGS.restore_transformer_dir,
 				'use_transformer': FLAGS.use_transformer,
@@ -224,8 +228,8 @@ def main(_):
 	df = pd.DataFrame([datum])
 	print(df)
     
-	with gcsfs.open(os.path.join('sweep_data', 'first_experiment'), 'wb') as gcs_file:
-		df.to_pickle(gcs_file)
+	with gcsfs.open(os.path.join('sweep_data', 'first_experiment' + '.csv'), 'w') as gcs_file:
+		df.to_csv(gcs_file)
 
 	with gcsfs.open('test_saving.txt', 'w') as f:
 		f.write('DATUM SAVED!')
