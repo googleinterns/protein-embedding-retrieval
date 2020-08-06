@@ -1,8 +1,6 @@
 """Lens training + nearest neighbors classification pipeline."""
 
 
-print('IMPORT HANG??')
-
 import os
 
 import sys
@@ -70,11 +68,10 @@ flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train ne
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
-	print('ACCESSING CLOUD BUCKET!')
-	gcsfs = GCSFS('sequin-public')
+	with gcsfs.open('test_running.txt', 'w') as f:
+		f.write('RUNNING!')
 
-	with gcsfs.open('test_logs.txt', 'w') as f:
-		f.write('TESTING LOGS!')
+	gcsfs = GCSFS('sequin-public')
 
 	print('LOSS_FN_KWARGS')
 	num_families = len(family_ids)
@@ -82,7 +79,6 @@ def main(_):
 	  	'num_classes': num_families
 	}
 
-	print('FAMILY_ACCESSIONS')  
 	train_family_accessions = []
 	for _ in range(1, FLAGS.lens_train_families+1):
   		family_name = 'PF%05d' % _
@@ -93,19 +89,19 @@ def main(_):
 		family_name = 'PF%05d' % _
 		test_family_accessions.append(family_name)
 	
-	print('CREATING BATCHES')
 	train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions,
 													   batch_size=64,
 													   epochs=FLAGS.epochs, 
 													   drop_remainder=True)
-	print('BATCHES CREATED')
 
 	encoder_fn = encoder_fn_name_to_fn(FLAGS.encoder_fn_name)
 	encoder_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('encoder_fn_kwargs_resources', FLAGS.encoder_fn_kwargs_path))))
 
 	reduce_fn = reduce_fn_name_to_fn(FLAGS.reduce_fn_name)
 	reduce_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('reduce_fn_kwargs_resources', FLAGS.reduce_fn_kwargs_path))))
-	print('LOADED ARGUMENTS')
+
+	with gcsfs.open('test_load.txt', 'w') as f:
+		f.write('LOADED ARGUMENTS!')
 
 	if FLAGS.use_transformer:
 
@@ -152,10 +148,11 @@ def main(_):
 				                                      num_categories=pfam_num_categories,
 				                                      output_features=num_families,
 				                                  	  output='embedding')
-	print('CREATED MODEL')
-	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
 
-	print('BEGINNING TRAINING!')
+	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
+	
+	with gcsfs.open('test_model.txt', 'w') as f:
+		f.write('CREATED MODEL!')
 
 	optimizer = train(model=model,
                       train_data=train_batches,
@@ -165,7 +162,8 @@ def main(_):
                       weight_decay=FLAGS.weight_decay,
                       layers=layers)
 
-	print('MODEL TRAINED!')
+	with gcsfs.open('test_learning.txt', 'w') as f:
+		f.write('MODEL TRAINED!')
 
 	title = str(FLAGS.encoder_fn_name) + '-' + FLAGS.encoder_fn_kwargs_path + '-' + FLAGS.reduce_fn_name + '-' + \
 			FLAGS.reduce_fn_kwargs_path + '-' + str(FLAGS.epochs) + ' epochs' + '-' + \
@@ -182,7 +180,9 @@ def main(_):
                                    title=title,
                                    loss_fn_kwargs=loss_fn_kwargs,
                                    batch_size=512)
-	print('MODEL EVALUATED!')
+	
+	with gcsfs.open('test_eval.txt', 'w') as f:
+		f.write('MODEL EVALUATED!')
 
 	lens_accuracy = results['accuracy']
 	lens_cross_entropy = results['cross_entropy']
@@ -197,14 +197,18 @@ def main(_):
                                                               test_family_accessions=train_family_accessions,
                                                               train_samples=FLAGS.knn_train_samples)[0]
 	train_knn_accuracy = train_knn_results['1-nn accuracy']
-	print('TRAIN KNN EVALUATED!')
+	
+	with gcsfs.open('test_train_knn.txt', 'w') as f:
+		f.write('TRAIN KNN!')
 
 	test_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                              train_family_accessions=test_family_accessions, 
                                                              test_family_accessions=test_family_accessions,
                                                              train_samples=FLAGS.knn_train_samples)[0]
 	test_knn_accuracy = test_knn_results['1-nn accuracy']
-	print('TEST KNN EVALUATED!')
+	
+	with gcsfs.open('test_test_knn.txt', 'w') as f:
+		f.write('TEST KNN!')
 
 	datum = {
 				'encoder_fn_name': FLAGS.encoder_fn_name,
@@ -229,6 +233,9 @@ def main(_):
     
 	with gcsfs.open(os.path.join('sweep_data', title + '.csv'), 'w') as gcs_file:
 		df.to_pickle(gcs_file)
+
+	with gcsfs.open('test_saving.txt', 'w') as f:
+		f.write('DATUM SAVED!')
 
 
 if __name__ == '__main__':
