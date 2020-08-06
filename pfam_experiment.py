@@ -188,8 +188,8 @@ def main(_):
 	lens_cross_entropy = results['cross_entropy']
 
 	embedding_optimizer = create_optimizer(embedding_model, 
-										   learning_rate=[0.0, 0.0, 0.0], 
-										   weight_decay=[0.0, 0.0, 0.0], 
+										   learning_rate=FLAGS.learning_rate, 
+										   weight_decay=FLAGS.weight_decay, 
 										   layers=layers)
 
 	train_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
