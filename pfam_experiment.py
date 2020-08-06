@@ -165,19 +165,9 @@ def main(_):
 	with gcsfs.open('test_learning.txt', 'w') as f:
 		f.write('MODEL TRAINED!')
 
-	title = str(FLAGS.encoder_fn_name) + '-' + FLAGS.encoder_fn_kwargs_path + '-' + FLAGS.reduce_fn_name + '-' + \
-			FLAGS.reduce_fn_kwargs_path + '-' + str(FLAGS.epochs) + ' epochs' + '-' + \
-			'learning_rate: ' + str(FLAGS.learning_rate) + '-' + 'weight_decay: ' + str(FLAGS.weight_decay) + \
-			str(FLAGS.lens_train_families) + ' lens_train_families' + '-' + 'transformer: ' + str(FLAGS.use_transformer)
-	
-	if FLAGS.use_transformer:
-		title = title + '-' + 'bert: ' + str(FLAGS.use_bert) + '-' + 'pretrained_dir: ' + str(FLAGS.restore_transformer_dir)
-	
-	title = title + '-' + str(FLAGS.knn_train_samples) + ' knn_train_samples'
-
 	results, preds = pfam_evaluate(predict_fn=optimizer.target,
                                    test_family_accessions=test_family_accessions,
-                                   title=title,
+                                   title=None,
                                    loss_fn_kwargs=loss_fn_kwargs,
                                    batch_size=64)
 	
@@ -233,7 +223,7 @@ def main(_):
 
 	df = pd.DataFrame([datum])
     
-	with gcsfs.open(os.path.join('sweep_data', title), 'wb') as gcs_file:
+	with gcsfs.open(os.path.join('sweep_data', 'first_experiment'), 'wb') as gcs_file:
 		df.to_pickle(gcs_file)
 
 	with gcsfs.open('test_saving.txt', 'w') as f:
