@@ -1,6 +1,8 @@
 """Lens training + nearest neighbors classification pipeline."""
 
 
+print('IMPORT HANG??')
+
 import os
 
 import sys
