@@ -150,6 +150,11 @@ def main(_):
 				                                      output_features=num_families,
 				                                  	  output='embedding')
 
+	embedding_optimizer = create_optimizer(embedding_model, 
+										   learning_rate=FLAGS.learning_rate, 
+										   weight_decay=FLAGS.weight_decay, 
+										   layers=layers)
+	
 	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 				                                                             train_family_accessions=lens_knn_train_family_accessions, 
 				                                                             test_family_accessions=lens_knn_train_family_accessions,
@@ -187,11 +192,6 @@ def main(_):
 
 	lens_accuracy = results['accuracy']
 	lens_cross_entropy = float(results['cross_entropy'])
-
-	embedding_optimizer = create_optimizer(embedding_model, 
-										   learning_rate=FLAGS.learning_rate, 
-										   weight_decay=FLAGS.weight_decay, 
-										   layers=layers)
 
 	assert(embedding_optimizer.target.params.keys()==trained_params.keys()), 'Optimizer parameters do not match!'
 	for layer in embedding_optimizer.target.params.keys():
