@@ -1,0 +1,1 @@
+{"emb_dim": 512, "num_heads": 8, "qkv_dim": 512, "mlp_dim": 1024, "num_layers": 36}
