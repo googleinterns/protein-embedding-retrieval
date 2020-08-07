@@ -67,6 +67,8 @@ flags.DEFINE_boolean('use_transformer', True, 'Whether or not to use transformer
 flags.DEFINE_boolean('use_bert', True, 'Whether or not to use bidirectional transformer.')
 flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 
+flags.DEFINE_string('index', '00000000', 'Index used to save experiment results.')
+
 
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
@@ -99,6 +101,8 @@ def main(_):
 
 	reduce_fn = reduce_fn_name_to_fn(FLAGS.reduce_fn_name)
 	reduce_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('reduce_fn_kwargs_resources', FLAGS.reduce_fn_kwargs_path + '.json'))))
+
+	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
 
 	if FLAGS.use_transformer:
 
@@ -146,7 +150,19 @@ def main(_):
 				                                      output_features=num_families,
 				                                  	  output='embedding')
 
-	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
+	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+				                                                             train_family_accessions=lens_knn_train_family_accessions, 
+				                                                             test_family_accessions=lens_knn_train_family_accessions,
+				                                                             batch_size=FLAGS.batch_size,
+				                                                             train_samples=FLAGS.knn_train_samples)[0]
+	train_knn_accuracy_untrained_lens = train_knn_results_untrained_lens['1-nn accuracy']
+
+	test_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+				                                                            train_family_accessions=knn_test_family_accessions, 
+				                                                            test_family_accessions=knn_test_family_accessions,
+				                                                            batch_size=FLAGS.batch_size,
+				                                                            train_samples=FLAGS.knn_train_samples)[0]
+	test_knn_accuracy_untrained_lens = test_knn_results_untrained_lens['1-nn accuracy']
 	
 	with gcsfs.open('test_model.txt', 'w') as f:
 		f.write('CREATED MODEL!')
@@ -181,19 +197,19 @@ def main(_):
 	for layer in embedding_optimizer.target.params.keys():
 		embedding_optimizer.target.params[layer] = trained_params[layer]
 
-	train_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
-                                                              train_family_accessions=lens_knn_train_family_accessions, 
-                                                              test_family_accessions=lens_knn_train_family_accessions,
-                                                              batch_size=FLAGS.batch_size,
-                                                              train_samples=FLAGS.knn_train_samples)[0]
-	train_knn_accuracy = train_knn_results['1-nn accuracy']
+	train_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+			                                                               train_family_accessions=lens_knn_train_family_accessions, 
+			                                                               test_family_accessions=lens_knn_train_family_accessions,
+			                                                               batch_size=FLAGS.batch_size,
+			                                                               train_samples=FLAGS.knn_train_samples)[0]
+	train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
 
-	test_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
-                                                             train_family_accessions=knn_test_family_accessions, 
-                                                             test_family_accessions=knn_test_family_accessions,
-                                                             batch_size=FLAGS.batch_size,
-                                                             train_samples=FLAGS.knn_train_samples)[0]
-	test_knn_accuracy = test_knn_results['1-nn accuracy']
+	test_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+			                                                              train_family_accessions=knn_test_family_accessions, 
+			                                                              test_family_accessions=knn_test_family_accessions,
+			                                                              batch_size=FLAGS.batch_size,
+			                                                              train_samples=FLAGS.knn_train_samples)[0]
+	test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
 
 	datum = {
 				'encoder_fn_name': FLAGS.encoder_fn_name,
@@ -215,14 +231,16 @@ def main(_):
 				'knn_train_samples': FLAGS.knn_train_samples,
 				'lens_cross_entropy': lens_cross_entropy,
 				'lens_accuracy': lens_accuracy,
-				'train_knn_accuracy': train_knn_accuracy,
-				'test_knn_accuracy': test_knn_accuracy
+				'train_knn_accuracy_untrained_lens': train_knn_accuracy_untrained_lens,
+				'test_knn_accuracy_untrained_lens': test_knn_accuracy_untrained_lens,
+				'train_knn_accuracy_trained_lens': train_knn_accuracy_trained_lens,
+				'test_knn_accuracy_trained_lens': test_knn_accuracy_trained_lens
 			}
 	
 	print(datum)
 	df = pd.DataFrame([datum])
     
-	with gcsfs.open(os.path.join('sweep_data', 'experiment' + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join('sweep_data', flags.index + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
 
 
