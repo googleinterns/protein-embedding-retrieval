@@ -57,6 +57,7 @@ flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to u
 flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256.json', 'Path to reduce_fn_kwargs.')
 
 flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
+flags.DEFINE_integer('batch_size', 64, 'Batch size for training.')
 flags.DEFINE_list('learning_rate', [0.0, 1e-3, 1e-3], 'Learning rates for encoder, lens, and predictor.')
 flags.DEFINE_list('weight_decay', [0.0, 0.0, 0.0], 'Weight decays for encoder, lens, and predictor.')
 flags.DEFINE_integer('train_families', 1000, 'Number of famlies used to train lens.')
@@ -89,7 +90,7 @@ def main(_):
 		knn_test_family_accessions.append(family_name)
 	
 	train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
-													   batch_size=64,
+													   batch_size=FLAGS.batch_size,
 													   samples=FLAGS.lens_train_samples,
 													   epochs=FLAGS.epochs, 
 													   drop_remainder=True)
@@ -167,7 +168,7 @@ def main(_):
                                    test_family_accessions=lens_knn_train_family_accessions,
                                    title=None,
                                    loss_fn_kwargs=loss_fn_kwargs,
-                                   batch_size=64)
+                                   batch_size=FLAGS.batch_size)
 
 	lens_accuracy = results['accuracy']
 	lens_cross_entropy = float(results['cross_entropy'])
@@ -184,14 +185,14 @@ def main(_):
 	train_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                               train_family_accessions=lens_knn_train_family_accessions, 
                                                               test_family_accessions=lens_knn_train_family_accessions,
-                                                              batch_size=64,
+                                                              batch_size=FLAGS.batch_size,
                                                               train_samples=FLAGS.knn_train_samples)[0]
 	train_knn_accuracy = train_knn_results['1-nn accuracy']
 
 	test_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                              train_family_accessions=knn_test_family_accessions, 
                                                              test_family_accessions=knn_test_family_accessions,
-                                                             batch_size=64,
+                                                             batch_size=FLAGS.batch_size,
                                                              train_samples=FLAGS.knn_train_samples)[0]
 	test_knn_accuracy = test_knn_results['1-nn accuracy']
 
@@ -221,7 +222,7 @@ def main(_):
 	print(datum)
 	df = pd.DataFrame([datum])
     
-	with gcsfs.open(os.path.join('sweep_data', 'second_experiment' + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join('sweep_data', 'experiment' + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
 
 

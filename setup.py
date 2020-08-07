@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 # This follows the style of Jaxlib installation here:
 # https://github.com/google/jax#pip-installation
 PYTHON_VERSION = "cp37"
-CUDA_VERSION = "cuda101" # alternatives: cuda90, cuda92, cuda100, cuda101
+CUDA_VERSION = "cuda101" # alternatives: cuda90, cuda92, cuda100
 PLATFORM = "manylinux2010_x86_64" # alternatives: linux_x86_64
 BASE_URL = "https://storage.googleapis.com/jax-releases"
 
