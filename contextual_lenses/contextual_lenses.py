@@ -1,6 +1,6 @@
 """Contextual lenses
     
-Creates sequence length independent representation of embedded sequences
+Creates sequence length independent representations of embedded sequences
 Original paper: https://arxiv.org/pdf/2002.08866.pdf.
 """
 
