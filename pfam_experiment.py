@@ -181,9 +181,6 @@ def main(_):
 	for layer in embedding_optimizer.target.params.keys():
 		embedding_optimizer.target.params[layer] = trained_params[layer]
 
-	embedding_optimizer.target.params = copy.deepcopy(optimizer.target.params)
-
-
 	train_knn_results = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
                                                               train_family_accessions=lens_knn_train_family_accessions, 
                                                               test_family_accessions=lens_knn_train_family_accessions,
