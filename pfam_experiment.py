@@ -51,9 +51,9 @@ from absl import app, flags
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('encoder_fn_name', None, 'Name of encoder_fn to use. None if using Transformer.')
-flags.DEFINE_string('encoder_fn_kwargs_path', 'medium_transformer_kwargs.json', 'Path to encoder_fn_kwargs.')
+flags.DEFINE_string('encoder_fn_kwargs_path', 'medium_transformer_kwargs', 'Path to encoder_fn_kwargs.')
 flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to use.')
-flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256.json', 'Path to reduce_fn_kwargs.')
+flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256', 'Path to reduce_fn_kwargs.')
 
 flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_integer('batch_size', 64, 'Batch size for training.')
@@ -95,10 +95,10 @@ def main(_):
 													   drop_remainder=True)
 
 	encoder_fn = encoder_fn_name_to_fn(FLAGS.encoder_fn_name)
-	encoder_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('encoder_fn_kwargs_resources', FLAGS.encoder_fn_kwargs_path))))
+	encoder_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('encoder_fn_kwargs_resources', FLAGS.encoder_fn_kwargs_path + '.json'))))
 
 	reduce_fn = reduce_fn_name_to_fn(FLAGS.reduce_fn_name)
-	reduce_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('reduce_fn_kwargs_resources', FLAGS.reduce_fn_kwargs_path))))
+	reduce_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('reduce_fn_kwargs_resources', FLAGS.reduce_fn_kwargs_path + '.json'))))
 
 	if FLAGS.use_transformer:
 
