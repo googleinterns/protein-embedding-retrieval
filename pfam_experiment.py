@@ -59,13 +59,13 @@ flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256.json', 'Path to re
 flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_list('learning_rate', [0.0, 1e-3, 1e-3], 'Learning rates for encoder, lens, and predictor.')
 flags.DEFINE_list('weight_decay', [0.0, 0.0, 0.0], 'Weight decays for encoder, lens, and predictor.')
-flags.DEFINE_integer('train_families', 10000, 'Number of famlies used to train lens.')
-flags.DEFINE_integer('lens_train_samples', 25, 'Number of samples used to train lens.')
+flags.DEFINE_integer('train_families', 1000, 'Number of famlies used to train lens.')
+flags.DEFINE_integer('lens_train_samples', 50, 'Number of samples used to train lens.')
 flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train nearest neighbors algorithm.')
 
-flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 flags.DEFINE_boolean('use_transformer', True, 'Whether or not to use transformer encoder')
 flags.DEFINE_boolean('use_bert', True, 'Whether or not to use bidirectional transformer.')
+flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 
 
 # Train lens and measure performance of lens and nearest neighbors classifier.
@@ -217,11 +217,13 @@ def main(_):
 				'train_knn_accuracy': train_knn_accuracy,
 				'test_knn_accuracy': test_knn_accuracy
 			}
+	
 	print(datum)
 	df = pd.DataFrame([datum])
     
 	with gcsfs.open(os.path.join('sweep_data', 'second_experiment' + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
+
 
 if __name__ == '__main__':
 	app.run(main)
