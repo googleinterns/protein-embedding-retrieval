@@ -29,7 +29,6 @@ encoder_fn_name = 'cnn_one_hot'
 encoder_fn_kwargs_path = 'cnn_kwargs'
 use_transformer = False 
 use_bert = False 
-restore_transformer_dir = None
 for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 	reduce_fn_kwargs_path, lr_2, lr_3, wd_2, wd_3 = params
 	index = '%08d' % count
@@ -47,7 +46,6 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 					'knn_train_samples': knn_train_samples,
 					'use_transformer': use_transformer,
 					'use_bert': use_bert,
-					'restore_transformer_dir': restore_transformer_dir,
 					'index': index
 				 }
 	params_combinations.append(param_dict)
@@ -56,11 +54,10 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 
 
 # Transformer experiments
-encoder_fn_name = None
+encoder_fn_name = 'transformer'
 encoder_fn_kwargs_path = 'medium_transformer_kwargs'
 use_transformer = True 
 use_bert = True 
-restore_transformer_dir = None
 for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 	reduce_fn_kwargs_path, lr_2, lr_3, wd_2, wd_3 = params
 	index = '%08d' % count
@@ -78,7 +75,6 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 					'knn_train_samples': knn_train_samples,
 					'use_transformer': use_transformer,
 					'use_bert': use_bert,
-					'restore_transformer_dir': restore_transformer_dir,
 					'index': index
 				 }
 	params_combinations.append(param_dict)
@@ -87,7 +83,7 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 
 
 # Pretrained transformer experiments
-encoder_fn_name = None
+encoder_fn_name = 'transformer'
 encoder_fn_kwargs_path = 'medium_transformer_kwargs'
 use_transformer = True 
 use_bert = True 
