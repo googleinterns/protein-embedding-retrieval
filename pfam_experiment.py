@@ -154,7 +154,7 @@ def main(_):
 										   learning_rate=FLAGS.learning_rate, 
 										   weight_decay=FLAGS.weight_decay, 
 										   layers=layers)
-	
+
 	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 				                                                             train_family_accessions=lens_knn_train_family_accessions, 
 				                                                             test_family_accessions=lens_knn_train_family_accessions,
@@ -240,7 +240,7 @@ def main(_):
 	print(datum)
 	df = pd.DataFrame([datum])
     
-	with gcsfs.open(os.path.join('sweep_data', flags.index + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join('sweep_data', FLAGS.index + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
 
 
