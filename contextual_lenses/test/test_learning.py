@@ -18,7 +18,8 @@ linear_max_pool, linear_mean_pool, gated_conv
 from train_utils import create_optimizer, train_step, \
 create_representation_model
 
-from encoders import one_hot_encoder, cnn_one_hot_encoder
+from encoders import one_hot_encoder, cnn_one_hot_encoder, \
+one_hot_pos_emb_encoder, cnn_one_hot_pos_emb_encoder
 
 from loss_fns import mse_loss
 
@@ -237,6 +238,198 @@ test10 = {
       }
 
 
+# One-hot + positional embeddings:
+test11 = {
+          'testcase_name': 'pos_emb_max_pool',
+          'encoder_fn': one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': max_pool,
+          'reduce_fn_kwargs': {
+
+          },
+          'learning_rate': 1e-2,
+          'epochs': 1000,
+          'loss_threshold': 1e-4
+      }
+
+test12 = {
+          'testcase_name': 'pos_emb_mean_pool',
+          'encoder_fn': one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': mean_pool,
+          'reduce_fn_kwargs': {
+
+          },
+          'learning_rate': 1e-2,
+          'epochs': 1000,
+          'loss_threshold': 1e-4
+      }
+
+test13 = {
+          'testcase_name': 'pos_emb_linear_max_pool',
+          'encoder_fn': one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': linear_max_pool,
+          'reduce_fn_kwargs': {
+              'rep_size': 256
+          },
+          'learning_rate': 1e-3,
+          'epochs': 100,
+          'loss_threshold': 1e-4
+      }
+
+test14 = {
+          'testcase_name': 'pos_emb_linear_mean_pool',
+          'encoder_fn': one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': linear_mean_pool,
+          'reduce_fn_kwargs': {
+              'rep_size': 4096
+          },
+          'learning_rate': 1e-3,
+          'epochs': 100,
+          'loss_threshold': 1e-4
+      }
+
+
+test15 = {
+          'testcase_name': 'pos_emb_gated_conv',
+          'encoder_fn': one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': gated_conv,
+          'reduce_fn_kwargs': {
+              'rep_size': 256,
+              'm_layers': 3,
+              'm_features': [[512, 512], [512, 512]],
+              'm_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
+              'conv_rep_size': 256
+          },
+          'learning_rate': 1e-3,
+          'epochs': 100,
+          'loss_threshold': 1e-4
+      }
+
+
+# CNN + one-hot + positional embeddings:
+test16 = {
+          'testcase_name': 'cnn_pos_emb_max_pool',
+          'encoder_fn': cnn_one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'n_layers': 1,
+              'n_features': [256],
+              'n_kernel_sizes': [3],
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': max_pool,
+          'reduce_fn_kwargs': {
+
+          },
+          'learning_rate': 1e-3,
+          'epochs': 100,
+          'loss_threshold': 1e-4
+      }
+
+
+test17 = {
+          'testcase_name': 'cnn_pos_emb_mean_pool',
+          'encoder_fn': cnn_one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'n_layers': 1,
+              'n_features': [512],
+              'n_kernel_sizes': [5],
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': mean_pool,
+          'reduce_fn_kwargs': {
+
+          },
+          'learning_rate': 1e-3,
+          'epochs': 100,
+          'loss_threshold': 1e-4
+      }
+
+
+test18 = {
+          'testcase_name': 'cnn_pos_emb_linear_max_pool',
+          'encoder_fn': cnn_one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'n_layers': 1,
+              'n_features': [32],
+              'n_kernel_sizes': [3],
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': linear_max_pool,
+          'reduce_fn_kwargs': {
+              'rep_size': 256
+          },
+          'learning_rate': 1e-3,
+          'epochs': 100,
+          'loss_threshold': 1e-4
+      }
+
+
+test19 = {
+          'testcase_name': 'cnn_pos_emb_linear_mean_pool',
+          'encoder_fn': cnn_one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'n_layers': 1,
+              'n_features': [512],
+              'n_kernel_sizes': [5],
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': linear_mean_pool,
+          'reduce_fn_kwargs': {
+              'rep_size': 256
+          },
+          'learning_rate': 1e-3,
+          'epochs': 100,
+          'loss_threshold': 1e-4
+      }
+
+
+test20 = {
+          'testcase_name': 'cnn_pos_emb_gated_conv',
+          'encoder_fn': cnn_one_hot_pos_emb_encoder,
+          'encoder_fn_kwargs': {
+              'n_layers': 1,
+              'n_features': [32],
+              'n_kernel_sizes': [3],
+              'max_len': 512,
+              'posemb_init': nn.initializers.normal(stddev=1e-6)
+          },
+          'reduce_fn': gated_conv,
+          'reduce_fn_kwargs': {
+              'rep_size': 256,
+              'm_layers': 3,
+              'm_features': [[512, 512], [512, 512]],
+              'm_kernel_sizes': [[12, 12], [10, 10], [8, 8]],
+              'conv_rep_size': 256
+          },
+          'learning_rate': 1e-3,
+          'epochs': 100,
+          'loss_threshold': 1e-4
+      }
+
+
 tests = (test1,
          test2,
          test3,
@@ -246,7 +439,17 @@ tests = (test1,
          test7,
          test8,
          test9,
-         test10)
+         test10,
+         test11,
+         test12,
+         test13,
+         test14,
+         test15,
+         test16,
+         test17,
+         test18,
+         test19,
+         test20)
 
 
 class TestLearning(parameterized.TestCase):
