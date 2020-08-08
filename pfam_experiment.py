@@ -159,7 +159,7 @@ def main(_):
 
 	embedding_optimizer = create_optimizer(embedding_model, 
 										   learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
-										   weight_decay=FLAGS.[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], 
+										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], 
 										   layers=layers)
 
 	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
