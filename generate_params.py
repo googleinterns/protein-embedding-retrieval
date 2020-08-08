@@ -24,38 +24,6 @@ train_families = 1000
 lens_train_samples = 50
 knn_train_samples = 5
 
-# CNN experiments
-encoder_fn_name = 'cnn_one_hot'
-encoder_fn_kwargs_path = 'cnn_kwargs'
-use_transformer = False 
-use_bert = False 
-for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, lrs, wds, wds, wds):
-	reduce_fn_kwargs_path, lr_1, lr_2, lr_3, wd_1, wd_2, wd_3 = params
-	index = '%08d' % count
-	param_dict = {
-					'encoder_fn_name': encoder_fn_name,
-					'encoder_fn_kwargs_path': encoder_fn_kwargs_path,
-					'reduce_fn_name': reduce_fn_name,
-					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
-					'epochs': epochs,
-					'batch_size': batch_size,
-					'encoder_lr': lr_1,
-					'lens_lr': lr_2,
-					'predictor_lr': lr_3,
-					'encoder_wd': wd_1,
-					'lens_wd': wd_2,
-					'encoder_wd': wd_3,
-					'train_families': train_families,
-					'lens_train_samples': lens_train_samples,
-					'knn_train_samples': knn_train_samples,
-					'use_transformer': use_transformer,
-					'use_bert': use_bert,
-					'index': index
-				 }
-	params_combinations.append(param_dict)
-	index_to_params[index] = param_dict
-	count += 1
-
 
 # Transformer experiments
 encoder_fn_name = 'transformer'
@@ -128,3 +96,39 @@ with open('index_to_params.json', 'w') as f:
 	json.dump(index_to_params, f)
 
 print(count)
+
+
+'''
+# CNN experiments
+encoder_fn_name = 'cnn_one_hot'
+encoder_fn_kwargs_path = 'cnn_kwargs'
+use_transformer = False 
+use_bert = False 
+for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, lrs, wds, wds, wds):
+	reduce_fn_kwargs_path, lr_1, lr_2, lr_3, wd_1, wd_2, wd_3 = params
+	index = '%08d' % count
+	param_dict = {
+					'encoder_fn_name': encoder_fn_name,
+					'encoder_fn_kwargs_path': encoder_fn_kwargs_path,
+					'reduce_fn_name': reduce_fn_name,
+					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
+					'epochs': epochs,
+					'batch_size': batch_size,
+					'encoder_lr': lr_1,
+					'lens_lr': lr_2,
+					'predictor_lr': lr_3,
+					'encoder_wd': wd_1,
+					'lens_wd': wd_2,
+					'encoder_wd': wd_3,
+					'train_families': train_families,
+					'lens_train_samples': lens_train_samples,
+					'knn_train_samples': knn_train_samples,
+					'use_transformer': use_transformer,
+					'use_bert': use_bert,
+					'index': index
+				 }
+	params_combinations.append(param_dict)
+	index_to_params[index] = param_dict
+	count += 1
+'''
+
