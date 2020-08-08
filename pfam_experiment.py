@@ -59,8 +59,8 @@ flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_integer('batch_size', 64, 'Batch size for training.')
 
 flags.DEFINE_float('encoder_lr', 0.0, 'Encoder learning rate.')
-flags.DEFINE_float('lens_lr', 0.0, 'Lens learning rate.')
-flags.DEFINE_float('predictor_lr', 0.0, 'Predictor learning rate.')
+flags.DEFINE_float('lens_lr', 1e-3, 'Lens learning rate.')
+flags.DEFINE_float('predictor_lr', 1e-3, 'Predictor learning rate.')
 
 flags.DEFINE_float('encoder_wd', 0.0, 'Encoder weight decay.')
 flags.DEFINE_float('lens_wd', 0.0, 'Lens weight decay.')
