@@ -57,8 +57,15 @@ flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256', 'Path to reduce_
 
 flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_integer('batch_size', 64, 'Batch size for training.')
-flags.DEFINE_list('learning_rate', [0.0, 1e-3, 1e-3], 'Learning rates for encoder, lens, and predictor.')
-flags.DEFINE_list('weight_decay', [0.0, 0.0, 0.0], 'Weight decays for encoder, lens, and predictor.')
+
+flags.DEFINE_float('encoder_lr', 0.0, 'Encoder learning rate.')
+flags.DEFINE_float('lens_lr', 0.0, 'Lens learning rate.')
+flags.DEFINE_float('predictor_lr', 0.0, 'Predictor learning rate.')
+
+flags.DEFINE_float('encoder_wd', 0.0, 'Encoder weight decay.')
+flags.DEFINE_float('lens_wd', 0.0, 'Lens weight decay.')
+flags.DEFINE_float('predictor_wd', 0.0, 'Predictor weight decay.')
+
 flags.DEFINE_integer('train_families', 1000, 'Number of famlies used to train lens.')
 flags.DEFINE_integer('lens_train_samples', 50, 'Number of samples used to train lens.')
 flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train nearest neighbors algorithm.')
@@ -151,8 +158,8 @@ def main(_):
 				                                  	  output='embedding')
 
 	embedding_optimizer = create_optimizer(embedding_model, 
-										   learning_rate=FLAGS.learning_rate, 
-										   weight_decay=FLAGS.weight_decay, 
+										   learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
+										   weight_decay=FLAGS.[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], 
 										   layers=layers)
 
 	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
@@ -176,8 +183,8 @@ def main(_):
                       train_data=train_batches,
                       loss_fn=cross_entropy_loss,
                       loss_fn_kwargs=loss_fn_kwargs,
-                      learning_rate=FLAGS.learning_rate,
-                      weight_decay=FLAGS.weight_decay,
+                      learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr],
+                      weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
                       layers=layers)
 	trained_params = copy.deepcopy(optimizer.target.params)
 
@@ -218,12 +225,12 @@ def main(_):
 				'reduce_fn_kwargs_path': FLAGS.reduce_fn_kwargs_path,
 				'epochs': FLAGS.epochs,
 				'batch_size': FLAGS.batch_size,
-				'encoder_lr': FLAGS.learning_rate[0],
-				'lens_lr': FLAGS.learning_rate[1],
-				'predictor_lr': FLAGS.learning_rate[2],
-				'encoder_wd': FLAGS.weight_decay[0],
-				'lens_wd': FLAGS.weight_decay[1],
-				'predictor_wd': FLAGS.weight_decay[2],
+				'encoder_lr': FLAGS.encoder_lr,
+				'lens_lr': FLAGS.lens_lr,
+				'predictor_lr': FLAGS.predictor_lr,
+				'encoder_wd': FLAGS.encoder_wd,
+				'lens_wd': FLAGS.lens_wd,
+				'predictor_wd': FLAGS.predictor_wd,
 				'train_families': FLAGS.train_families,
 				'use_transformer': FLAGS.use_transformer,
 				'use_bert': FLAGS.use_bert,
