@@ -29,8 +29,8 @@ encoder_fn_name = 'cnn_one_hot'
 encoder_fn_kwargs_path = 'cnn_kwargs'
 use_transformer = False 
 use_bert = False 
-for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
-	reduce_fn_kwargs_path, lr_2, lr_3, wd_2, wd_3 = params
+for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, lrs, wds, wds, wds):
+	reduce_fn_kwargs_path, lr_1, lr_2, lr_3, wd_1, wd_2, wd_3 = params
 	index = '%08d' % count
 	param_dict = {
 					'encoder_fn_name': encoder_fn_name,
@@ -39,8 +39,12 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
 					'epochs': epochs,
 					'batch_size': batch_size,
-					'learning_rate': [lr_1, lr_2, lr_3],
-					'weight_decay': [wd_1, wd_2, wd_3],
+					'encoder_lr': lr_1,
+					'lens_lr': lr_2,
+					'predictor_lr': lr_3,
+					'encoder_wd': wd_1,
+					'lens_wd': wd_2,
+					'encoder_wd': wd_3,
 					'train_families': train_families,
 					'lens_train_samples': lens_train_samples,
 					'knn_train_samples': knn_train_samples,
@@ -68,8 +72,10 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
 					'epochs': epochs,
 					'batch_size': batch_size,
-					'learning_rate': [lr_1, lr_2, lr_3],
-					'weight_decay': [wd_1, wd_2, wd_3],
+					'lens_lr': lr_2, 
+					'predictor_lr': lr_3,
+					'lens_wd':  wd_2,
+					'predictor_wd': wd_3,
 					'train_families': train_families,
 					'lens_train_samples': lens_train_samples,
 					'knn_train_samples': knn_train_samples,
@@ -98,8 +104,10 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
 					'epochs': epochs,
 					'batch_size': batch_size,
-					'learning_rate': [lr_1, lr_2, lr_3],
-					'weight_decay': [wd_1, wd_2, wd_3],
+					'lens_lr': lr_2, 
+					'predictor_lr': lr_3,
+					'lens_wd':  wd_2,
+					'predictor_wd': wd_3,
 					'train_families': train_families,
 					'lens_train_samples': lens_train_samples,
 					'knn_train_samples': knn_train_samples,
