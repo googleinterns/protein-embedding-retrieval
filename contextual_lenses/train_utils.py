@@ -242,7 +242,7 @@ def create_representation_model(encoder_fn, encoder_fn_kwargs, reduce_fn, reduce
                                        reduce_fn_kwargs=reduce_fn_kwargs,
                                        num_categories=num_categories,
                                        output_features=output_features,
-                                       outputt=output,
+                                       output=output,
                                        use_transformer=False)
   
   _, initial_params = RepresentationModel.init_by_shape(key,
