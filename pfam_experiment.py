@@ -70,8 +70,8 @@ flags.DEFINE_integer('train_families', 1000, 'Number of famlies used to train le
 flags.DEFINE_integer('lens_train_samples', 50, 'Number of samples used to train lens.')
 flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train nearest neighbors algorithm.')
 
-flags.DEFINE_boolean('use_transformer', True, 'Whether or not to use transformer encoder')
-flags.DEFINE_boolean('use_bert', True, 'Whether or not to use bidirectional transformer.')
+flags.DEFINE_boolean('use_transformer', False, 'Whether or not to use transformer encoder')
+flags.DEFINE_boolean('use_bert', False, 'Whether or not to use bidirectional transformer.')
 flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 
 flags.DEFINE_string('index', '00000000', 'Index used to save experiment results.')
