@@ -175,9 +175,6 @@ def main(_):
 				                                                            batch_size=FLAGS.batch_size,
 				                                                            train_samples=FLAGS.knn_train_samples)[0]
 	test_knn_accuracy_untrained_lens = test_knn_results_untrained_lens['1-nn accuracy']
-	
-	with gcsfs.open('test_model.txt', 'w') as f:
-		f.write('CREATED MODEL!')
 
 	optimizer = train(model=model,
                       train_data=train_batches,
@@ -187,9 +184,6 @@ def main(_):
                       weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
                       layers=layers)
 	trained_params = copy.deepcopy(optimizer.target.params)
-
-	with gcsfs.open('test_learning.txt', 'w') as f:
-		f.write('MODEL TRAINED!')
 
 	results, preds = pfam_evaluate(predict_fn=optimizer.target,
                                    test_family_accessions=lens_knn_train_family_accessions,
@@ -243,7 +237,6 @@ def main(_):
 				'train_knn_accuracy_trained_lens': train_knn_accuracy_trained_lens,
 				'test_knn_accuracy_trained_lens': test_knn_accuracy_trained_lens
 			}
-	
 	print(datum)
 	df = pd.DataFrame([datum])
     

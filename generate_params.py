@@ -84,11 +84,11 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 					'restore_transformer_dir': restore_transformer_dir,
 					'index': index
 				 }
-	params_combinations.append(param_dict)
-	index_to_params[index] = param_dict
+	# params_combinations.append(param_dict)
+	# index_to_params[index] = param_dict
 	count += 1
 
-'''
+
 # CNN experiments
 encoder_fn_name = 'cnn_one_hot'
 encoder_fn_kwargs_path = 'cnn_kwargs'
@@ -120,7 +120,6 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, lrs, wds, wds,
 	params_combinations.append(param_dict)
 	index_to_params[index] = param_dict
 	count += 1
-'''
 
 params_combinations = list(np.random.permutation(np.array(params_combinations)))
 with open('params_combinations.json', 'w') as f:
