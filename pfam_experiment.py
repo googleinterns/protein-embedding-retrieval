@@ -119,7 +119,7 @@ def main(_):
 			model_cls = models.FlaxLM
 
 		if FLAGS.restore_transformer_dir is not None:
-			pretrained_transformer_params = load_transformer_params(restore_transformer_dir, model_cls)
+			pretrained_transformer_params = load_transformer_params(FLAGS.restore_transformer_dir, model_cls)
 		else:
 			pretrained_transformer_params = None
 
