@@ -203,6 +203,8 @@ def main(_):
 		datum['train_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = train_knn_accuracy_untrained_lens
 		datum['test_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = test_knn_accuracy_untrained_lens
 
+	print(datum)
+
 	encoder_fn_params = None
 	reduce_fn_params = None
 	predict_fn_params = None
@@ -214,6 +216,8 @@ def main(_):
 														   epochs=measurement_epochs, 
 														   drop_remainder=True)
 
+		print(encoder_fn_params, reduce_fn_params, predict_fn_params)
+		
 		model = create_model(use_transformer=FLAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
 							 encoder_fn=encoder_fn, encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs, layers=layers, 
 							 output='prediction', encoder_fn_params=encoder_fn_params, reduce_fn_params=reduce_fn_params, predict_fn_params=predict_fn_params)
@@ -261,6 +265,8 @@ def main(_):
 					                                                              train_samples=knn_train_samples)[0]
 			test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
 			datum['test_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = test_knn_accuracy_trained_lens
+
+		print(datum)
 
 		assert(model.params.keys()==trained_params.keys()), 'Model and optimizer parameters do not match!'
 		predict_fn_params = trained_params[layers[-1]]
