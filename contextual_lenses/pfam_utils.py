@@ -107,8 +107,8 @@ def create_pfam_seq_batches(family_accessions, batch_size, test=False, samples=N
     pfam_df = pfam_df.groupby('mod_family_accession').head(samples).reset_index()
   
   pfam_batches = create_data_iterator(df=pfam_df, input_col='one_hot_inds', output_col='index',
-	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
-	  								  seed=seed, drop_remainder=drop_remainder, add_outputs=False, as_numpy=False)
+                	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
+                	  								  seed=seed, drop_remainder=drop_remainder, add_outputs=False, as_numpy=False)
 
   return pfam_batches
 
@@ -126,8 +126,8 @@ def create_pfam_batches(family_accessions, batch_size, test=False, samples=None,
   pfam_indexes = pfam_df['index'].values
 
   pfam_batches = create_data_iterator(df=pfam_df, input_col='one_hot_inds', output_col='index',
-	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
-	  								  seed=seed, drop_remainder=drop_remainder)
+                	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
+                	  								  seed=seed, drop_remainder=drop_remainder)
 
   return pfam_batches, pfam_indexes
 
@@ -182,13 +182,13 @@ def compute_embeddings(encoder, data_batches):
 
 
 def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test_family_accessions, batch_size=512, 
-                                          n_neighbors=1, train_samples=None, test_samples=None):
+                                          n_neighbors=1, train_samples=None, test_samples=None, seed=0, random_state=0):
   """Nearest neighbors classification on Pfam families using specified encoder."""
 
   train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=batch_size,
-                                                     samples=train_samples, buffer_size=1)
+                                                     samples=train_samples, buffer_size=1, seed=seed, random_state=random_state)
   test_batches, test_indexes = create_pfam_batches(family_accessions=test_family_accessions, batch_size=batch_size, 
-                                                   test=True, samples=test_samples, buffer_size=1)
+                                                   test=True, samples=test_samples, buffer_size=1, seed=seed, random_state=random_state)
 
   train_vectors = compute_embeddings(encoder, train_batches)
   test_vectors = compute_embeddings(encoder, test_batches)
@@ -206,26 +206,4 @@ def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test
   }
 
   return results, knn_predictions, knn_classifier
-
-
-def train_and_test_knn_pfam_families(encoder, start, end, batch_size=512, n_neighbors=1,
-                                     train_samples=None, test_samples=None):
-  """Trains and tests k-NN on Pfam families with accession number >= start and <= end."""
-
-  train_family_accessions = []
-  test_family_accessions = []
-  for i in range(start, end+1):
-    family_name = 'PF%05d' % i
-    train_family_accessions.append(family_name)
-    test_family_accessions.append(family_name)
-
-  results = pfam_nearest_neighbors_classification(encoder=encoder, 
-              train_family_accessions=train_family_accessions, 
-              test_family_accessions=test_family_accessions,
-              batch_size=batch_size,
-              n_neighbors=n_neighbors,
-              train_samples=train_samples,
-              test_samples=test_samples)[0]
-  
-  return results
 

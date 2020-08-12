@@ -50,8 +50,8 @@ from absl import app, flags
 # Define flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('encoder_fn_name', None, 'Name of encoder_fn to use. None if using Transformer.')
-flags.DEFINE_string('encoder_fn_kwargs_path', 'medium_transformer_kwargs', 'Path to encoder_fn_kwargs.')
+flags.DEFINE_string('encoder_fn_name', 'cnn_one_hot', 'Name of encoder_fn to use. None if using Transformer.')
+flags.DEFINE_string('encoder_fn_kwargs_path', 'cnn_kwargs', 'Path to encoder_fn_kwargs.')
 flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to use.')
 flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256', 'Path to reduce_fn_kwargs.')
 
@@ -106,7 +106,7 @@ def main(_):
 				'restore_transformer_dir': FLAGS.restore_transformer_dir
 			}
 
-	knn_train_samples_ = [1, 5] # 2, 3, 4, 5, 10, 25, 50]
+	knn_train_samples_ = [1, 5, 10, 50]
 
 	gcsfs = GCSFS(FLAGS.gcs_bucket)
 
@@ -191,14 +191,18 @@ def main(_):
 					                                                             train_family_accessions=lens_knn_train_family_accessions, 
 					                                                             test_family_accessions=lens_knn_train_family_accessions,
 					                                                             batch_size=FLAGS.batch_size,
-					                                                             train_samples=knn_train_samples)[0]
+					                                                             train_samples=knn_train_samples,
+					                                                             seed=1,
+					                                                             random_state=1)[0]
 		train_knn_accuracy_untrained_lens = train_knn_results_untrained_lens['1-nn accuracy']
 
 		test_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                            train_family_accessions=knn_test_family_accessions, 
 					                                                            test_family_accessions=knn_test_family_accessions,
 					                                                            batch_size=FLAGS.batch_size,
-					                                                            train_samples=knn_train_samples)[0]
+					                                                            train_samples=knn_train_samples,
+					                                                            seed=1,
+					                                                            random_state=1)[0]
 		test_knn_accuracy_untrained_lens = test_knn_results_untrained_lens['1-nn accuracy']
 
 		datum['train_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = train_knn_accuracy_untrained_lens
@@ -251,7 +255,9 @@ def main(_):
 					                                                               train_family_accessions=lens_knn_train_family_accessions, 
 					                                                               test_family_accessions=lens_knn_train_family_accessions,
 					                                                               batch_size=FLAGS.batch_size,
-					                                                               train_samples=knn_train_samples)[0]
+					                                                               train_samples=knn_train_samples,
+					                                                               seed=1,
+					                                                               random_state=1)[0]
 			train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
 			datum['train_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = train_knn_accuracy_trained_lens
 
@@ -259,7 +265,9 @@ def main(_):
 					                                                              train_family_accessions=knn_test_family_accessions, 
 					                                                              test_family_accessions=knn_test_family_accessions,
 					                                                              batch_size=FLAGS.batch_size,
-					                                                              train_samples=knn_train_samples)[0]
+					                                                              train_samples=knn_train_samples,
+					                                                              seed=1,
+					                                                              random_state=1)[0]
 			test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
 			datum['test_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = test_knn_accuracy_trained_lens
 
