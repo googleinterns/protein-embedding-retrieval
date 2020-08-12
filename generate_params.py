@@ -12,6 +12,8 @@ index_to_params = {}
 
 count = 0
 
+
+# *** FIRST BATCH *** 
 reduce_fn_name = 'linear_max_pool'
 reduce_fn_kwargs_paths = ['linear_pool_256', 'linear_pool_1024']
 epochs = 50
@@ -90,6 +92,7 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, wds, wds):
 
 
 # CNN experiments
+batch_size = 256
 encoder_fn_name = 'cnn_one_hot'
 encoder_fn_kwargs_path = 'cnn_kwargs'
 use_transformer = False 
@@ -117,10 +120,14 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, lrs, wds, wds,
 					'use_bert': use_bert,
 					'index': index
 				 }
-	params_combinations.append(param_dict)
-	index_to_params[index] = param_dict
+	# params_combinations.append(param_dict)
+	# index_to_params[index] = param_dict
 	count += 1
 
+
+# *** SECOND BATCH ***
+
+np.random.seed(0)
 params_combinations = list(np.random.permutation(np.array(params_combinations)))
 with open('params_combinations.json', 'w') as f:
 	json.dump(params_combinations, f)

@@ -56,6 +56,7 @@ flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to u
 flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256', 'Path to reduce_fn_kwargs.')
 
 flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
+flags.DEFINE_integer('measurements', 1, 'Number of times to interrupt lens training loop to take measurements (1 = no interruption).')
 flags.DEFINE_integer('batch_size', 64, 'Batch size for training.')
 
 flags.DEFINE_float('encoder_lr', 0.0, 'Encoder learning rate.')
@@ -68,19 +69,46 @@ flags.DEFINE_float('predictor_wd', 0.0, 'Predictor weight decay.')
 
 flags.DEFINE_integer('train_families', 1000, 'Number of famlies used to train lens.')
 flags.DEFINE_integer('lens_train_samples', 50, 'Number of samples used to train lens.')
-flags.DEFINE_integer('knn_train_samples', 5, 'Number of samples used to train nearest neighbors algorithm.')
 
 flags.DEFINE_boolean('use_transformer', False, 'Whether or not to use transformer encoder')
 flags.DEFINE_boolean('use_bert', False, 'Whether or not to use bidirectional transformer.')
 flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 
+flags.DEFINE_string('gcs_bucket', 'sequin-public', 'GCS bucket to save to and load from.')
+flags.DEFINE_string('save_dir', 'sweep_data', 'Directory in GCS bucket to save to.')
 flags.DEFINE_string('index', '00000000', 'Index used to save experiment results.')
 
 
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
-	gcsfs = GCSFS('sequin-public')
+	assert(FLAGS.epochs % FLAGS.measurements == 0), 'Number of measurements must divide number of epochs!'
+	measurement_epochs = FLAGS.epochs // FLAGS.measurements
+
+	datum = {
+				'index': FLAGS.index
+				'encoder_fn_name': FLAGS.encoder_fn_name,
+				'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
+				'reduce_fn_name': FLAGS.reduce_fn_name,
+				'reduce_fn_kwargs_path': FLAGS.reduce_fn_kwargs_path,
+				'epochs': FLAGS.epochs,
+				'measurements': FLAGS.measurements,
+				'batch_size': FLAGS.batch_size,
+				'encoder_lr': FLAGS.encoder_lr,
+				'lens_lr': FLAGS.lens_lr,
+				'predictor_lr': FLAGS.predictor_lr,
+				'encoder_wd': FLAGS.encoder_wd,
+				'lens_wd': FLAGS.lens_wd,
+				'predictor_wd': FLAGS.predictor_wd,
+				'train_families': FLAGS.train_families,
+				'use_transformer': FLAGS.use_transformer,
+				'use_bert': FLAGS.use_bert,
+				'restore_transformer_dir': FLAGS.restore_transformer_dir
+			}
+
+	knn_train_samples_ = [1, 2, 3, 4, 5, 10, 25, 50]
+
+	gcsfs = GCSFS(FLAGS.gcs_bucket)
 
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
@@ -96,12 +124,47 @@ def main(_):
 	for _ in range(15001, 16001):
 		family_name = 'PF%05d' % _
 		knn_test_family_accessions.append(family_name)
-	
-	train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
-													   batch_size=FLAGS.batch_size,
-													   samples=FLAGS.lens_train_samples,
-													   epochs=FLAGS.epochs, 
-													   drop_remainder=True)
+
+	def create_model(use_transformer, use_bert, restore_transformer_dir, encoder_fn, encoder_fn_kwargs,
+					 reduce_fn, reduce_fn_kwargs, layers, output='prediction', 
+					 encoder_fn_params=None, reduce_fn_params=None, predict_fn_params=None):
+		
+		if use_transformer:
+
+			if use_bert:
+				model_cls = models.FlaxBERT
+			else:
+				model_cls = models.FlaxLM
+
+			if FLAGS.restore_transformer_dir is not None:
+				pretrained_transformer_params = load_transformer_params(FLAGS.restore_transformer_dir, model_cls)
+			else:
+				pretrained_transformer_params = None
+
+			model = create_transformer_representation_model(transformer_kwargs=encoder_fn_kwargs,
+		                                                    reduce_fn=reduce_fn,
+		                                                    reduce_fn_kwargs=reduce_fn_kwargs,
+		                                                    num_categories=pfam_num_categories,
+		                                                    output_features=num_families,
+		                                                    output=output,
+		                                                    bidirectional=FLAGS.use_bert,
+		                                                    encoder_fn_params=pretrained_transformer_params,
+		                                                    reduce_fn_params=reduce_fn_params,
+		                                                    predict_fn_params=predict_fn_params)
+
+		else:
+			model = create_representation_model(encoder_fn=encoder_fn,
+			                                    encoder_fn_kwargs=encoder_fn_kwargs,
+			                                    reduce_fn=reduce_fn,
+			                                    reduce_fn_kwargs=reduce_fn_kwargs,
+			                                    num_categories=pfam_num_categories,
+			                                    output_features=num_families,
+			                                  	output=output,
+			                                  	encoder_fn_params=encoder_fn_params,
+		                                        reduce_fn_params=reduce_fn_params,
+		                                        predict_fn_params=predict_fn_params)
+
+		return model
 
 	encoder_fn = encoder_fn_name_to_fn(FLAGS.encoder_fn_name)
 	encoder_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('encoder_fn_kwargs_resources', FLAGS.encoder_fn_kwargs_path + '.json'))))
@@ -109,138 +172,115 @@ def main(_):
 	reduce_fn = reduce_fn_name_to_fn(FLAGS.reduce_fn_name)
 	reduce_fn_kwargs = json.load(open(resource_filename('contextual_lenses.resources', os.path.join('reduce_fn_kwargs_resources', FLAGS.reduce_fn_kwargs_path + '.json'))))
 
-	layers = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
+	layers, trainable_encoder = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
 
-	if FLAGS.use_transformer:
-
-		if FLAGS.use_bert:
-			model_cls = models.FlaxBERT
-		else:
-			model_cls = models.FlaxLM
-
-		if FLAGS.restore_transformer_dir is not None:
-			pretrained_transformer_params = load_transformer_params(FLAGS.restore_transformer_dir, model_cls)
-		else:
-			pretrained_transformer_params = None
-
-		model = create_transformer_representation_model(transformer_kwargs=encoder_fn_kwargs,
-	                                                    reduce_fn=reduce_fn,
-	                                                    reduce_fn_kwargs=reduce_fn_kwargs,
-	                                                    num_categories=pfam_num_categories,
-	                                                    output_features=num_families,
-	                                                    output='prediction',
-	                                                    bidirectional=FLAGS.use_bert,
-	                                                    encoder_fn_params=pretrained_transformer_params)
-
-		embedding_model = create_transformer_representation_model(transformer_kwargs=encoder_fn_kwargs,
-	                                                    		  reduce_fn=reduce_fn,
-				                                                  reduce_fn_kwargs=reduce_fn_kwargs,
-				                                                  num_categories=pfam_num_categories,
-				                                                  output_features=num_families,
-				                                                  output='embedding',
-				                                                  bidirectional=FLAGS.use_bert,
-				                                                  encoder_fn_params=pretrained_transformer_params)
-	else:
-		model = create_representation_model(encoder_fn=encoder_fn,
-		                                    encoder_fn_kwargs=encoder_fn_kwargs,
-		                                    reduce_fn=reduce_fn,
-		                                    reduce_fn_kwargs=reduce_fn_kwargs,
-		                                    num_categories=pfam_num_categories,
-		                                    output_features=num_families,
-		                                  	output='prediction')
-
-		embedding_model = create_representation_model(encoder_fn=encoder_fn,
-				                                      encoder_fn_kwargs=encoder_fn_kwargs,
-				                                      reduce_fn=reduce_fn,
-				                                      reduce_fn_kwargs=reduce_fn_kwargs,
-				                                      num_categories=pfam_num_categories,
-				                                      output_features=num_families,
-				                                  	  output='embedding')
+	embedding_model = create_model(use_transformer=FlAGS.use_transformer, use_bert=FLAGS.use_bert, 
+								   restore_transformer_dir=FLAGS.restore_transformer_dir, encoder_fn=encoder_fn, 
+								   encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs,
+								   layers=layers, output='embedding')
 
 	embedding_optimizer = create_optimizer(embedding_model, 
 										   learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
 										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], 
 										   layers=layers)
 
-	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
-				                                                             train_family_accessions=lens_knn_train_family_accessions, 
-				                                                             test_family_accessions=lens_knn_train_family_accessions,
-				                                                             batch_size=FLAGS.batch_size,
-				                                                             train_samples=FLAGS.knn_train_samples)[0]
-	train_knn_accuracy_untrained_lens = train_knn_results_untrained_lens['1-nn accuracy']
+	for knn_train_samples in knn_train_samples_:
 
-	test_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
-				                                                            train_family_accessions=knn_test_family_accessions, 
-				                                                            test_family_accessions=knn_test_family_accessions,
-				                                                            batch_size=FLAGS.batch_size,
-				                                                            train_samples=FLAGS.knn_train_samples)[0]
-	test_knn_accuracy_untrained_lens = test_knn_results_untrained_lens['1-nn accuracy']
+		train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+					                                                             train_family_accessions=lens_knn_train_family_accessions, 
+					                                                             test_family_accessions=lens_knn_train_family_accessions,
+					                                                             batch_size=FLAGS.batch_size,
+					                                                             train_samples=knn_train_samples)[0]
+		train_knn_accuracy_untrained_lens = train_knn_results_untrained_lens['1-nn accuracy']
 
-	optimizer = train(model=model,
-                      train_data=train_batches,
-                      loss_fn=cross_entropy_loss,
-                      loss_fn_kwargs=loss_fn_kwargs,
-                      learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr],
-                      weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
-                      layers=layers)
-	trained_params = copy.deepcopy(optimizer.target.params)
+		test_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+					                                                            train_family_accessions=knn_test_family_accessions, 
+					                                                            test_family_accessions=knn_test_family_accessions,
+					                                                            batch_size=FLAGS.batch_size,
+					                                                            train_samples=knn_train_samples)[0]
+		test_knn_accuracy_untrained_lens = test_knn_results_untrained_lens['1-nn accuracy']
 
-	results, preds = pfam_evaluate(predict_fn=optimizer.target,
-                                   test_family_accessions=lens_knn_train_family_accessions,
-                                   title=None,
-                                   loss_fn_kwargs=loss_fn_kwargs,
-                                   batch_size=FLAGS.batch_size)
+		datum['train_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = train_knn_accuracy_untrained_lens
+		datum['test_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = test_knn_accuracy_untrained_lens
 
-	lens_accuracy = results['accuracy']
-	lens_cross_entropy = float(results['cross_entropy'])
+	encoder_fn_params = None
+	reduce_fn_params = None
+	predict_fn_params = None
+	for i in range(FLAGS.measurements):
 
-	assert(embedding_optimizer.target.params.keys()==trained_params.keys()), 'Optimizer parameters do not match!'
-	for layer in embedding_optimizer.target.params.keys():
-		embedding_optimizer.target.params[layer] = trained_params[layer]
+		train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
+														   batch_size=FLAGS.batch_size,
+														   samples=FLAGS.lens_train_samples,
+														   epochs=measurement_epochs, 
+														   drop_remainder=True)
 
-	train_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
-			                                                               train_family_accessions=lens_knn_train_family_accessions, 
-			                                                               test_family_accessions=lens_knn_train_family_accessions,
-			                                                               batch_size=FLAGS.batch_size,
-			                                                               train_samples=FLAGS.knn_train_samples)[0]
-	train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
+		model = create_model(use_transformer=FlAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
+							 encoder_fn=encoder_fn, encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs, layers=layers, 
+							 output='prediction', encoder_fn_params=encoder_fn_params, reduce_fn_params=reduce_fn_params, predict_fn_params=predict_fn_params)
 
-	test_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
-			                                                              train_family_accessions=knn_test_family_accessions, 
-			                                                              test_family_accessions=knn_test_family_accessions,
-			                                                              batch_size=FLAGS.batch_size,
-			                                                              train_samples=FLAGS.knn_train_samples)[0]
-	test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
+		optimizer = train(model=model,
+	                      train_data=train_batches,
+	                      loss_fn=cross_entropy_loss,
+	                      loss_fn_kwargs=loss_fn_kwargs,
+	                      learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr],
+	                      weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
+	                      layers=layers)
+		
+		trained_params = copy.deepcopy(optimizer.target.params)
 
-	datum = {
-				'encoder_fn_name': FLAGS.encoder_fn_name,
-				'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
-				'reduce_fn_name': FLAGS.reduce_fn_name,
-				'reduce_fn_kwargs_path': FLAGS.reduce_fn_kwargs_path,
-				'epochs': FLAGS.epochs,
-				'batch_size': FLAGS.batch_size,
-				'encoder_lr': FLAGS.encoder_lr,
-				'lens_lr': FLAGS.lens_lr,
-				'predictor_lr': FLAGS.predictor_lr,
-				'encoder_wd': FLAGS.encoder_wd,
-				'lens_wd': FLAGS.lens_wd,
-				'predictor_wd': FLAGS.predictor_wd,
-				'train_families': FLAGS.train_families,
-				'use_transformer': FLAGS.use_transformer,
-				'use_bert': FLAGS.use_bert,
-				'restore_transformer_dir': FLAGS.restore_transformer_dir,
-				'knn_train_samples': FLAGS.knn_train_samples,
-				'lens_cross_entropy': lens_cross_entropy,
-				'lens_accuracy': lens_accuracy,
-				'train_knn_accuracy_untrained_lens': train_knn_accuracy_untrained_lens,
-				'test_knn_accuracy_untrained_lens': test_knn_accuracy_untrained_lens,
-				'train_knn_accuracy_trained_lens': train_knn_accuracy_trained_lens,
-				'test_knn_accuracy_trained_lens': test_knn_accuracy_trained_lens
-			}
+		results, preds = pfam_evaluate(predict_fn=optimizer.target,
+	                                   test_family_accessions=lens_knn_train_family_accessions,
+	                                   title=None,
+	                                   loss_fn_kwargs=loss_fn_kwargs,
+	                                   batch_size=FLAGS.batch_size)
+
+		lens_accuracy = results['accuracy']
+		datum['lens_accuracy' + '_measurement_' + str(i)] = lens_accuracy
+
+		lens_cross_entropy = float(results['cross_entropy'])
+		datum['lens_cross_entropy' + '_measurement_' + str(i)] = lens_cross_entropy
+
+		assert(embedding_optimizer.target.params.keys()==trained_params.keys()), 'Optimizer parameters do not match!'
+		for layer in embedding_optimizer.target.params.keys():
+			embedding_optimizer.target.params[layer] = trained_params[layer]
+
+		for knn_train_samples in knn_train_samples_:
+
+			train_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+					                                                               train_family_accessions=lens_knn_train_family_accessions, 
+					                                                               test_family_accessions=lens_knn_train_family_accessions,
+					                                                               batch_size=FLAGS.batch_size,
+					                                                               train_samples=knn_train_samples)[0]
+			train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
+			datum['train_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = train_knn_accuracy_trained_lens
+
+			test_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+					                                                              train_family_accessions=knn_test_family_accessions, 
+					                                                              test_family_accessions=knn_test_family_accessions,
+					                                                              batch_size=FLAGS.batch_size,
+					                                                              train_samples=knn_train_samples)[0]
+			test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
+			datum['test_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' = str(i)] = test_knn_accuracy_trained_lens
+
+		assert(model.params.keys()==trained_params.keys()), 'Model and optimizer parameters do not match!'
+		predict_fn_params = trained_params[layers[-1]]
+		if trainable_encoder:
+			encoder_fn_params = trained_params[layers[0]]
+			if len(layers) == 3:
+				reduce_fn_params = trained_params[layers[1]]
+			else:
+				reduce_fn_params = None
+		else:
+			encoder_fn_params = None
+			if len(layers) == 2:
+				reduce_fn_params = trained_params[layers[0]]
+			else:
+				reduce_fn_params = None
+
 	print(datum)
 	df = pd.DataFrame([datum])
     
-	with gcsfs.open(os.path.join('sweep_data', FLAGS.index + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join(FlAGS.gcs_bucket, FLAGS.index + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
 
 
