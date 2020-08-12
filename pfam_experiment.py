@@ -179,10 +179,8 @@ def main(_):
 								   encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs,
 								   layers=layers, output='embedding')
 
-	embedding_optimizer = create_optimizer(embedding_model, 
-										   learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
-										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], 
-										   layers=layers)
+	embedding_optimizer = create_optimizer(embedding_model,learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
+										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], layers=layers)
 
 	for knn_train_samples in knn_train_samples_:
 
@@ -215,9 +213,7 @@ def main(_):
 														   samples=FLAGS.lens_train_samples,
 														   epochs=measurement_epochs, 
 														   drop_remainder=True)
-
-		print(encoder_fn_params, reduce_fn_params, predict_fn_params)
-		
+		print("starting" + str(i))
 		model = create_model(use_transformer=FLAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
 							 encoder_fn=encoder_fn, encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs, layers=layers, 
 							 output='prediction', encoder_fn_params=encoder_fn_params, reduce_fn_params=reduce_fn_params, predict_fn_params=predict_fn_params)
@@ -229,7 +225,7 @@ def main(_):
 	                      learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr],
 	                      weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
 	                      layers=layers)
-		
+		print("trained")
 		trained_params = copy.deepcopy(optimizer.target.params)
 
 		results, preds = pfam_evaluate(predict_fn=optimizer.target,
@@ -286,7 +282,7 @@ def main(_):
 	print(datum)
 	df = pd.DataFrame([datum])
     
-	with gcsfs.open(os.path.join(FLAGS.gcs_bucket, FLAGS.index + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.index + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
 
 
