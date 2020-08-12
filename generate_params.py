@@ -130,7 +130,7 @@ batch_size = 64
 lr_1 = 0.0
 lrs = [1e-3, 5e-4, 1e-4, 5e-5]
 wd_1 = 0.0
-wds = [0.0, 0.1, 0.2]
+wds = [0.0, 0.05, 0.1, 0.2]
 train_families = 10000
 lens_train_samples = 50
 
@@ -163,7 +163,7 @@ for params in itertools.product(lrs, lrs, wds, wds):
 	params_combinations.append(param_dict)
 	index_to_params[index] = param_dict
 	count += 1
-	
+
 
 np.random.seed(0)
 params_combinations = list(np.random.permutation(np.array(params_combinations)))
