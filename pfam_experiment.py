@@ -106,7 +106,7 @@ def main(_):
 				'restore_transformer_dir': FLAGS.restore_transformer_dir
 			}
 
-	knn_train_samples_ = [1, 2, 3, 4, 5, 10, 25, 50]
+	knn_train_samples_ = [1, 5] # 2, 3, 4, 5, 10, 25, 50]
 
 	gcsfs = GCSFS(FLAGS.gcs_bucket)
 
