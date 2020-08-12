@@ -136,10 +136,13 @@ def main(_):
 			else:
 				model_cls = models.FlaxLM
 
-			if FLAGS.restore_transformer_dir is not None:
-				pretrained_transformer_params = load_transformer_params(FLAGS.restore_transformer_dir, model_cls)
+			if encoder_fn_params is not None:
+				pretrained_transformer_params = encoder_fn_params
 			else:
-				pretrained_transformer_params = None
+				if FLAGS.restore_transformer_dir is not None:
+					pretrained_transformer_params = load_transformer_params(FLAGS.restore_transformer_dir, model_cls)
+				else:
+					pretrained_transformer_params = None
 
 			model = create_transformer_representation_model(transformer_kwargs=encoder_fn_kwargs,
 		                                                    reduce_fn=reduce_fn,
@@ -201,8 +204,6 @@ def main(_):
 		datum['train_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = train_knn_accuracy_untrained_lens
 		datum['test_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = test_knn_accuracy_untrained_lens
 
-	print(datum)
-
 	encoder_fn_params = None
 	reduce_fn_params = None
 	predict_fn_params = None
@@ -261,8 +262,6 @@ def main(_):
 					                                                              train_samples=knn_train_samples)[0]
 			test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
 			datum['test_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = test_knn_accuracy_trained_lens
-
-		print(datum)
 
 		assert(model.params.keys()==trained_params.keys()), 'Model and optimizer parameters do not match!'
 		predict_fn_params = trained_params[layers[-1]]
