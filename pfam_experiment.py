@@ -86,7 +86,7 @@ def main(_):
 	measurement_epochs = FLAGS.epochs // FLAGS.measurements
 
 	datum = {
-				'index': FLAGS.index
+				'index': FLAGS.index,
 				'encoder_fn_name': FLAGS.encoder_fn_name,
 				'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
 				'reduce_fn_name': FLAGS.reduce_fn_name,
