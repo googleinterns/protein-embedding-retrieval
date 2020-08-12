@@ -174,7 +174,7 @@ def main(_):
 
 	layers, trainable_encoder = architecture_to_layers(FLAGS.encoder_fn_name, FLAGS.reduce_fn_name)
 
-	embedding_model = create_model(use_transformer=FlAGS.use_transformer, use_bert=FLAGS.use_bert, 
+	embedding_model = create_model(use_transformer=FLAGS.use_transformer, use_bert=FLAGS.use_bert, 
 								   restore_transformer_dir=FLAGS.restore_transformer_dir, encoder_fn=encoder_fn, 
 								   encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs,
 								   layers=layers, output='embedding')
@@ -214,7 +214,7 @@ def main(_):
 														   epochs=measurement_epochs, 
 														   drop_remainder=True)
 
-		model = create_model(use_transformer=FlAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
+		model = create_model(use_transformer=FLAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
 							 encoder_fn=encoder_fn, encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs, layers=layers, 
 							 output='prediction', encoder_fn_params=encoder_fn_params, reduce_fn_params=reduce_fn_params, predict_fn_params=predict_fn_params)
 
@@ -280,7 +280,7 @@ def main(_):
 	print(datum)
 	df = pd.DataFrame([datum])
     
-	with gcsfs.open(os.path.join(FlAGS.gcs_bucket, FLAGS.index + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join(FLAGS.gcs_bucket, FLAGS.index + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file)
 
 
