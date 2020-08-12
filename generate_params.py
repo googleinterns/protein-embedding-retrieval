@@ -134,6 +134,7 @@ wds = [0.0, 0.05, 0.1, 0.2]
 train_families = 10000
 lens_train_samples = 50
 
+
 # Transformer experiments
 encoder_fn_name = 'transformer'
 encoder_fn_kwargs_path = 'medium_transformer_kwargs'
@@ -158,6 +159,39 @@ for params in itertools.product(lrs, lrs, wds, wds):
 					'lens_train_samples': lens_train_samples,
 					'use_transformer': use_transformer,
 					'use_bert': use_bert,
+					'index': index
+				 }
+	# params_combinations.append(param_dict)
+	# index_to_params[index] = param_dict
+	count += 1
+
+
+# Pretrained transformer experiments
+encoder_fn_name = 'transformer'
+encoder_fn_kwargs_path = 'medium_transformer_kwargs'
+restore_transformer_dir = 'gs://sequin-public/transformer_models/medium_trembl_bert/'
+use_transformer = True 
+use_bert = True 
+for params in itertools.product(lrs, lrs, wds, wds):
+	lr_2, lr_3, wd_2, wd_3 = params
+	index = '%08d' % count
+	param_dict = {
+					'encoder_fn_name': encoder_fn_name,
+					'encoder_fn_kwargs_path': encoder_fn_kwargs_path,
+					'reduce_fn_name': reduce_fn_name,
+					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
+					'epochs': epochs,
+					'measurements': measurements,
+					'batch_size': batch_size,
+					'lens_lr': lr_2, 
+					'predictor_lr': lr_3,
+					'lens_wd':  wd_2,
+					'predictor_wd': wd_3,
+					'train_families': train_families,
+					'lens_train_samples': lens_train_samples,
+					'use_transformer': use_transformer,
+					'use_bert': use_bert,
+					'restore_transformer_dir': restore_transformer_dir,
 					'index': index
 				 }
 	params_combinations.append(param_dict)
