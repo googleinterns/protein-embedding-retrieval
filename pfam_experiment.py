@@ -110,9 +110,9 @@ def main(_):
 
 	gcsfs = GCSFS(FLAGS.gcs_bucket)
 
-	with gcsfs.open('starting.txt', 'w') as f:
+	with gcsfs.open('a_starting.txt', 'w') as f:
 		f.write('DONE')
-		
+
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
 	  	'num_classes': num_families
@@ -188,11 +188,24 @@ def main(_):
 	embedding_optimizer = create_optimizer(embedding_model,learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
 										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], layers=layers)
 
-	with gcsfs.open('really_starting.txt', 'w') as f:
+	with gcsfs.open('a_really_starting.txt', 'w') as f:
 		f.write('DONE')
+
+	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+					                                                             train_family_accessions=lens_knn_train_family_accessions, 
+					                                                             test_family_accessions=lens_knn_train_family_accessions,
+					                                                             batch_size=FLAGS.batch_size,
+					                                                             train_samples=1,
+					                                                             seed=1,
+					                                                             random_state=1)[0]
+	train_knn_accuracy_untrained_lens = train_knn_results_untrained_lens['1-nn accuracy']
+	datum['train_knn_accuracy_untrained_lens_1_knn_train_samples'] = train_knn_accuracy_untrained_lens
+	with gcsfs.open('a_train_untrained_lens_' + str(1) + '.txt', 'w') as f:
+			f.write('DONE')
 
 	for knn_train_samples in knn_train_samples_:
 
+		'''
 		train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                             train_family_accessions=lens_knn_train_family_accessions, 
 					                                                             test_family_accessions=lens_knn_train_family_accessions,
@@ -205,6 +218,7 @@ def main(_):
 
 		with gcsfs.open('train_untrained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
 			f.write('DONE')
+		'''
 
 		test_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                            train_family_accessions=knn_test_family_accessions, 
@@ -216,7 +230,7 @@ def main(_):
 		test_knn_accuracy_untrained_lens = test_knn_results_untrained_lens['1-nn accuracy']
 		datum['test_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = test_knn_accuracy_untrained_lens
 
-		with gcsfs.open('test_untrained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
+		with gcsfs.open('a_test_untrained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
 			f.write('DONE')
 
 	encoder_fn_params = None
@@ -224,7 +238,7 @@ def main(_):
 	predict_fn_params = None
 	for i in range(FLAGS.measurements):
 		
-		with gcsfs.open('lens_train_start.txt', 'w') as f:
+		with gcsfs.open('a_lens_train_start.txt', 'w') as f:
 			f.write('DONE')
 
 		train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
@@ -245,7 +259,7 @@ def main(_):
 	                      weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
 	                      layers=layers)
 
-		with gcsfs.open('lens_train_end.txt', 'w') as f:
+		with gcsfs.open('a_lens_train_end.txt', 'w') as f:
 			f.write('DONE')
 
 		trained_params = copy.deepcopy(optimizer.target.params)
@@ -266,8 +280,21 @@ def main(_):
 		for layer in embedding_optimizer.target.params.keys():
 			embedding_optimizer.target.params[layer] = trained_params[layer]
 
+		train_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
+					                                                               train_family_accessions=lens_knn_train_family_accessions, 
+					                                                               test_family_accessions=lens_knn_train_family_accessions,
+					                                                               batch_size=FLAGS.batch_size,
+					                                                               train_samples=knn_train_samples,
+					                                                               seed=1,
+					                                                               random_state=1)[0]
+		train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
+		datum['train_knn_accuracy_trained_lens_1_knn_train_samples' + '_measurement_' + str(i)] = train_knn_accuracy_trained_lens
+		with gcsfs.open('a_train_trained_lens_' + str(1) + '.txt', 'w') as f:
+			f.write('DONE')
+
 		for knn_train_samples in knn_train_samples_:
 
+			'''
 			train_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                               train_family_accessions=lens_knn_train_family_accessions, 
 					                                                               test_family_accessions=lens_knn_train_family_accessions,
@@ -280,6 +307,7 @@ def main(_):
 			
 			with gcsfs.open('train_trained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
 				f.write('DONE')
+			'''
 
 			test_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                              train_family_accessions=knn_test_family_accessions, 
@@ -291,7 +319,7 @@ def main(_):
 			test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
 			datum['test_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = test_knn_accuracy_trained_lens
 
-			with gcsfs.open('test_trained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
+			with gcsfs.open('a_test_trained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
 				f.write('DONE')
 
 		assert(model.params.keys()==trained_params.keys()), 'Model and optimizer parameters do not match!'
