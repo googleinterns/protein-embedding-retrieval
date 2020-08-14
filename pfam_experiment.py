@@ -82,9 +82,6 @@ flags.DEFINE_string('index', '00000000', 'Index used to save experiment results.
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
-	with gcsfs.open('starting.txt', 'w') as f:
-		f.write('DONE')
-
 	assert(FLAGS.epochs % FLAGS.measurements == 0), 'Number of measurements must divide number of epochs!'
 	measurement_epochs = FLAGS.epochs // FLAGS.measurements
 
@@ -113,6 +110,9 @@ def main(_):
 
 	gcsfs = GCSFS(FLAGS.gcs_bucket)
 
+	with gcsfs.open('starting.txt', 'w') as f:
+		f.write('DONE')
+		
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
 	  	'num_classes': num_families
