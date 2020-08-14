@@ -82,6 +82,9 @@ flags.DEFINE_string('index', '00000000', 'Index used to save experiment results.
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
+	with gcsfs.open('starting.txt', 'w') as f:
+		f.write('DONE')
+
 	assert(FLAGS.epochs % FLAGS.measurements == 0), 'Number of measurements must divide number of epochs!'
 	measurement_epochs = FLAGS.epochs // FLAGS.measurements
 
@@ -185,6 +188,9 @@ def main(_):
 	embedding_optimizer = create_optimizer(embedding_model,learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
 										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], layers=layers)
 
+	with gcsfs.open('really_starting.txt', 'w') as f:
+		f.write('DONE')
+
 	for knn_train_samples in knn_train_samples_:
 
 		train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
@@ -195,6 +201,10 @@ def main(_):
 					                                                             seed=1,
 					                                                             random_state=1)[0]
 		train_knn_accuracy_untrained_lens = train_knn_results_untrained_lens['1-nn accuracy']
+		datum['train_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = train_knn_accuracy_untrained_lens
+
+		with gcsfs.open('train_untrained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
+			f.write('DONE')
 
 		test_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                            train_family_accessions=knn_test_family_accessions, 
@@ -204,14 +214,18 @@ def main(_):
 					                                                            seed=1,
 					                                                            random_state=1)[0]
 		test_knn_accuracy_untrained_lens = test_knn_results_untrained_lens['1-nn accuracy']
-
-		datum['train_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = train_knn_accuracy_untrained_lens
 		datum['test_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = test_knn_accuracy_untrained_lens
+
+		with gcsfs.open('test_untrained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
+			f.write('DONE')
 
 	encoder_fn_params = None
 	reduce_fn_params = None
 	predict_fn_params = None
 	for i in range(FLAGS.measurements):
+		
+		with gcsfs.open('lens_train_start.txt', 'w') as f:
+			f.write('DONE')
 
 		train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
 														   batch_size=FLAGS.batch_size,
@@ -230,6 +244,9 @@ def main(_):
 	                      learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr],
 	                      weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
 	                      layers=layers)
+
+		with gcsfs.open('lens_train_end.txt', 'w') as f:
+			f.write('DONE')
 
 		trained_params = copy.deepcopy(optimizer.target.params)
 
@@ -260,6 +277,9 @@ def main(_):
 					                                                               random_state=1)[0]
 			train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
 			datum['train_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = train_knn_accuracy_trained_lens
+			
+			with gcsfs.open('train_trained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
+				f.write('DONE')
 
 			test_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                              train_family_accessions=knn_test_family_accessions, 
@@ -270,6 +290,9 @@ def main(_):
 					                                                              random_state=1)[0]
 			test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
 			datum['test_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = test_knn_accuracy_trained_lens
+
+			with gcsfs.open('test_trained_lens_' + str(knn_train_samples) + '.txt', 'w') as f:
+				f.write('DONE')
 
 		assert(model.params.keys()==trained_params.keys()), 'Model and optimizer parameters do not match!'
 		predict_fn_params = trained_params[layers[-1]]
