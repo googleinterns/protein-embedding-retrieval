@@ -194,8 +194,8 @@ for params in itertools.product(lrs, lrs, wds, wds):
 					'restore_transformer_dir': restore_transformer_dir,
 					'index': index
 				 }
-	params_combinations.append(param_dict)
-	index_to_params[index] = param_dict
+	# params_combinations.append(param_dict)
+	# index_to_params[index] = param_dict
 	count += 1
 
 
