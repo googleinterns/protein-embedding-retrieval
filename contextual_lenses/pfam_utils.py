@@ -96,19 +96,19 @@ def create_pfam_df(family_accessions, test=False):
 
 
 def create_pfam_seq_batches(family_accessions, batch_size, test=False, samples=None, epochs=1,
-                            drop_remainder=False, buffer_size=None, seed=0, random_state=0):
+                            drop_remainder=False, buffer_size=None, shuffle_seed=0, sample_random_state=0):
   """Creates iterable object of Pfam data batches."""
 
   pfam_df = create_pfam_df(family_accessions, test=test)
     
   if samples is not None:
     # shuffle data
-    pfam_df = pfam_df.sample(frac=1, replace=False, random_state=random_state)
+    pfam_df = pfam_df.sample(frac=1, replace=False, random_state=sample_random_state)
     pfam_df = pfam_df.groupby('mod_family_accession').head(samples).reset_index()
   
   pfam_batches = create_data_iterator(df=pfam_df, input_col='one_hot_inds', output_col='index',
                 	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
-                	  								  seed=seed, drop_remainder=drop_remainder, add_outputs=False, as_numpy=False)
+                	  								  seed=shuffle_seed, drop_remainder=drop_remainder, add_outputs=False, as_numpy=False)
 
   return pfam_batches
 

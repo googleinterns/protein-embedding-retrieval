@@ -346,5 +346,6 @@ def architecture_to_layers(encoder_fn_name, reduce_fn_name):
       layers.append('Dense_2')
 
   trainable_encoder = not no_trainable_encoder
+
   return layers, trainable_encoder
 

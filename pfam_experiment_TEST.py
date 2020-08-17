@@ -216,6 +216,15 @@ def main(_):
 	encoder_fn_params = None
 	reduce_fn_params = None
 	predict_fn_params = None
+	model = create_model(use_transformer=FLAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
+							 encoder_fn=encoder_fn, encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs, layers=layers, 
+							 output='prediction', encoder_fn_params=encoder_fn_params, reduce_fn_params=reduce_fn_params, predict_fn_params=predict_fn_params)
+	
+	optimizer = create_optimizer(model=model, 
+								 learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
+								 weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
+								 layers=layers)
+	
 	for i in range(FLAGS.measurements):
 
 		train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
@@ -224,11 +233,11 @@ def main(_):
 														   epochs=measurement_epochs, 
 														   drop_remainder=True)
 
-		model = create_model(use_transformer=FLAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
-							 encoder_fn=encoder_fn, encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs, layers=layers, 
-							 output='prediction', encoder_fn_params=encoder_fn_params, reduce_fn_params=reduce_fn_params, predict_fn_params=predict_fn_params)
+		# model = create_model(use_transformer=FLAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
+		# 					 encoder_fn=encoder_fn, encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs, layers=layers, 
+		# 					 output='prediction', encoder_fn_params=encoder_fn_params, reduce_fn_params=reduce_fn_params, predict_fn_params=predict_fn_params)
 
-		optimizer = train(model=model,
+		optimizer = train(model=optimizer.target,
 	                      train_data=train_batches,
 	                      loss_fn=cross_entropy_loss,
 	                      loss_fn_kwargs=loss_fn_kwargs,
@@ -300,4 +309,3 @@ def main(_):
 
 if __name__ == '__main__':
 	app.run(main)
-
