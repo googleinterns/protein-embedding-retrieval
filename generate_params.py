@@ -199,6 +199,40 @@ for params in itertools.product(lrs, lrs, wds, wds):
 	count += 1
 
 
+# CNN experiments
+reduce_fn_name = 'linear_max_pool'
+reduce_fn_kwargs_path = 'linear_pool_1024'
+epochs = 10
+measurements = 2
+batch_size = 512
+lrs = [1e-3, 5e-4, 1e-4, 5e-5]
+wds = [0.0, 0.1, 0.2]
+train_families = 10000
+lens_train_samples = 50
+for params in itertools.product(lrs, lrs, lrs, wds, wds, wds):
+	lr_1, lr_2, lr_3, wd_1, wd_2, wd_3 = params
+	index = '%08d' % count
+	param_dict = {
+					'reduce_fn_name': reduce_fn_name,
+					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
+					'epochs': epochs,
+					'measurements': measurements,
+					'batch_size': batch_size,
+					'encoder_lr': lr_1,
+					'lens_lr': lr_2, 
+					'predictor_lr': lr_3,
+					'encoder_wd': wd_1,
+					'lens_wd':  wd_2,
+					'predictor_wd': wd_3,
+					'train_families': train_families,
+					'lens_train_samples': lens_train_samples,
+					'index': index
+				 }
+	params_combinations.append(param_dict)
+	index_to_params[index] = param_dict
+	count += 1
+
+
 np.random.seed(0)
 params_combinations = list(np.random.permutation(np.array(params_combinations)))
 with open('params_combinations.json', 'w') as f:

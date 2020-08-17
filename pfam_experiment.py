@@ -53,7 +53,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('encoder_fn_name', 'cnn_one_hot', 'Name of encoder_fn to use. None if using Transformer.')
 flags.DEFINE_string('encoder_fn_kwargs_path', 'cnn_kwargs', 'Path to encoder_fn_kwargs.')
 flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to use.')
-flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256', 'Path to reduce_fn_kwargs.')
+flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_1024', 'Path to reduce_fn_kwargs.')
 
 flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_integer('measurements', 1, 'Number of times to interrupt lens training loop to take measurements (1 = no interruption).')

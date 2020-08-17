@@ -53,7 +53,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_string('encoder_fn_name', 'cnn_one_hot', 'Name of encoder_fn to use. None if using Transformer.')
 flags.DEFINE_string('encoder_fn_kwargs_path', 'cnn_kwargs', 'Path to encoder_fn_kwargs.')
 flags.DEFINE_string('reduce_fn_name', 'linear_max_pool', 'Name of reduce_fn to use.')
-flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_256', 'Path to reduce_fn_kwargs.')
+flags.DEFINE_string('reduce_fn_kwargs_path', 'linear_pool_1024', 'Path to reduce_fn_kwargs.')
 
 flags.DEFINE_integer('epochs', 10, 'Number of epochs for lens training.')
 flags.DEFINE_integer('measurements', 1, 'Number of times to interrupt lens training loop to take measurements (1 = no interruption).')
@@ -224,7 +224,7 @@ def main(_):
 								 learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
 								 weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
 								 layers=layers)
-	
+
 	for i in range(FLAGS.measurements):
 
 		train_batches, train_indexes = create_pfam_batches(family_accessions=lens_knn_train_family_accessions,
@@ -232,10 +232,6 @@ def main(_):
 														   samples=FLAGS.lens_train_samples,
 														   epochs=measurement_epochs, 
 														   drop_remainder=True)
-
-		# model = create_model(use_transformer=FLAGS.use_transformer, use_bert=FLAGS.use_bert, restore_transformer_dir=FLAGS.restore_transformer_dir,
-		# 					 encoder_fn=encoder_fn, encoder_fn_kwargs=encoder_fn_kwargs, reduce_fn=reduce_fn, reduce_fn_kwargs=reduce_fn_kwargs, layers=layers, 
-		# 					 output='prediction', encoder_fn_params=encoder_fn_params, reduce_fn_params=reduce_fn_params, predict_fn_params=predict_fn_params)
 
 		optimizer = train(model=optimizer.target,
 	                      train_data=train_batches,
@@ -284,21 +280,6 @@ def main(_):
 					                                                              random_state=1)[0]
 			test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
 			datum['test_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = test_knn_accuracy_trained_lens
-
-		assert(model.params.keys()==trained_params.keys()), 'Model and optimizer parameters do not match!'
-		predict_fn_params = trained_params[layers[-1]]
-		if trainable_encoder:
-			encoder_fn_params = trained_params[layers[0]]
-			if len(layers) == 3:
-				reduce_fn_params = trained_params[layers[1]]
-			else:
-				reduce_fn_params = None
-		else:
-			encoder_fn_params = None
-			if len(layers) == 2:
-				reduce_fn_params = trained_params[layers[0]]
-			else:
-				reduce_fn_params = None
 
 	print(datum)
 	df = pd.DataFrame([datum])
