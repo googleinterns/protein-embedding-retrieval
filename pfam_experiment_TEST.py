@@ -193,9 +193,10 @@ def main(_):
 	embedding_optimizer = create_optimizer(embedding_model,learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
 										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], layers=layers)
 
-	with gcsfs.open('aa_starting.txt', 'w') as f:
+	with gcsfs.open('a_starting.txt', 'w') as f:
 		f.write('GO')
 
+	'''
 	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                         train_family_accessions=lens_knn_train_family_accessions, 
 					                                                         test_family_accessions=lens_knn_train_family_accessions,
@@ -223,6 +224,7 @@ def main(_):
 
 		with gcsfs.open('aa_step_2' + str(knn_train_samples) + '.txt', 'w') as f:
 			f.write('GO')
+	'''
 
 	encoder_fn_params = None
 	reduce_fn_params = None
@@ -236,7 +238,7 @@ def main(_):
 								 weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
 								 layers=layers)
 
-	with gcsfs.open('aa_step_3.txt', 'w') as f:
+	with gcsfs.open('a_step_3.txt', 'w') as f:
 		f.write('GO')
 
 	for i in range(FLAGS.measurements):
@@ -255,7 +257,7 @@ def main(_):
 	                      weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
 	                      layers=layers)
 
-		with gcsfs.open('aa_step_4' + str(i) + '.txt', 'w') as f:
+		with gcsfs.open('a_step_4' + str(i) + '.txt', 'w') as f:
 			f.write('GO')
 
 		trained_params = copy.deepcopy(optimizer.target.params)
@@ -279,14 +281,14 @@ def main(_):
 		train_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                           train_family_accessions=lens_knn_train_family_accessions, 
 					                                                           test_family_accessions=lens_knn_train_family_accessions,
-					                                                           batch_size=FLAGS.batch_size,
+					                                                           batch_size=FLAGS.knn_batch_size,
 					                                                           train_samples=1,
 					                                                           shuffle_seed=1,
 					                                                           sample_random_state=1)[0]
 		train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
 		datum['train_knn_accuracy_trained_lens_1_knn_train_samples' + '_measurement_' + str(i)] = train_knn_accuracy_trained_lens
 
-		with gcsfs.open('aa_step_5' + str(i) + '.txt', 'w') as f:
+		with gcsfs.open('a_step_5' + str(i) + '.txt', 'w') as f:
 			f.write('GO')
 
 		for knn_train_samples in knn_train_samples_:
@@ -294,26 +296,26 @@ def main(_):
 			test_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                              train_family_accessions=knn_test_family_accessions, 
 					                                                              test_family_accessions=knn_test_family_accessions,
-					                                                              batch_size=FLAGS.batch_size,
+					                                                              batch_size=FLAGS.knn_batch_size,
 					                                                              train_samples=knn_train_samples,
 					                                                              shuffle_seed=1,
 					                                                              sample_random_state=1)[0]
 			test_knn_accuracy_trained_lens = test_knn_results_trained_lens['1-nn accuracy']
 			datum['test_knn_accuracy_trained_lens_' + str(knn_train_samples) + '_knn_train_samples' + '_measurement_' + str(i)] = test_knn_accuracy_trained_lens
 
-			with gcsfs.open('aa_step_6' + str(i) + '_' + str(knn_train_samples) + '.txt', 'w') as f:
+			with gcsfs.open('a_step_6' + str(i) + '_' + str(knn_train_samples) + '.txt', 'w') as f:
 				f.write('GO')
 
 	print(datum)
 	df = pd.DataFrame([datum])
 
-	with gcsfs.open('aa_printing.txt', 'w') as f:
+	with gcsfs.open('a_printing.txt', 'w') as f:
 			f.write('GO')
     
 	with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.index + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file, index=False)
 
-	with gcsfs.open('aa_saving_and_finishing.txt', 'w') as f:
+	with gcsfs.open('a_saving_and_finishing.txt', 'w') as f:
 			f.write('GO')
 
 
