@@ -90,8 +90,8 @@ flags.DEFINE_integer('sleep_time', 600, 'Max number of seconds to sleep for befo
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
-	if FLAGS.sleep_time > 0:
-		time.sleep(np.random.uniform(0, FLAGS.sleep_time))
+	# if FLAGS.sleep_time > 0:
+	# 	time.sleep(np.random.uniform(0, FLAGS.sleep_time))
 
 	if FLAGS.use_transformer:
 		assert(FLAGS.encoder_fn_name=='transformer'), 'encoder_fn_name must be \'transformer\' if \'use_transformer\' is True'
