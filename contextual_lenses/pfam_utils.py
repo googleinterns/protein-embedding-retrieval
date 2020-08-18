@@ -185,10 +185,10 @@ def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test
                                           n_neighbors=1, train_samples=None, test_samples=None, shuffle_seed=0, sample_random_state=0):
   """Nearest neighbors classification on Pfam families using specified encoder."""
 
-  train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=batch_size,
-                                                     samples=train_samples, buffer_size=1, seed=shuffle_seed, random_state=sample_random_state)
-  test_batches, test_indexes = create_pfam_batches(family_accessions=test_family_accessions, batch_size=batch_size, test=True,
-                                                   samples=test_samples, buffer_size=1, seed=shuffle_seed, random_state=sample_random_state)
+  train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=batch_size, samples=train_samples, 
+                                                     buffer_size=1, shuffle_seed=shuffle_seed, sample_random_state=sample_random_state)
+  test_batches, test_indexes = create_pfam_batches(family_accessions=test_family_accessions, batch_size=batch_size, test=True, samples=test_samples, 
+                                                   buffer_size=1, shuffle_seed=shuffle_seed, sample_random_state=sample_random_state)
 
   train_vectors = compute_embeddings(encoder, train_batches)
   test_vectors = compute_embeddings(encoder, test_batches)
