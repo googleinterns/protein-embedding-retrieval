@@ -90,8 +90,8 @@ flags.DEFINE_int('sleep_time', 600, 'Max number of seconds to sleep for before j
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
-	if FLAGS.sleep_time > 0:
-		time.sleep(np.random.uniform(0, FLAGS.sleep_time))
+	# if FLAGS.sleep_time > 0:
+	# 	time.sleep(np.random.uniform(0, FLAGS.sleep_time))
 
 	if FLAGS.use_transformer:
 		assert(FLAGS.encoder_fn_name=='transformer'), 'encoder_fn_name must be \'transformer\' if \'use_transformer\' is True'
@@ -280,7 +280,7 @@ def main(_):
 		train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
 		datum['train_knn_accuracy_trained_lens_1_knn_train_samples' + '_measurement_' + str(i)] = train_knn_accuracy_trained_lens
 		'''
-		
+
 		for knn_train_samples in knn_train_samples_:
 
 			test_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
