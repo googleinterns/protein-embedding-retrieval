@@ -209,6 +209,7 @@ def main(_):
 
 	with gcsfs.open('aa_step_1.txt', 'w') as f:
 		f.write('GO')
+	'''
 
 	for knn_train_samples in knn_train_samples_:
 
@@ -224,7 +225,6 @@ def main(_):
 
 		with gcsfs.open('aa_step_2' + str(knn_train_samples) + '.txt', 'w') as f:
 			f.write('GO')
-	'''
 
 	encoder_fn_params = None
 	reduce_fn_params = None
