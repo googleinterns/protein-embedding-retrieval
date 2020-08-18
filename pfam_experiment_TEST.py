@@ -84,14 +84,14 @@ flags.DEFINE_string('gcs_bucket', 'sequin-public', 'GCS bucket to save to and lo
 flags.DEFINE_string('save_dir', 'sweep_data', 'Directory in GCS bucket to save to.')
 flags.DEFINE_string('index', '00000000', 'Index used to save experiment results.')
 
-flags.DEFINE_int('sleep_time', 600, 'Max number of seconds to sleep for before job starts, used to balance cloud quotas.')
+flags.DEFINE_integer('sleep_time', 600, 'Max number of seconds to sleep for before job starts, used to balance cloud quotas.')
 
 
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
-	# if FLAGS.sleep_time > 0:
-	# 	time.sleep(np.random.uniform(0, FLAGS.sleep_time))
+	if FLAGS.sleep_time > 0:
+		time.sleep(np.random.uniform(0, FLAGS.sleep_time))
 
 	if FLAGS.use_transformer:
 		assert(FLAGS.encoder_fn_name=='transformer'), 'encoder_fn_name must be \'transformer\' if \'use_transformer\' is True'
