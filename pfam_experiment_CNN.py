@@ -125,6 +125,12 @@ def main(_):
 
 	gcsfs = GCSFS(FLAGS.gcs_bucket)
 
+	print(datum)
+	df = pd.DataFrame([datum])
+
+	with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.index + '.csv'), 'w') as gcs_file:
+		df.to_csv(gcs_file, index=False)
+
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
 	  	'num_classes': num_families
@@ -270,6 +276,7 @@ def main(_):
 		for layer in embedding_optimizer.target.params.keys():
 			embedding_optimizer.target.params[layer] = trained_params[layer]
 
+		'''
 		if i == FLAGS.measurements - 1:
 			train_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 						                                                           train_family_accessions=lens_knn_train_family_accessions, 
@@ -280,6 +287,7 @@ def main(_):
 						                                                           sample_random_state=1)[0]
 			train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
 			datum['train_knn_accuracy_trained_lens_1_knn_train_samples' + '_measurement_' + str(i)] = train_knn_accuracy_trained_lens
+		'''
 
 		for knn_train_samples in knn_train_samples_:
 
@@ -303,4 +311,3 @@ def main(_):
 if __name__ == '__main__':
 	app.run(main)
 
-	

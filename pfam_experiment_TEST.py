@@ -125,6 +125,12 @@ def main(_):
 
 	gcsfs = GCSFS(FLAGS.gcs_bucket)
 
+	print(datum)
+	df = pd.DataFrame([datum])
+
+	with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.index + '.csv'), 'w') as gcs_file:
+		df.to_csv(gcs_file, index=False)
+
 	num_families = len(family_ids)
 	loss_fn_kwargs = {
 	  	'num_classes': num_families
