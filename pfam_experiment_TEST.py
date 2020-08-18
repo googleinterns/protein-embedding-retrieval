@@ -23,6 +23,8 @@ import json
 
 import copy
 
+import time
+
 from pkg_resources import resource_filename
 
 from fs_gcsfs import GCSFS
@@ -82,9 +84,14 @@ flags.DEFINE_string('gcs_bucket', 'sequin-public', 'GCS bucket to save to and lo
 flags.DEFINE_string('save_dir', 'sweep_data', 'Directory in GCS bucket to save to.')
 flags.DEFINE_string('index', '00000000', 'Index used to save experiment results.')
 
+flags.DEFINE_int('sleep_time', 600, 'Max number of seconds to sleep for before job starts, used to balance cloud quotas.')
+
 
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
+
+	if FLAGS.sleep_time > 0:
+		time.sleep(np.random.uniform(0, FLAGS.sleep_time))
 
 	if FLAGS.use_transformer:
 		assert(FLAGS.encoder_fn_name=='transformer'), 'encoder_fn_name must be \'transformer\' if \'use_transformer\' is True'
@@ -192,7 +199,7 @@ def main(_):
 
 	embedding_optimizer = create_optimizer(embedding_model,learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
 										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], layers=layers)
-	
+	'''
 	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                         train_family_accessions=lens_knn_train_family_accessions, 
 					                                                         test_family_accessions=lens_knn_train_family_accessions,
@@ -202,6 +209,7 @@ def main(_):
 					                                                         sample_random_state=1)[0]
 	train_knn_accuracy_untrained_lens = train_knn_results_untrained_lens['1-nn accuracy']
 	datum['train_knn_accuracy_untrained_lens_1_knn_train_samples'] = train_knn_accuracy_untrained_lens
+	'''
 
 	for knn_train_samples in knn_train_samples_:
 
@@ -261,6 +269,7 @@ def main(_):
 		for layer in embedding_optimizer.target.params.keys():
 			embedding_optimizer.target.params[layer] = trained_params[layer]
 
+		'''
 		train_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
 					                                                           train_family_accessions=lens_knn_train_family_accessions, 
 					                                                           test_family_accessions=lens_knn_train_family_accessions,
@@ -270,7 +279,8 @@ def main(_):
 					                                                           sample_random_state=1)[0]
 		train_knn_accuracy_trained_lens = train_knn_results_trained_lens['1-nn accuracy']
 		datum['train_knn_accuracy_trained_lens_1_knn_train_samples' + '_measurement_' + str(i)] = train_knn_accuracy_trained_lens
-
+		'''
+		
 		for knn_train_samples in knn_train_samples_:
 
 			test_knn_results_trained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
