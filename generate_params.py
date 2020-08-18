@@ -229,8 +229,8 @@ for params in itertools.product(lrs, lrs, lrs, wds, wds, wds):
 					'lens_train_samples': lens_train_samples,
 					'index': index
 				 }
-	params_combinations.append(param_dict)
-	index_to_params[index] = param_dict
+	# params_combinations.append(param_dict)
+	# index_to_params[index] = param_dict
 	count += 1
 
 
@@ -312,6 +312,45 @@ for params in itertools.product(lens_lrs, predictor_lrs, lens_wds, predictor_wds
 				 }
 	# params_combinations.append(param_dict)
 	# index_to_params[index] = param_dict
+	count += 1
+
+
+# CNN experiments
+reduce_fn_name = 'linear_max_pool'
+reduce_fn_kwargs_path = 'linear_pool_1024'
+epochs = 10
+measurements = 2
+batch_size = 512
+encoder_lrs = [1e-3, 5e-4, 1e-4]
+lens_lrs = [1e-4, 5e-5, 1e-5]
+predictor_lrs = [1e-3, 5e-4, 1e-4]
+encoder_wds = [0.0, 0.05, 0.1, 0.2]
+lens_wds = [0.0, 0.05, 0.1, 0.2]
+predictor_wds = [0.0, 0.05, 0.1]
+train_families = 10000
+lens_train_samples = 50
+for params in itertools.product(encoder_lrs, lens_lrs, predictor_lrs, encoder_wds, lens_wds, predictor_wds):
+	lr_1, lr_2, lr_3, wd_1, wd_2, wd_3 = params
+	index = '%08d' % count
+	param_dict = {
+					'reduce_fn_name': reduce_fn_name,
+					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
+					'epochs': epochs,
+					'measurements': measurements,
+					'lens_batch_size': batch_size,
+					'knn_batch_size': batch_size,
+					'encoder_lr': lr_1,
+					'lens_lr': lr_2, 
+					'predictor_lr': lr_3,
+					'encoder_wd': wd_1,
+					'lens_wd':  wd_2,
+					'predictor_wd': wd_3,
+					'train_families': train_families,
+					'lens_train_samples': lens_train_samples,
+					'index': index
+				 }
+	params_combinations.append(param_dict)
+	index_to_params[index] = param_dict
 	count += 1
 
 
