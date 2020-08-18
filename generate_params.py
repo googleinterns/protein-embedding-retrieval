@@ -298,7 +298,7 @@ for params in itertools.product(lens_lrs, predictor_lrs, lens_wds, predictor_wds
 					'epochs': epochs,
 					'measurements': measurements,
 					'lens_batch_size': batch_size,
-					'knn_batch_size': knn_batch_size,
+					'knn_batch_size': batch_size,
 					'lens_lr': lr_2, 
 					'predictor_lr': lr_3,
 					'lens_wd':  wd_2,
