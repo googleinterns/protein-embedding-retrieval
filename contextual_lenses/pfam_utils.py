@@ -114,20 +114,20 @@ def create_pfam_seq_batches(family_accessions, batch_size, test=False, samples=N
 
 
 def create_pfam_batches(family_accessions, batch_size, test=False, samples=None, epochs=1,
-                        drop_remainder=False, buffer_size=None, seed=0, random_state=0):
+                        drop_remainder=False, buffer_size=None, shuffle_seed=0, sample_random_state=0):
   """Creates iterable object of Pfam data batches."""
 
   pfam_df = create_pfam_df(family_accessions, test=test)
     
   if samples is not None:
-    pfam_df = pfam_df.sample(frac=1, replace=False, random_state=random_state)
+    pfam_df = pfam_df.sample(frac=1, replace=False, random_state=sample_random_state)
     pfam_df = pfam_df.groupby('mod_family_accession').head(samples).reset_index()
   
   pfam_indexes = pfam_df['index'].values
 
   pfam_batches = create_data_iterator(df=pfam_df, input_col='one_hot_inds', output_col='index',
                 	  								  batch_size=batch_size, epochs=epochs, buffer_size=buffer_size, 
-                	  								  seed=seed, drop_remainder=drop_remainder)
+                	  								  seed=shuffle_seed, drop_remainder=drop_remainder)
 
   return pfam_batches, pfam_indexes
 
@@ -182,13 +182,13 @@ def compute_embeddings(encoder, data_batches):
 
 
 def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test_family_accessions, batch_size=512, 
-                                          n_neighbors=1, train_samples=None, test_samples=None, seed=0, random_state=0):
+                                          n_neighbors=1, train_samples=None, test_samples=None, shuffle_seed=0, sample_random_state=0):
   """Nearest neighbors classification on Pfam families using specified encoder."""
 
   train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=batch_size,
-                                                     samples=train_samples, buffer_size=1, seed=seed, random_state=random_state)
-  test_batches, test_indexes = create_pfam_batches(family_accessions=test_family_accessions, batch_size=batch_size, 
-                                                   test=True, samples=test_samples, buffer_size=1, seed=seed, random_state=random_state)
+                                                     samples=train_samples, buffer_size=1, seed=shuffle_seed, random_state=sample_random_state)
+  test_batches, test_indexes = create_pfam_batches(family_accessions=test_family_accessions, batch_size=batch_size, test=True,
+                                                   samples=test_samples, buffer_size=1, seed=shuffle_seed, random_state=sample_random_state)
 
   train_vectors = compute_embeddings(encoder, train_batches)
   test_vectors = compute_embeddings(encoder, test_batches)
