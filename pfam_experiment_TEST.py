@@ -81,7 +81,7 @@ flags.DEFINE_boolean('use_bert', False, 'Whether or not to use bidirectional tra
 flags.DEFINE_string('restore_transformer_dir', None, 'Directory to load pretrained transformer from.')
 
 flags.DEFINE_string('gcs_bucket', 'sequin-public', 'GCS bucket to save to and load from.')
-flags.DEFINE_string('save_dir', 'sweep_data', 'Directory in GCS bucket to save to.')
+flags.DEFINE_string('save_dir', 'second_batch', 'Directory in GCS bucket to save to.')
 flags.DEFINE_string('index', '00000000', 'Index used to save experiment results.')
 
 flags.DEFINE_integer('sleep_time', 600, 'Max number of seconds to sleep for before job starts, used to balance cloud quotas.')
@@ -293,7 +293,7 @@ def main(_):
 	print(datum)
 	df = pd.DataFrame([datum])
 
-	with gcsfs.open(os.path.join('gs://' + FLAGS.gcs_bucket, FLAGS.save_dir, FLAGS.index + '.csv'), 'w') as gcs_file:
+	with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.index + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file, index=False)
 
 

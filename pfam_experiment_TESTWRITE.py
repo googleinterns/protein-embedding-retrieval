@@ -131,9 +131,6 @@ def main(_):
 	with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.index + '.csv'), 'w') as gcs_file:
 		df.to_csv(gcs_file, index=False)
 
-	# with gcsfs.open(os.path.join('gs://' + FLAGS.gcs_bucket, FLAGS.save_dir, FLAGS.index + '.csv'), 'w') as gcs_file:
-	# 	df.to_csv(gcs_file, index=False)
-
 
 if __name__ == '__main__':
 	app.run(main)
