@@ -275,8 +275,8 @@ for params in itertools.product(lens_lrs, predictor_lrs, lens_wds, predictor_wds
 					'use_bert': use_bert,
 					'index': index
 				 }
-	params_combinations.append(param_dict)
-	index_to_params[index] = param_dict
+	# params_combinations.append(param_dict)
+	# index_to_params[index] = param_dict
 	count += 1
 
 
@@ -310,8 +310,8 @@ for params in itertools.product(lens_lrs, predictor_lrs, lens_wds, predictor_wds
 					'restore_transformer_dir': restore_transformer_dir,
 					'index': index
 				 }
-	params_combinations.append(param_dict)
-	index_to_params[index] = param_dict
+	# params_combinations.append(param_dict)
+	# index_to_params[index] = param_dict
 	count += 1
 
 
@@ -324,8 +324,8 @@ batch_size = 512
 encoder_lrs = [1e-3, 5e-4, 1e-4]
 lens_lrs = [1e-4, 5e-5, 1e-5]
 predictor_lrs = [1e-3, 5e-4, 1e-4]
-encoder_wds = [0.0, 0.05, 0.1, 0.2]
-lens_wds = [0.0, 0.05, 0.1, 0.2]
+encoder_wds = [0.05, 0.1, 0.2]
+lens_wds = [0.05, 0.1, 0.2]
 predictor_wds = [0.0, 0.05, 0.1]
 train_families = 10000
 lens_train_samples = 50
@@ -349,8 +349,8 @@ for params in itertools.product(encoder_lrs, lens_lrs, predictor_lrs, encoder_wd
 					'lens_train_samples': lens_train_samples,
 					'index': index
 				 }
-	# params_combinations.append(param_dict)
-	# index_to_params[index] = param_dict
+	params_combinations.append(param_dict)
+	index_to_params[index] = param_dict
 	count += 1
 
 
