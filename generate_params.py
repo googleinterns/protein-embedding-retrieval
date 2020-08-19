@@ -349,11 +349,42 @@ for params in itertools.product(encoder_lrs, lens_lrs, predictor_lrs, encoder_wd
 					'lens_train_samples': lens_train_samples,
 					'index': index
 				 }
-	params_combinations.append(param_dict)
-	index_to_params[index] = param_dict
+	# params_combinations.append(param_dict)
+	# index_to_params[index] = param_dict
 	count += 1
 
 
+'''
+# LAST CNN BATCH
+encoder_lrs_ = [1e-3, 5e-4, 1e-4, 5e-5]
+lens_lrs_ = [5e-5, 1e-5, 5e-6]
+predictor_lrs_ = [1e-4, 5e-5, 1e-5, 5e-6]
+encoder_wds_ = [0.2, 0.3]
+lens_wds_ = [0.05, 0.1]
+predictor_wds_ = [0.0, 0.05, 0.1]
+
+l1 = list(itertools.product(encoder_lrs, lens_lrs, predictor_lrs, encoder_wds, lens_wds, predictor_wds))
+l2 = list(itertools.product(encoder_lrs_, lens_lrs_, predictor_lrs_, encoder_wds_, lens_wds_, predictor_wds_))
+print(len(l2))
+c = 0
+d = 0
+for x in l2:
+	if x not in l1:
+		c += 1
+	else:
+		d += 1
+print(c, d)
+'''
+
+
+
+
+
+
+
+
+
+'''
 np.random.seed(0)
 params_combinations = list(np.random.permutation(np.array(params_combinations)))
 with open('params_combinations.json', 'w') as f:
@@ -361,7 +392,7 @@ with open('params_combinations.json', 'w') as f:
 
 with open('index_to_params.json', 'w') as f:
 	json.dump(index_to_params, f)
-
+'''
 print(count)
 
 

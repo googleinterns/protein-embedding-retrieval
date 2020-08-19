@@ -32,7 +32,7 @@ from contextual_lenses.loss_fns import cross_entropy_loss
 # Data preprocessing.
 # Original code source: https://www.kaggle.com/drewbryant/starter-pfam-seed-random-split.
 data_partitions_dirpath = 'random_split/'
-bucket_name = 'sequin-public'
+bucket_name = 'protein-embedding-xgcp' # 'sequin-public'
 
 def read_all_shards(partition='train', data_dir=data_partitions_dirpath, bucket_name=bucket_name):
   """Combines different CSVs into a single dataframe."""
