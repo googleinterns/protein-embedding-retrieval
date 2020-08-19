@@ -201,7 +201,7 @@ def main(_):
 	embedding_optimizer = create_optimizer(embedding_model,learning_rate=[FLAGS.encoder_lr, FLAGS.lens_lr, FLAGS.predictor_lr], 
 										   weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd], layers=layers)
 
-	with gcsfs.open('start.txt', 'w') as f:
+	with gcsfs.open('nop_start.txt', 'w') as f:
 		f.write('GO')
 
  	train_knn_results_untrained_lens = pfam_nearest_neighbors_classification(encoder=embedding_optimizer.target, 
@@ -214,7 +214,7 @@ def main(_):
 	train_knn_accuracy_untrained_lens = train_knn_results_untrained_lens['1-nn accuracy']
 	datum['train_knn_accuracy_untrained_lens_1_knn_train_samples'] = train_knn_accuracy_untrained_lens
 	
-	with gcsfs.open('train_knn_1.txt', 'w') as f:
+	with gcsfs.open('nop_train_knn_1.txt', 'w') as f:
 		f.write('GO')
 
 	for knn_train_samples in knn_train_samples_:
@@ -229,7 +229,7 @@ def main(_):
 		test_knn_accuracy_untrained_lens = test_knn_results_untrained_lens['1-nn accuracy']
 		datum['test_knn_accuracy_untrained_lens_' + str(knn_train_samples) + '_knn_train_samples'] = test_knn_accuracy_untrained_lens
 
-		with gcsfs.open('test_knn_' + str(knn_train_samples) + '.txt', 'w') as f:
+		with gcsfs.open('nop_test_knn_' + str(knn_train_samples) + '.txt', 'w') as f:
 			f.write('GO')
 
 	encoder_fn_params = None
@@ -244,7 +244,7 @@ def main(_):
 								 weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
 								 layers=layers)
 
-	with gcsfs.open('optimizer_created.txt', 'w') as f:
+	with gcsfs.open('nop_optimizer_created.txt', 'w') as f:
 		f.write('GO')
 
 	for i in range(FLAGS.measurements):
@@ -263,7 +263,7 @@ def main(_):
 	                      weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
 	                      layers=layers)
 
-		with gcsfs.open('optimizer_trained.txt', 'w') as f:
+		with gcsfs.open('nop_optimizer_trained.txt', 'w') as f:
 			f.write('GO')
 
 		trained_params = copy.deepcopy(optimizer.target.params)
@@ -274,7 +274,7 @@ def main(_):
 	                                   loss_fn_kwargs=loss_fn_kwargs,
 	                                   batch_size=FLAGS.lens_batch_size)
 
-		with gcsfs.open('optimizer_evaluated.txt', 'w') as f:
+		with gcsfs.open('nop_optimizer_evaluated.txt', 'w') as f:
 			f.write('GO')
 
 		lens_accuracy = results['accuracy']
