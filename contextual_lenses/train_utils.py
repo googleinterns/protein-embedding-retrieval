@@ -51,9 +51,13 @@ def create_data_iterator(df,
 
     if add_outputs:
         batches = tf.data.Dataset.zip(
-            (inputs, outputs)).shuffle(buffer_size=buffer_size, seed=seed)
+            (inputs, outputs)).shuffle(buffer_size=buffer_size,
+                                       seed=seed,
+                                       reshuffle_each_iteration=True)
     else:
-        batches = inputs.shuffle(buffer_size=buffer_size, seed=seed)
+        batches = inputs.shuffle(buffer_size=buffer_size,
+                                 seed=seed,
+                                 reshuffle_each_iteration=True)
 
     batches = batches.repeat(epochs).batch(batch_size=batch_size,
                                            drop_remainder=drop_remainder)

@@ -10,6 +10,7 @@ from flax import nn
 from flax.training import checkpoints
 
 import jax
+from jax import random
 import jax.numpy as jnp
 from jax.config import config
 config.enable_omnistaging()
@@ -91,6 +92,8 @@ flags.DEFINE_integer('knn_shuffle_seed', 1,
                      'Random seed used for KNN data batching.')
 flags.DEFINE_integer('knn_sample_random_state', 1,
                      'Random state used for KNN data sampling.')
+flags.DEFINE_integer('random_key', 0,
+                     'Random key used for model instantiation.')
 
 flags.DEFINE_boolean('use_transformer', False,
                      'Whether or not to use transformer encoder')
@@ -143,8 +146,9 @@ def create_model(use_transformer,
             reduce_fn_kwargs=reduce_fn_kwargs,
             num_categories=pfam_num_categories,
             output_features=num_families,
-            output=output,
             bidirectional=FLAGS.use_bert,
+            output=output,
+            key=random.PRNGKey(FLAGS.random_key),
             encoder_fn_params=pretrained_transformer_params,
             reduce_fn_params=reduce_fn_params,
             predict_fn_params=predict_fn_params)
@@ -158,6 +162,7 @@ def create_model(use_transformer,
             num_categories=pfam_num_categories,
             output_features=num_families,
             output=output,
+            key=random.PRNGKey(FLAGS.random_key),
             encoder_fn_params=encoder_fn_params,
             reduce_fn_params=reduce_fn_params,
             predict_fn_params=predict_fn_params)
