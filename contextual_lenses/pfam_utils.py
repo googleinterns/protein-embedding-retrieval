@@ -32,7 +32,7 @@ from contextual_lenses.loss_fns import cross_entropy_loss
 # Data preprocessing.
 # Original code source: https://www.kaggle.com/drewbryant/starter-pfam-seed-random-split.
 data_partitions_dirpath = 'random_split/'
-bucket_name = 'protein-embedding-xgcp' # 'sequin-public'
+bucket_name = 'sequin-public'
 
 def read_all_shards(partition='train', data_dir=data_partitions_dirpath, bucket_name=bucket_name):
   """Combines different CSVs into a single dataframe."""
@@ -181,13 +181,13 @@ def compute_embeddings(encoder, data_batches):
   return vectors
 
 
-def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test_family_accessions, batch_size=512, 
-                                          n_neighbors=1, train_samples=None, test_samples=None, shuffle_seed=0, sample_random_state=0):
+def pfam_nearest_neighbors_classification(encoder, family_accessions, batch_size=512, n_neighbors=1, 
+                                          train_samples=None, test_samples=None, shuffle_seed=0, sample_random_state=0):
   """Nearest neighbors classification on Pfam families using specified encoder."""
 
-  train_batches, train_indexes = create_pfam_batches(family_accessions=train_family_accessions, batch_size=batch_size, samples=train_samples, 
+  train_batches, train_indexes = create_pfam_batches(family_accessions=family_accessions, batch_size=batch_size, samples=train_samples, 
                                                      buffer_size=1, shuffle_seed=shuffle_seed, sample_random_state=sample_random_state)
-  test_batches, test_indexes = create_pfam_batches(family_accessions=test_family_accessions, batch_size=batch_size, test=True, samples=test_samples, 
+  test_batches, test_indexes = create_pfam_batches(family_accessions=family_accessions, batch_size=batch_size, test=True, samples=test_samples, 
                                                    buffer_size=1, shuffle_seed=shuffle_seed, sample_random_state=sample_random_state)
 
   train_vectors = compute_embeddings(encoder, train_batches)
@@ -206,4 +206,4 @@ def pfam_nearest_neighbors_classification(encoder, train_family_accessions, test
   }
 
   return results, knn_predictions, knn_classifier
-
+  
