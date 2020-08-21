@@ -12,11 +12,52 @@ index_to_params = {}
 
 count = 0
 
-'''
-def create_params(encoder_lrs, lens_lrs, predictor_lrs, encoder_wds, lens_wds, predictor_wds, 
-				  lens_batch_size, knn_batch_size, reduce_fn_name, reduce_fn_kwargs_paths,
-				  train_families, lens_train_samples, use_transformer, use_bert, restore_transformer_dir)
-'''
+
+def create_params(encoder_lrs, lens_lrs, predictor_lrs, encoder_wds, lens_wds, predictor_wds, reduce_fn_kwargs_paths,
+				  lens_train_samples, train_families, epochs, measurements, encoder_fn_name, encoder_fn_kwargs_path, reduce_fn_name, 
+				  lens_batch_size=64, knn_batch_size=64, use_transformer=False, use_bert=False, restore_transformer_dir=None,
+				  first_test_family=15000, last_test_family=16000, gcs_bucket='sequin-public', save_dir='pfam_experiment_data',
+				  lens_shuffle_seed=0, lens_sample_random_state=0, knn_shuffle_seed=1, knn_sample_random_state=1):
+	"""Generates parameters from lists of parameters."""
+
+	params = []
+
+	for encoder_lr, lens_lr, predictor_lr, encoder_wd, lens_wd, predictor_wd, reduce_fn_kwargs_paths, lens_train_samples in \
+		itertools.product(encoder_lrs, lens_lrs, predictor_lrs, encoder_wds, lens_wds, predictor_wds, reduce_fn_kwargs_paths, lens_train_samples):
+
+		param_dict = {
+					'encoder_fn_name': encoder_fn_name,
+					'encoder_fn_kwargs_path': encoder_fn_kwargs_path,
+					'reduce_fn_name': reduce_fn_name,
+					'reduce_fn_kwargs_path': reduce_fn_kwargs_path,
+					'epochs': epochs,
+					'measurements': measurements,
+					'lens_batch_size': lens_batch_size,
+					'knn_batch_size': knn_batch_size,
+					'encoder_lr': encoder_lr,
+					'lens_lr': lens_lr, 
+					'predictor_lr': predictor_lr,
+					'encoder_wd': encoder_wd,
+					'lens_wd':  lens_wd,
+					'predictor_wd': predictor_wd,
+					'train_families': train_families,
+					'lens_train_samples': lens_train_samples,
+					'first_test_family': first_test_family,
+					'last_test_family': last_test_family,
+					'use_transformer': use_transformer,
+					'use_bert': use_bert,
+					'restore_transformer_dir': restore_transformer_dir,
+					'lens_shuffle_seed': lens_shuffle_seed,
+					'lens_sample_random_state': lens_sample_random_state,
+					'knn_shuffle_seed': knn_shuffle_seed,
+					'knn_sample_random_state': knn_sample_random_state,
+					'gcs_bucket': gcs_bucket,
+					'save_dir': save_dir
+				 }
+		params.append(param_dict)
+
+	return params
+
 
 # *** FIRST BATCH *** 
 reduce_fn_name = 'linear_max_pool'
@@ -127,6 +168,19 @@ for params in itertools.product(reduce_fn_kwargs_paths, lrs, lrs, lrs, wds, wds,
 	# params_combinations.append(param_dict)
 	# index_to_params[index] = param_dict
 	count += 1
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 10000 train samples below
