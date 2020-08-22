@@ -197,15 +197,15 @@ def main(_):
     if FLAGS.use_transformer:
         assert (
             FLAGS.encoder_fn_name is 'transformer'
-        ), 'encoder_fn_name must be \'transformer\' if \'use_transformer\' is True!'
+        ), 'encoder_fn_name must be transformer if use_transformer is True!'
 
     assert (FLAGS.epochs % FLAGS.measurements == 0
             ), 'Number of measurements must divide number of epochs!'
     measurement_epochs = FLAGS.epochs // FLAGS.measurements
 
-    assert FLAGS.save_dir is not '', 'Specify \'save_dir\'!'
+    assert FLAGS.save_dir is not '', 'Specify save_dir!'
 
-    assert FLAGS.index is not '', 'Specify \'index\'!'
+    assert FLAGS.index is not '', 'Specify index!'
 
     datum = {
         'index': FLAGS.index,
