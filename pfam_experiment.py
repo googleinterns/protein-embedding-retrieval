@@ -124,6 +124,8 @@ def create_model(use_transformer,
                  predict_fn_params=None):
     """Creates representation model (encoder --> lens --> predictor) architecture."""
 
+    num_families = len(family_ids)
+    
     if use_transformer:
 
         if use_bert:
