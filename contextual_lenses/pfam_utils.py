@@ -32,15 +32,15 @@ from contextual_lenses.loss_fns import cross_entropy_loss
 # Data preprocessing.
 # Original code source: https://www.kaggle.com/drewbryant/starter-pfam-seed-random-split.
 def read_all_shards(partition='train',
-                    data_dir=data_partitions_dirpath,
-                    bucket_name=gcs_bucket):
+                    data_dir,
+                    bucket_name):
     """Combines different CSVs into a single dataframe."""
 
     gcsfs = GCSFS(bucket_name)
 
     shards = []
-    for fn in gcsfs.listdir(data_partitions_dirpath + partition):
-        with gcsfs.open(os.path.join(data_partitions_dirpath, partition,
+    for fn in gcsfs.listdir(data_dir + partition):
+        with gcsfs.open(os.path.join(data_dir, partition,
                                      fn)) as f:
             shards.append(pd.read_csv(f, index_col=None))
     return pd.concat(shards)
