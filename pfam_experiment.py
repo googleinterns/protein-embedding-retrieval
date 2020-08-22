@@ -125,7 +125,7 @@ def create_model(use_transformer,
     """Creates representation model (encoder --> lens --> predictor) architecture."""
 
     num_families = len(family_ids)
-    
+
     if use_transformer:
 
         if use_bert:
@@ -187,8 +187,10 @@ def measure_nearest_neighbor_performance(accuracy_label, encoder,
         sample_random_state=sample_random_state,
         data_partitions_dirpath=FLAGS.data_partitions_dirpath,
         gcs_bucket=FLAGS.gcs_bucket)[0]
+
     accuracy = results['1-nn accuracy']
-    accuracy_dict = {label: accuracy}
+    
+    accuracy_dict = {accuracy_label: accuracy}
 
     return accuracy_dict
 
