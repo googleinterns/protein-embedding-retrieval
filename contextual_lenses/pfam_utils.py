@@ -31,7 +31,7 @@ from contextual_lenses.loss_fns import cross_entropy_loss
 
 # Data preprocessing.
 # Original code source: https://www.kaggle.com/drewbryant/starter-pfam-seed-random-split.
-def read_all_shards(partition='train',
+def read_all_shards(partition,
                     data_dir,
                     bucket_name):
     """Combines different CSVs into a single dataframe."""
@@ -90,11 +90,11 @@ def create_pfam_df(family_accessions,
     """Processes Pfam data into a featurized dataframe with samples many entries per family."""
 
     if test:
-        pfam_df = read_all_shards('test',
+        pfam_df = read_all_shards(partition='test',
                                   data_dir=data_partitions_dirpath,
                                   bucket_name=gcs_bucket)
     else:
-        pfam_df = read_all_shards('train',
+        pfam_df = read_all_shards(partition='train',
                                   data_dir=data_partitions_dirpath,
                                   bucket_name=gcs_bucket)
 
