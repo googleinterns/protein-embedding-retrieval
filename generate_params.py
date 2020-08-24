@@ -323,6 +323,8 @@ def main():
                             restore_transformer_dir=None,
                             gcs_bucket='sequin-public')
     '''
+
+    '''
     # Medium transformer 
     params += create_params(
         encoder_lrs=[0.0],
@@ -464,6 +466,7 @@ def main():
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         gcs_bucket='sequin-public')
+    '''
 
     # NEW
     # Small transformer 
@@ -661,7 +664,7 @@ def main():
 
 
     frozen_param_dict_to_index = {}
-    index = 0
+    index = 0 + 328
     for param_dict in params:
         if frozendict(param_dict) not in frozen_param_dict_to_index.keys():
             frozen_param_dict_to_index[frozendict(param_dict)] = index
