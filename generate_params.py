@@ -4,6 +4,8 @@ import json
 
 import itertools
 
+import os
+
 import numpy as np
 
 from frozendict import frozendict
@@ -33,11 +35,16 @@ def create_params(encoder_lrs,
                   last_test_family=16000,
                   gcs_bucket='sequin-public',
                   data_partitions_dirpath='random_split/',
-                  save_dir='pfam_experiment_data',
+                  results_save_dir='pfam_experiment_data',
                   lens_shuffle_seed=0,
                   lens_sample_random_state=0,
                   knn_shuffle_seed=1,
-                  knn_sample_random_state=1):
+                  knn_sample_random_state=1,
+                  load_model=False,
+                  load_model_dir='',
+                  load_model_step=0,
+                  save_model=False,
+                  save_model_dir=''):
     """Generates parameters from lists of parameters."""
 
     params = []
@@ -73,7 +80,12 @@ def create_params(encoder_lrs,
             'use_bert': use_bert,
             'gcs_bucket': gcs_bucket,
             'data_partitions_dirpath': data_partitions_dirpath,
-            'save_dir': save_dir
+            'results_save_dir': results_save_dir,
+            'load_model': load_model,
+            'load_model_dir': load_model_dir,
+            'load_model_step': load_model_step,
+            'save_model': save_model,
+            'save_model_dir': save_model_dir
         }
 
         if restore_transformer_dir is not None:
@@ -660,197 +672,214 @@ def main():
         random_keys=range(10))
     '''
 
-    # Large transformer 
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-5],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.05],
-        predictor_wds=[0.0],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='large_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=8,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        random_keys=range(5))
+    for i in range(5):
+        # Large transformer 
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[1e-5],
+            predictor_lrs=[1e-3],
+            encoder_wds=[0.0],
+            lens_wds=[0.05],
+            predictor_wds=[0.0],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='large_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=8,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            gcs_bucket='sequin-public',
+            random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers', 'large_0_' + str(i)))
 
-    # Pretrained large transformer
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-5],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.05],
-        predictor_wds=[0.0],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='large_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=8,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        restore_transformer_dir=
-        'gs://sequin-public/transformer_models/large_bert/',
-        gcs_bucket='sequin-public',
-        random_keys=range(5))
+        # Pretrained large transformer
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[1e-5],
+            predictor_lrs=[1e-3],
+            encoder_wds=[0.0],
+            lens_wds=[0.05],
+            predictor_wds=[0.0],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='large_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=8,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            restore_transformer_dir=
+            'gs://sequin-public/transformer_models/large_bert/',
+            gcs_bucket='sequin-public',
+            random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers', 'large_1_' + str(i)))
 
-    # Large transformer
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[5e-5],
-        predictor_lrs=[5e-4],
-        encoder_wds=[0.0],
-        lens_wds=[0.2],
-        predictor_wds=[0.2],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='large_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=8,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        random_keys=range(5))
+        # Large transformer
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[5e-5],
+            predictor_lrs=[5e-4],
+            encoder_wds=[0.0],
+            lens_wds=[0.2],
+            predictor_wds=[0.2],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='large_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=8,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            gcs_bucket='sequin-public',
+            random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers', 'large_2_' + str(i)))
 
-    # Pretrained large transformer
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[5e-5],
-        predictor_lrs=[5e-4],
-        encoder_wds=[0.0],
-        lens_wds=[0.2],
-        predictor_wds=[0.2],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='large_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=8,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        restore_transformer_dir=
-        'gs://sequin-public/transformer_models/large_bert/',
-        gcs_bucket='sequin-public',
-        random_keys=range(5))
+        # Pretrained large transformer
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[5e-5],
+            predictor_lrs=[5e-4],
+            encoder_wds=[0.0],
+            lens_wds=[0.2],
+            predictor_wds=[0.2],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='large_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=8,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            restore_transformer_dir=
+            'gs://sequin-public/transformer_models/large_bert/',
+            gcs_bucket='sequin-public',
+            random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers', 'large_3_' + str(i)))
 
-    # Large transformer 
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-4],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.1],
-        predictor_wds=[0.0],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='large_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=8,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        random_keys=range(5))
+        # Large transformer 
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[1e-4],
+            predictor_lrs=[1e-3],
+            encoder_wds=[0.0],
+            lens_wds=[0.1],
+            predictor_wds=[0.0],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='large_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=8,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            gcs_bucket='sequin-public',
+            random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers', 'large_4_' + str(i)))
 
-    # Pretrained large transformer 
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-4],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.1],
-        predictor_wds=[0.0],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='large_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=8,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        restore_transformer_dir=
-        'gs://sequin-public/transformer_models/large_bert/',
-        random_keys=range(5))
+        # Pretrained large transformer 
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[1e-4],
+            predictor_lrs=[1e-3],
+            encoder_wds=[0.0],
+            lens_wds=[0.1],
+            predictor_wds=[0.0],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='large_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=8,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            gcs_bucket='sequin-public',
+            restore_transformer_dir=
+            'gs://sequin-public/transformer_models/large_bert/',
+            random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers', 'large_5_' + str(i)))
 
-    # Large transformer
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-3],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.1],
-        predictor_wds=[0.0],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='large_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=8,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        random_keys=range(5))
+        # Large transformer
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[1e-3],
+            predictor_lrs=[1e-3],
+            encoder_wds=[0.0],
+            lens_wds=[0.1],
+            predictor_wds=[0.0],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='large_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=8,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            gcs_bucket='sequin-public',
+            random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers', 'large_6_' + str(i)))
 
-    # Pretrained large transformer 
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-3],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.1],
-        predictor_wds=[0.0],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='large_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=8,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        restore_transformer_dir=
-        'gs://sequin-public/transformer_models/large_bert/',
-        random_keys=range(5))
+        # Pretrained large transformer 
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[1e-3],
+            predictor_lrs=[1e-3],
+            encoder_wds=[0.0],
+            lens_wds=[0.1],
+            predictor_wds=[0.0],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='large_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=8,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            gcs_bucket='sequin-public',
+            restore_transformer_dir=
+            'gs://sequin-public/transformer_models/large_bert/',
+            random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers', 'large_7_' + str(i)))
 
 
     frozen_param_dict_to_label = {}
