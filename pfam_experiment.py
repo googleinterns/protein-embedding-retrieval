@@ -344,6 +344,9 @@ def main(_):
         weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
         layers=layers)
 
+    checkpoints.save_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, prefix='abc_checkpoint_')
+    optimizer = checkpoints.restore_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, prefix='abc_checkpoint_')
+
     for i in range(FLAGS.measurements):
 
         train_batches, train_indexes = create_pfam_batches(
