@@ -220,11 +220,11 @@ def main(_):
     assert FLAGS.label != '', 'Specify label!'
 
     if FLAGS.load_model:
-        assert FLAGS.model_load_dir != '', 'Specify model_load_dir!'
-        assert FLAGS.model_load_steps > 0, 'Loaded model must have been trained for more than 0 steps.'
+        assert FLAGS.load_model_dir != '', 'Specify load_model_dir!'
+        assert FLAGS.load_model_step > 0, 'Loaded model must have been trained for more than 0 steps.'
 
     if FLAGS.save_model:
-        assert FLAGS.model_save_dir != '', 'Specify model_save_dir!'
+        assert FLAGS.save_model_dir != '', 'Specify save_model_dir!'
 
     datum = {
             'label': FLAGS.label,
