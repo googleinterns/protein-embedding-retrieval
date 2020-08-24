@@ -189,7 +189,7 @@ def measure_nearest_neighbor_performance(accuracy_label, encoder,
         gcs_bucket=FLAGS.gcs_bucket)[0]
 
     accuracy = results['1-nn accuracy']
-    
+
     accuracy_dict = {accuracy_label: accuracy}
 
     return accuracy_dict
@@ -213,6 +213,17 @@ def main(_):
 
     datum = {
         'index': FLAGS.index,
+        'lens_shuffle_seed': FLAGS.lens_shuffle_seed,
+        'lens_sample_random_state': FLAGS.lens_sample_random_state,
+        'knn_shuffle_seed': FLAGS.knn_shuffle_seed,
+        'knn_sample_random_state': FLAGS.knn_sample_random_state,
+        'random_key': FLAGS.random_key,
+        'lens_train_samples': FLAGS.lens_train_samples,
+        'first_test_family': FLAGS.first_test_family,
+        'last_test_family': FLAGS.last_test_family,
+        'gcs_bucket': FLAGS.gcs_bucket,
+        'data_partitions_dirpath': FLAGS.data_partitions_dirpath,
+        'save_dir': FLAGS.save_dir,
         'encoder_fn_name': FLAGS.encoder_fn_name,
         'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
         'reduce_fn_name': FLAGS.reduce_fn_name,
@@ -252,7 +263,7 @@ def main(_):
         lens_knn_train_family_accessions.append(family_name)
 
     knn_test_family_accessions = []
-    for _ in range(FLAGS.first_test_family + 1, FLAGS.last_test_family + 1):
+    for _ in range(FLAGS.first_test_family, FLAGS.last_test_family + 1):
         family_name = 'PF%05d' % _
         knn_test_family_accessions.append(family_name)
 
