@@ -106,12 +106,14 @@ flags.DEFINE_string('gcs_bucket', 'sequin-public',
                     'GCS bucket to save to and load from.')
 flags.DEFINE_string('data_partitions_dirpath', 'random_split/',
                     'Location of Pfam data in GCS bucket.')
+
 flags.DEFINE_string('results_save_dir', '', 'Directory in GCS bucket to save to.')
 
 flags.DEFINE_boolean('load_model', False, 'Whether or not to load a trained model.')
-flags.DEFINE_string('model_load_dir', '', 'Directory in GCS bucket to load trained optimizer from.')
+flags.DEFINE_string('load_model_dir', '', 'Directory in GCS bucket to load trained optimizer from.')
+flags.DEFINE_integer('load_model_step', 0, 'Number of steps optimizer to be loaded has been trained for.')
 flags.DEFINE_boolean('save_model', False, 'Whether or not to save trained model.')
-flags.DEFINE_string('model_save_dir', '', 'Directory in GCS bucket to save trained optimizer to.')
+flags.DEFINE_string('save_model_dir', '', 'Directory in GCS bucket to save trained optimizer to.')
 
 flags.DEFINE_string('label', '', 'Label used to save experiment results.')
 
@@ -217,6 +219,13 @@ def main(_):
 
     assert FLAGS.label != '', 'Specify label!'
 
+    if FLAGS.load_model:
+        assert FLAGS.model_load_dir != '', 'Specify model_load_dir!'
+        assert FLAGS.model_load_steps > 0, 'Loaded model must have been trained for more than 0 steps.'
+
+    if FLAGS.save_model:
+        assert FLAGS.model_save_dir != '', 'Specify model_save_dir!'
+
     datum = {
             'label': FLAGS.label,
             'encoder_fn_name': FLAGS.encoder_fn_name,
@@ -247,7 +256,12 @@ def main(_):
             'restore_transformer_dir': FLAGS.restore_transformer_dir,
             'gcs_bucket': FLAGS.gcs_bucket,
             'data_partitions_dirpath': FLAGS.data_partitions_dirpath,
-            'results_save_dir': FLAGS.results_save_dir
+            'results_save_dir': FLAGS.results_save_dir,
+            'load_model': FLAGS.load_model,
+            'load_model_dir': FLAGS.load_model_dir,
+            'load_model_step': FLAGS.load_model_step,
+            'save_model': FLAGS.save_model,
+            'save_model_dir': FLAGS.save_model_dir
             }   
 
     gcsfs = GCSFS(FLAGS.gcs_bucket)
@@ -350,8 +364,8 @@ def main(_):
         weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
         layers=layers)
 
-    checkpoints.save_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, step=0, prefix='abc_checkpoint_')
-    optimizer = checkpoints.restore_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, step=0, prefix='abc_checkpoint_')
+    if FLAGS.load_model:
+        optimizer = checkpoints.restore_checkpoint(ckpt_dir=os.path.join('gs://' + FLAGS.gcs_bucket, FLAGS.load_model_dir), target=optimizer, step=FLAGS.load_model_step)
 
     for i in range(FLAGS.measurements):
 
@@ -424,7 +438,8 @@ def main(_):
                     shuffle_seed=FLAGS.knn_shuffle_seed,
                     sample_random_state=FLAGS.knn_sample_random_state))
 
-    checkpoints.save_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, step=FLAGS.epochs)
+    if FLAGS.save_model:
+        checkpoints.save_checkpoint(ckpt_dir=os.path.join('gs://' + FLAGS.gcs_bucket, FLAGS.save_model_dir), target=optimizer, step=FLAGS.epochs)
 
     print(datum)
     df = pd.DataFrame([datum])
