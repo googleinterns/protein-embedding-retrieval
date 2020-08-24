@@ -106,7 +106,13 @@ flags.DEFINE_string('gcs_bucket', 'sequin-public',
                     'GCS bucket to save to and load from.')
 flags.DEFINE_string('data_partitions_dirpath', 'random_split/',
                     'Location of Pfam data in GCS bucket.')
-flags.DEFINE_string('save_dir', '', 'Directory in GCS bucket to save to.')
+flags.DEFINE_string('results_save_dir', '', 'Directory in GCS bucket to save to.')
+
+flags.DEFINE_boolean('load_model', False, 'Whether or not to load a trained model.')
+flags.DEFINE_string('model_load_dir', '', 'Directory in GCS bucket to load trained optimizer from.')
+flags.DEFINE_boolean('save_model', False, 'Whether or not to save trained model.')
+flags.DEFINE_string('model_save_dir', '', 'Directory in GCS bucket to save trained optimizer to.')
+
 flags.DEFINE_string('label', '', 'Label used to save experiment results.')
 
 
@@ -207,7 +213,7 @@ def main(_):
             ), 'Number of measurements must divide number of epochs!'
     measurement_epochs = FLAGS.epochs // FLAGS.measurements
 
-    assert FLAGS.save_dir != '', 'Specify save_dir!'
+    assert FLAGS.results_save_dir != '', 'Specify results_save_dir!'
 
     assert FLAGS.label != '', 'Specify label!'
 
@@ -241,14 +247,14 @@ def main(_):
             'restore_transformer_dir': FLAGS.restore_transformer_dir,
             'gcs_bucket': FLAGS.gcs_bucket,
             'data_partitions_dirpath': FLAGS.data_partitions_dirpath,
-            'save_dir': FLAGS.save_dir
+            'results_save_dir': FLAGS.results_save_dir
             }   
 
     gcsfs = GCSFS(FLAGS.gcs_bucket)
 
     print(datum)
     df = pd.DataFrame([datum])
-    with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.label + '.csv'),
+    with gcsfs.open(os.path.join(FLAGS.results_save_dir, FLAGS.label + '.csv'),
                     'w') as gcs_file:
         df.to_csv(gcs_file, index=False)
 
@@ -344,8 +350,8 @@ def main(_):
         weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
         layers=layers)
 
-    checkpoints.save_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, prefix='abc_checkpoint_')
-    optimizer = checkpoints.restore_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, prefix='abc_checkpoint_')
+    checkpoints.save_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, step=0, prefix='abc_checkpoint_')
+    optimizer = checkpoints.restore_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, step=0, prefix='abc_checkpoint_')
 
     for i in range(FLAGS.measurements):
 
@@ -418,11 +424,11 @@ def main(_):
                     shuffle_seed=FLAGS.knn_shuffle_seed,
                     sample_random_state=FLAGS.knn_sample_random_state))
 
-    checkpoints.save_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer)
+    checkpoints.save_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer, step=FLAGS.epochs)
 
     print(datum)
     df = pd.DataFrame([datum])
-    with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.label + '.csv'),
+    with gcsfs.open(os.path.join(FLAGS.results_save_dir, FLAGS.label + '.csv'),
                     'w') as gcs_file:
         df.to_csv(gcs_file, index=False)
 
