@@ -64,13 +64,13 @@ def create_params(encoder_lrs,
             'lens_train_samples': lens_train_samples,
             'first_test_family': first_test_family,
             'last_test_family': last_test_family,
-            'random_key': random_key,
-            'use_transformer': use_transformer,
-            'use_bert': use_bert,
             'lens_shuffle_seed': lens_shuffle_seed,
             'lens_sample_random_state': lens_sample_random_state,
             'knn_shuffle_seed': knn_shuffle_seed,
             'knn_sample_random_state': knn_sample_random_state,
+            'random_key': random_key,
+            'use_transformer': use_transformer,
+            'use_bert': use_bert,
             'gcs_bucket': gcs_bucket,
             'data_partitions_dirpath': data_partitions_dirpath,
             'save_dir': save_dir
@@ -466,16 +466,207 @@ def main():
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         gcs_bucket='sequin-public')
+
+    # Small transformer 
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-4],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.1],
+        predictor_wds=[0.0],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='small_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=64,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        random_keys=range(10))
+
+    # Pretrained small transformer 
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-4],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.1],
+        predictor_wds=[0.0],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='small_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=64,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        restore_transformer_dir=
+        'gs://sequin-public/transformer_models/small_trembl_bert/',
+        random_keys=range(10))
+
+    # Small transformer
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-3],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.1],
+        predictor_wds=[0.0],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='small_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=64,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        random_keys=range(10))
+
+    # Pretrained small transformer 
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-3],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.1],
+        predictor_wds=[0.0],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='small_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=64,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        restore_transformer_dir=
+        'gs://sequin-public/transformer_models/small_trembl_bert/',
+        random_keys=range(10))
+
+    # Small transformer 
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-4],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.0],
+        predictor_wds=[0.0],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='small_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=64,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        random_keys=range(10))
+
+    # Pretrained small transformer 
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-4],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.0],
+        predictor_wds=[0.0],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='small_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=64,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        restore_transformer_dir=
+        'gs://sequin-public/transformer_models/small_trembl_bert/',
+        random_keys=range(10))
+
+    # Small transformer
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-4],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.2],
+        predictor_wds=[0.2],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='small_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=64,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        random_keys=range(10))
+
+    # Pretrained small transformer 
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-4],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.2],
+        predictor_wds=[0.2],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='small_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=64,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        restore_transformer_dir=
+        'gs://sequin-public/transformer_models/small_trembl_bert/',
+        random_keys=range(10))
     '''
 
-    # NEW
-    # Small transformer 
+    # Large transformer 
     params += create_params(
         encoder_lrs=[0.0],
-        lens_lrs=[1e-4],
+        lens_lrs=[1e-5],
         predictor_lrs=[1e-3],
         encoder_wds=[0.0],
-        lens_wds=[0.1],
+        lens_wds=[0.05],
         predictor_wds=[0.0],
         reduce_fn_kwargs_paths=['linear_pool_1024'],
         lens_train_samples=[50],
@@ -483,16 +674,89 @@ def main():
         epochs=10,
         measurements=1,
         encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='small_transformer_kwargs',
+        encoder_fn_kwargs_path='large_transformer_kwargs',
         reduce_fn_name='linear_max_pool',
-        lens_batch_size=64,
+        lens_batch_size=8,
         knn_batch_size=64,
         use_transformer=True,
         use_bert=True,
         gcs_bucket='sequin-public',
-        random_keys=range(10))
+        random_keys=range(5))
 
-    # Pretrained small transformer 
+    # Pretrained large transformer
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-5],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.05],
+        predictor_wds=[0.0],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='large_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=8,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        restore_transformer_dir=
+        'gs://sequin-public/transformer_models/large_bert/',
+        gcs_bucket='sequin-public',
+        random_keys=range(5))
+
+    # Large transformer
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[5e-5],
+        predictor_lrs=[5e-4],
+        encoder_wds=[0.0],
+        lens_wds=[0.2],
+        predictor_wds=[0.2],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='large_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=8,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        random_keys=range(5))
+
+    # Pretrained large transformer
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[5e-5],
+        predictor_lrs=[5e-4],
+        encoder_wds=[0.0],
+        lens_wds=[0.2],
+        predictor_wds=[0.2],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='large_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=8,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        restore_transformer_dir=
+        'gs://sequin-public/transformer_models/large_bert/',
+        gcs_bucket='sequin-public',
+        random_keys=range(5))
+
+    # Large transformer 
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-4],
@@ -506,18 +770,41 @@ def main():
         epochs=10,
         measurements=1,
         encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='small_transformer_kwargs',
+        encoder_fn_kwargs_path='large_transformer_kwargs',
         reduce_fn_name='linear_max_pool',
-        lens_batch_size=64,
+        lens_batch_size=8,
+        knn_batch_size=64,
+        use_transformer=True,
+        use_bert=True,
+        gcs_bucket='sequin-public',
+        random_keys=range(5))
+
+    # Pretrained large transformer 
+    params += create_params(
+        encoder_lrs=[0.0],
+        lens_lrs=[1e-4],
+        predictor_lrs=[1e-3],
+        encoder_wds=[0.0],
+        lens_wds=[0.1],
+        predictor_wds=[0.0],
+        reduce_fn_kwargs_paths=['linear_pool_1024'],
+        lens_train_samples=[50],
+        train_families=10000,
+        epochs=10,
+        measurements=1,
+        encoder_fn_name='transformer',
+        encoder_fn_kwargs_path='large_transformer_kwargs',
+        reduce_fn_name='linear_max_pool',
+        lens_batch_size=8,
         knn_batch_size=64,
         use_transformer=True,
         use_bert=True,
         gcs_bucket='sequin-public',
         restore_transformer_dir=
-        'gs://sequin-public/transformer_models/small_trembl_bert/',
-        random_keys=range(10))
+        'gs://sequin-public/transformer_models/large_bert/',
+        random_keys=range(5))
 
-    # Small transformer
+    # Large transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-3],
@@ -531,16 +818,16 @@ def main():
         epochs=10,
         measurements=1,
         encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='small_transformer_kwargs',
+        encoder_fn_kwargs_path='large_transformer_kwargs',
         reduce_fn_name='linear_max_pool',
-        lens_batch_size=64,
+        lens_batch_size=8,
         knn_batch_size=64,
         use_transformer=True,
         use_bert=True,
         gcs_bucket='sequin-public',
-        random_keys=range(10))
+        random_keys=range(5))
 
-    # Pretrained small transformer 
+    # Pretrained large transformer 
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-3],
@@ -554,117 +841,20 @@ def main():
         epochs=10,
         measurements=1,
         encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='small_transformer_kwargs',
+        encoder_fn_kwargs_path='large_transformer_kwargs',
         reduce_fn_name='linear_max_pool',
-        lens_batch_size=64,
+        lens_batch_size=8,
         knn_batch_size=64,
         use_transformer=True,
         use_bert=True,
         gcs_bucket='sequin-public',
         restore_transformer_dir=
-        'gs://sequin-public/transformer_models/small_trembl_bert/',
-        random_keys=range(10))
-
-    # NEW NEW
-    # Small transformer 
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-4],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.0],
-        predictor_wds=[0.0],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='small_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=64,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        random_keys=range(10))
-
-    # Pretrained small transformer 
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-4],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.0],
-        predictor_wds=[0.0],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='small_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=64,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        restore_transformer_dir=
-        'gs://sequin-public/transformer_models/small_trembl_bert/',
-        random_keys=range(10))
-
-    # Small transformer
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-4],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.2],
-        predictor_wds=[0.2],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='small_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=64,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        random_keys=range(10))
-
-    # Pretrained small transformer 
-    params += create_params(
-        encoder_lrs=[0.0],
-        lens_lrs=[1e-4],
-        predictor_lrs=[1e-3],
-        encoder_wds=[0.0],
-        lens_wds=[0.2],
-        predictor_wds=[0.2],
-        reduce_fn_kwargs_paths=['linear_pool_1024'],
-        lens_train_samples=[50],
-        train_families=10000,
-        epochs=10,
-        measurements=1,
-        encoder_fn_name='transformer',
-        encoder_fn_kwargs_path='small_transformer_kwargs',
-        reduce_fn_name='linear_max_pool',
-        lens_batch_size=64,
-        knn_batch_size=64,
-        use_transformer=True,
-        use_bert=True,
-        gcs_bucket='sequin-public',
-        restore_transformer_dir=
-        'gs://sequin-public/transformer_models/small_trembl_bert/',
-        random_keys=range(10))
+        'gs://sequin-public/transformer_models/large_bert/',
+        random_keys=range(5))
 
 
     frozen_param_dict_to_index = {}
-    index = 0 + 328
+    index = 0 + 408
     for param_dict in params:
         if frozendict(param_dict) not in frozen_param_dict_to_index.keys():
             frozen_param_dict_to_index[frozendict(param_dict)] = index
