@@ -853,38 +853,38 @@ def main():
         random_keys=range(5))
 
 
-    frozen_param_dict_to_index = {}
-    index = 0 + 408
+    frozen_param_dict_to_label = {}
+    label = 0 + 408
     for param_dict in params:
-        if frozendict(param_dict) not in frozen_param_dict_to_index.keys():
-            frozen_param_dict_to_index[frozendict(param_dict)] = index
-            index += 1
+        if frozendict(param_dict) not in frozen_param_dict_to_label.keys():
+            frozen_param_dict_to_label[frozendict(param_dict)] = label
+            label += 1
 
     unique_params = []
-    for frozen_param_dict in frozen_param_dict_to_index.keys():
+    for frozen_param_dict in frozen_param_dict_to_label.keys():
         param_dict = dict(frozen_param_dict)
         param_dict.update(
-            {'index': frozen_param_dict_to_index[frozen_param_dict]})
+            {'label': frozen_param_dict_to_label[frozen_param_dict]})
         unique_params.append(param_dict)
-    unique_params = sorted(unique_params, key=lambda x: x['index'])
+    unique_params = sorted(unique_params, key=lambda x: x['label'])
 
-    def transform_index(param_dict):
-        param_dict['index'] = '%08d' % param_dict['index']
+    def transform_label(param_dict):
+        param_dict['label'] = '%08d' % param_dict['label']
         return param_dict
 
     unique_params = [
-        transform_index(param_dict) for param_dict in unique_params
+        transform_label(param_dict) for param_dict in unique_params
     ]
 
     with open('params_combinations.json', 'w') as f:
         json.dump(unique_params, f)
 
-    index_to_params = {}
+    label_to_params = {}
     for param_dict in unique_params:
-        index_to_params[param_dict['index']] = param_dict
+        label_to_params[param_dict['label']] = param_dict
 
-    with open('index_to_params.json', 'w') as f:
-        json.dump(index_to_params, f)
+    with open('label_to_params.json', 'w') as f:
+        json.dump(label_to_params, f)
 
 
 if __name__ == '__main__':

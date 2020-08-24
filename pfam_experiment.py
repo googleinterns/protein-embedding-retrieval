@@ -48,7 +48,7 @@ from contextual_lenses.load_transformer import load_transformer_params
 
 from absl import app, flags
 
-# Define flags
+# Define flags.
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string('encoder_fn_name', 'cnn_one_hot',
@@ -81,7 +81,7 @@ flags.DEFINE_integer('train_families', 10000,
                      'Number of famlies used to train lens.')
 flags.DEFINE_integer('lens_train_samples', 50,
                      'Number of samples used to train lens.')
-flags.DEFINE_integer('first_test_family', 15000, 'First family to test on.')
+flags.DEFINE_integer('first_test_family', 15001, 'First family to test on.')
 flags.DEFINE_integer('last_test_family', 16000, 'Last family to test on.')
 
 flags.DEFINE_integer('lens_shuffle_seed', 0,
@@ -107,7 +107,7 @@ flags.DEFINE_string('gcs_bucket', 'sequin-public',
 flags.DEFINE_string('data_partitions_dirpath', 'random_split/',
                     'Location of Pfam data in GCS bucket.')
 flags.DEFINE_string('save_dir', '', 'Directory in GCS bucket to save to.')
-flags.DEFINE_string('index', '', 'Index used to save experiment results.')
+flags.DEFINE_string('label', '', 'Label used to save experiment results.')
 
 
 def create_model(use_transformer,
@@ -209,10 +209,10 @@ def main(_):
 
     assert FLAGS.save_dir != '', 'Specify save_dir!'
 
-    assert FLAGS.index != '', 'Specify index!'
+    assert FLAGS.label != '', 'Specify label!'
 
     datum = {
-            'index': FLAGS.index,
+            'label': FLAGS.label,
             'encoder_fn_name': FLAGS.encoder_fn_name,
             'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
             'reduce_fn_name': FLAGS.reduce_fn_name,
@@ -248,7 +248,7 @@ def main(_):
 
     print(datum)
     df = pd.DataFrame([datum])
-    with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.index + '.csv'),
+    with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.label + '.csv'),
                     'w') as gcs_file:
         df.to_csv(gcs_file, index=False)
 
@@ -415,9 +415,11 @@ def main(_):
                     shuffle_seed=FLAGS.knn_shuffle_seed,
                     sample_random_state=FLAGS.knn_sample_random_state))
 
+    checkpoints.save_checkpoint(ckpt_dir='gs://sequin-public/pfam_experiment_optimizers', target=optimizer)
+
     print(datum)
     df = pd.DataFrame([datum])
-    with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.index + '.csv'),
+    with gcsfs.open(os.path.join(FLAGS.save_dir, FLAGS.label + '.csv'),
                     'w') as gcs_file:
         df.to_csv(gcs_file, index=False)
 
