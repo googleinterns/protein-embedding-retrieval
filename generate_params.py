@@ -101,9 +101,7 @@ def main():
 
     params = []
 
-    # 1000 train families
-
-    # Medium transformer
+    # 1000 train families sweep
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-3, 5e-4, 1e-4, 5e-5, 1e-5],
@@ -126,7 +124,6 @@ def main():
         restore_transformer_dir=None,
         gcs_bucket='sequin-public')
 
-    # Pretrained medium transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-3, 5e-4, 1e-4, 5e-5, 1e-5],
@@ -150,7 +147,6 @@ def main():
         'gs://sequin-public/transformer_models/medium_trembl_bert/',
         gcs_bucket='sequin-public')
 
-    # 1-layer CNN
     params += create_params(
         encoder_lrs=[1e-3, 5e-4, 1e-4, 5e-5, 1e-5],
         lens_lrs=[1e-3, 5e-4, 1e-4, 5e-5, 1e-5],
@@ -173,9 +169,7 @@ def main():
         restore_transformer_dir=None,
         gcs_bucket='sequin-public')
 
-    # 10000 train families
-
-    # Medium transformer
+    # 10000 train families sweep
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-3, 5e-4, 1e-4, 5e-5],
                             predictor_lrs=[1e-3, 5e-4, 1e-4, 5e-5],
@@ -197,7 +191,6 @@ def main():
                             restore_transformer_dir=None,
                             gcs_bucket='sequin-public')
 
-    # Pretrained medium transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-3, 5e-4, 1e-4, 5e-5],
@@ -221,7 +214,6 @@ def main():
         'gs://sequin-public/transformer_models/medium_trembl_bert/',
         gcs_bucket='sequin-public')
 
-    # 2-layer CNN
     params += create_params(encoder_lrs=[1e-3, 1e-4, 1e-5],
                             lens_lrs=[1e-3, 1e-4, 1e-5],
                             predictor_lrs=[1e-3, 1e-4, 1e-5],
@@ -243,7 +235,6 @@ def main():
                             restore_transformer_dir=None,
                             gcs_bucket='sequin-public')
 
-    # Medium transformer
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-4, 5e-5, 1e-5],
                             predictor_lrs=[1e-3, 5e-4, 1e-4],
@@ -265,7 +256,6 @@ def main():
                             restore_transformer_dir=None,
                             gcs_bucket='sequin-public')
 
-    # Pretrained medium transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-4, 5e-5, 1e-5],
@@ -289,7 +279,6 @@ def main():
         'gs://sequin-public/transformer_models/medium_trembl_bert/',
         gcs_bucket='sequin-public')
 
-    # 2-layer CNN
     params += create_params(encoder_lrs=[1e-3, 5e-4, 1e-4],
                             lens_lrs=[1e-4, 5e-5, 1e-5],
                             predictor_lrs=[1e-3, 5e-4, 1e-4],
@@ -311,7 +300,6 @@ def main():
                             restore_transformer_dir=None,
                             gcs_bucket='sequin-public')
 
-    # 2-layer CNN
     params += create_params(encoder_lrs=[1e-3, 5e-4, 1e-4, 5e-5],
                             lens_lrs=[5e-5, 1e-5, 5e-6],
                             predictor_lrs=[1e-4, 5e-5, 1e-5, 5e-6],
@@ -333,7 +321,7 @@ def main():
                             restore_transformer_dir=None,
                             gcs_bucket='sequin-public')
 
-    # Medium transformer
+    # 10000 train families medium transformer random keys sweep
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-5],
                             predictor_lrs=[1e-3],
@@ -355,7 +343,6 @@ def main():
                             gcs_bucket='sequin-public',
                             random_keys=range(10))
 
-    # Pretrained medium transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-5],
@@ -380,7 +367,6 @@ def main():
         gcs_bucket='sequin-public',
         random_keys=range(10))
 
-    # Medium transformer
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[5e-5],
                             predictor_lrs=[5e-4],
@@ -402,7 +388,6 @@ def main():
                             gcs_bucket='sequin-public',
                             random_keys=range(10))
 
-    # Pretrained medium transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[5e-5],
@@ -427,7 +412,7 @@ def main():
         gcs_bucket='sequin-public',
         random_keys=range(10))
 
-    # Small transformer
+    # 10000 train families small transformer random keys sweep
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-3, 1e-4, 1e-5, 1e-6],
                             predictor_lrs=[1e-3, 1e-4, 1e-5, 1e-6],
@@ -448,7 +433,6 @@ def main():
                             use_bert=True,
                             gcs_bucket='sequin-public')
 
-    # Pretrained small transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-3, 1e-4, 1e-5, 1e-6],
@@ -472,7 +456,6 @@ def main():
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         gcs_bucket='sequin-public')
 
-    # Small transformer
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-4],
                             predictor_lrs=[1e-3],
@@ -494,7 +477,6 @@ def main():
                             gcs_bucket='sequin-public',
                             random_keys=range(10))
 
-    # Pretrained small transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-4],
@@ -519,7 +501,6 @@ def main():
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         random_keys=range(10))
 
-    # Small transformer
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-3],
                             predictor_lrs=[1e-3],
@@ -541,7 +522,6 @@ def main():
                             gcs_bucket='sequin-public',
                             random_keys=range(10))
 
-    # Pretrained small transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-3],
@@ -566,7 +546,6 @@ def main():
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         random_keys=range(10))
 
-    # Small transformer
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-4],
                             predictor_lrs=[1e-3],
@@ -588,7 +567,6 @@ def main():
                             gcs_bucket='sequin-public',
                             random_keys=range(10))
 
-    # Pretrained small transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-4],
@@ -613,7 +591,6 @@ def main():
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         random_keys=range(10))
 
-    # Small transformer
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-4],
                             predictor_lrs=[1e-3],
@@ -635,7 +612,6 @@ def main():
                             gcs_bucket='sequin-public',
                             random_keys=range(10))
 
-    # Pretrained small transformer
     params += create_params(
         encoder_lrs=[0.0],
         lens_lrs=[1e-4],
@@ -660,8 +636,8 @@ def main():
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         random_keys=range(10))
 
+    # 10000 train families large transformer random keys sweep
     for i in range(5):
-        # Large transformer
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[1e-5],
@@ -687,7 +663,6 @@ def main():
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'large_0_' + str(i)))
 
-        # Pretrained large transformer
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[1e-5],
@@ -715,7 +690,6 @@ def main():
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'large_1_' + str(i)))
 
-        # Large transformer
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[5e-5],
@@ -741,7 +715,6 @@ def main():
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'large_2_' + str(i)))
 
-        # Pretrained large transformer
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[5e-5],
@@ -769,7 +742,6 @@ def main():
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'large_3_' + str(i)))
 
-        # Large transformer
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[1e-4],
@@ -795,7 +767,6 @@ def main():
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'large_4_' + str(i)))
 
-        # Pretrained large transformer
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[1e-4],
@@ -823,7 +794,6 @@ def main():
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'large_5_' + str(i)))
 
-        # Large transformer
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[1e-3],
@@ -849,7 +819,6 @@ def main():
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'large_6_' + str(i)))
 
-        # Pretrained large transformer
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[1e-3],

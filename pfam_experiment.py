@@ -210,12 +210,14 @@ def measure_nearest_neighbor_performance(accuracy_label, encoder,
     return accuracy_dict
 
 
-def parameter_update(model, params):
+def set_model_parameters(model, params):
     """Updates a model's parameters using a parameters dictionary."""
+
+    params = copy.deepcopy(params)
 
     assert (
         model.params.keys() == params.keys()), 'Model parameters do not match!'
-    
+
     for layer in model.params.keys():
         model.params[layer] = params[layer]
 
@@ -389,10 +391,9 @@ def main(_):
                                                    target=optimizer,
                                                    step=FLAGS.load_model_step)
 
-        trained_params = copy.deepcopy(optimizer.target.params)
-
-        embedding_model = parameter_update(model=embedding_model,
-                                           params=trained_params)
+        trained_params = optimizer.target.params
+        embedding_model = set_model_parameters(model=embedding_model,
+                                               params=trained_params)
 
     if FLAGS.save_model:
         checkpoints.save_checkpoint(ckpt_dir=os.path.join(
@@ -408,7 +409,7 @@ def main(_):
             samples=FLAGS.lens_train_samples,
             epochs=measurement_epochs,
             drop_remainder=True,
-            shuffle_seed=FLAGS.lens_shuffle_seed,
+            shuffle_seed=FLAGS.lens_shuffle_seed + i,
             sample_random_state=FLAGS.lens_sample_random_state)
 
         optimizer = train(
@@ -421,8 +422,6 @@ def main(_):
             ],
             weight_decay=[FLAGS.encoder_wd, FLAGS.lens_wd, FLAGS.predictor_wd],
             layers=layers)
-
-        trained_params = copy.deepcopy(optimizer.target.params)
 
         results, preds = pfam_evaluate(
             predict_fn=optimizer.target,
@@ -440,8 +439,9 @@ def main(_):
         datum['lens_cross_entropy' + '_measurement_' +
               str(i)] = lens_cross_entropy
 
-        embedding_model = parameter_update(model=embedding_model,
-                                           params=trained_params)
+        trained_params = optimizer.target.params
+        embedding_model = set_model_parameters(model=embedding_model,
+                                               params=trained_params)
 
         datum.update(
             measure_nearest_neighbor_performance(
