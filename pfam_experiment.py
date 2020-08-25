@@ -107,13 +107,20 @@ flags.DEFINE_string('gcs_bucket', 'sequin-public',
 flags.DEFINE_string('data_partitions_dirpath', 'random_split/',
                     'Location of Pfam data in GCS bucket.')
 
-flags.DEFINE_string('results_save_dir', '', 'Directory in GCS bucket to save to.')
+flags.DEFINE_string('results_save_dir', '',
+                    'Directory in GCS bucket to save to.')
 
-flags.DEFINE_boolean('load_model', False, 'Whether or not to load a trained model.')
-flags.DEFINE_string('load_model_dir', '', 'Directory in GCS bucket to load trained optimizer from.')
-flags.DEFINE_integer('load_model_step', 0, 'Number of steps optimizer to be loaded has been trained for.')
-flags.DEFINE_boolean('save_model', False, 'Whether or not to save trained model.')
-flags.DEFINE_string('save_model_dir', '', 'Directory in GCS bucket to save trained optimizer to.')
+flags.DEFINE_boolean('load_model', False,
+                     'Whether or not to load a trained model.')
+flags.DEFINE_string('load_model_dir', '',
+                    'Directory in GCS bucket to load trained optimizer from.')
+flags.DEFINE_integer(
+    'load_model_step', 0,
+    'Number of steps optimizer to be loaded has been trained for.')
+flags.DEFINE_boolean('save_model', False,
+                     'Whether or not to save trained model.')
+flags.DEFINE_string('save_model_dir', '',
+                    'Directory in GCS bucket to save trained optimizer to.')
 
 flags.DEFINE_string('label', '', 'Label used to save experiment results.')
 
@@ -203,6 +210,18 @@ def measure_nearest_neighbor_performance(accuracy_label, encoder,
     return accuracy_dict
 
 
+def parameter_update(model, params):
+    """Updates a model's parameters using a parameters dictionary."""
+
+    assert (
+        model.params.keys() == params.keys()), 'Model parameters do not match!'
+    
+    for layer in model.params.keys():
+        model.params[layer] = params[layer]
+
+    return model
+
+
 # Train lens and measure performance of lens and nearest neighbors classifier.
 def main(_):
 
@@ -227,42 +246,42 @@ def main(_):
         assert FLAGS.save_model_dir != '', 'Specify save_model_dir!'
 
     datum = {
-            'label': FLAGS.label,
-            'encoder_fn_name': FLAGS.encoder_fn_name,
-            'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
-            'reduce_fn_name': FLAGS.reduce_fn_name,
-            'reduce_fn_kwargs_path': FLAGS.reduce_fn_kwargs_path,
-            'epochs': FLAGS.epochs,
-            'measurements': FLAGS.measurements,
-            'lens_batch_size': FLAGS.lens_batch_size,
-            'knn_batch_size': FLAGS.knn_batch_size,
-            'encoder_lr': FLAGS.encoder_lr,
-            'lens_lr': FLAGS.lens_lr,
-            'predictor_lr': FLAGS.predictor_lr,
-            'encoder_wd': FLAGS.encoder_wd,
-            'lens_wd': FLAGS.lens_wd,
-            'predictor_wd': FLAGS.predictor_wd,
-            'train_families': FLAGS.train_families,
-            'lens_train_samples': FLAGS.lens_train_samples,
-            'first_test_family': FLAGS.first_test_family,
-            'last_test_family': FLAGS.last_test_family,
-            'lens_shuffle_seed': FLAGS.lens_shuffle_seed,
-            'lens_sample_random_state': FLAGS.lens_sample_random_state,
-            'knn_shuffle_seed': FLAGS.knn_shuffle_seed,
-            'knn_sample_random_state': FLAGS.knn_sample_random_state,
-            'random_key': FLAGS.random_key,
-            'use_transformer': FLAGS.use_transformer,
-            'use_bert': FLAGS.use_bert,
-            'restore_transformer_dir': FLAGS.restore_transformer_dir,
-            'gcs_bucket': FLAGS.gcs_bucket,
-            'data_partitions_dirpath': FLAGS.data_partitions_dirpath,
-            'results_save_dir': FLAGS.results_save_dir,
-            'load_model': FLAGS.load_model,
-            'load_model_dir': FLAGS.load_model_dir,
-            'load_model_step': FLAGS.load_model_step,
-            'save_model': FLAGS.save_model,
-            'save_model_dir': FLAGS.save_model_dir
-            }   
+        'label': FLAGS.label,
+        'encoder_fn_name': FLAGS.encoder_fn_name,
+        'encoder_fn_kwargs_path': FLAGS.encoder_fn_kwargs_path,
+        'reduce_fn_name': FLAGS.reduce_fn_name,
+        'reduce_fn_kwargs_path': FLAGS.reduce_fn_kwargs_path,
+        'epochs': FLAGS.epochs,
+        'measurements': FLAGS.measurements,
+        'lens_batch_size': FLAGS.lens_batch_size,
+        'knn_batch_size': FLAGS.knn_batch_size,
+        'encoder_lr': FLAGS.encoder_lr,
+        'lens_lr': FLAGS.lens_lr,
+        'predictor_lr': FLAGS.predictor_lr,
+        'encoder_wd': FLAGS.encoder_wd,
+        'lens_wd': FLAGS.lens_wd,
+        'predictor_wd': FLAGS.predictor_wd,
+        'train_families': FLAGS.train_families,
+        'lens_train_samples': FLAGS.lens_train_samples,
+        'first_test_family': FLAGS.first_test_family,
+        'last_test_family': FLAGS.last_test_family,
+        'lens_shuffle_seed': FLAGS.lens_shuffle_seed,
+        'lens_sample_random_state': FLAGS.lens_sample_random_state,
+        'knn_shuffle_seed': FLAGS.knn_shuffle_seed,
+        'knn_sample_random_state': FLAGS.knn_sample_random_state,
+        'random_key': FLAGS.random_key,
+        'use_transformer': FLAGS.use_transformer,
+        'use_bert': FLAGS.use_bert,
+        'restore_transformer_dir': FLAGS.restore_transformer_dir,
+        'gcs_bucket': FLAGS.gcs_bucket,
+        'data_partitions_dirpath': FLAGS.data_partitions_dirpath,
+        'results_save_dir': FLAGS.results_save_dir,
+        'load_model': FLAGS.load_model,
+        'load_model_dir': FLAGS.load_model_dir,
+        'load_model_step': FLAGS.load_model_step,
+        'save_model': FLAGS.save_model,
+        'save_model_dir': FLAGS.save_model_dir
+    }
 
     gcsfs = GCSFS(FLAGS.gcs_bucket)
 
@@ -365,7 +384,16 @@ def main(_):
         layers=layers)
 
     if FLAGS.load_model:
-        optimizer = checkpoints.restore_checkpoint(ckpt_dir=os.path.join('gs://' + FLAGS.gcs_bucket, FLAGS.load_model_dir), target=optimizer, step=FLAGS.load_model_step)
+
+        optimizer = checkpoints.restore_checkpoint(ckpt_dir=os.path.join(
+            'gs://' + FLAGS.gcs_bucket, FLAGS.load_model_dir),
+                                                   target=optimizer,
+                                                   step=FLAGS.load_model_step)
+
+        trained_params = copy.deepcopy(optimizer.target.params)
+
+        embedding_model = parameter_update(model=embedding_model,
+                                           params=trained_params)
 
     for i in range(FLAGS.measurements):
 
@@ -407,10 +435,8 @@ def main(_):
         datum['lens_cross_entropy' + '_measurement_' +
               str(i)] = lens_cross_entropy
 
-        assert (embedding_model.params.keys() == trained_params.keys()
-                ), 'Optimizer parameters do not match!'
-        for layer in embedding_model.params.keys():
-            embedding_model.params[layer] = trained_params[layer]
+        embedding_model = parameter_update(model=embedding_model,
+                                           params=trained_params)
 
         datum.update(
             measure_nearest_neighbor_performance(
@@ -439,7 +465,10 @@ def main(_):
                     sample_random_state=FLAGS.knn_sample_random_state))
 
     if FLAGS.save_model:
-        checkpoints.save_checkpoint(ckpt_dir=os.path.join('gs://' + FLAGS.gcs_bucket, FLAGS.save_model_dir), target=optimizer, step=FLAGS.load_model_step + FLAGS.epochs)
+        checkpoints.save_checkpoint(ckpt_dir=os.path.join(
+            'gs://' + FLAGS.gcs_bucket, FLAGS.save_model_dir),
+                                    target=optimizer,
+                                    step=FLAGS.load_model_step + FLAGS.epochs)
 
     print(datum)
     df = pd.DataFrame([datum])
