@@ -69,13 +69,17 @@ def residues_to_one_hot_inds(seq):
     return one_hot_inds
 
 
-# Dictionary mapping family id to index.
-family_ids = open(
-    resource_filename('contextual_lenses.resources', 'pfam_family_ids.txt'),
-    'r').readlines()
-family_id_to_index = {}
-for i, family_id in enumerate(family_ids):
-    family_id_to_index[family_id.replace('\n', '')] = i
+def get_family_id_to_index():
+    """Dictionary mapping family id to index."""
+   
+    family_ids = open(
+        resource_filename('contextual_lenses.resources', 'pfam_family_ids.txt'),
+        'r').readlines()
+    family_id_to_index = {}
+    for i, family_id in enumerate(family_ids):
+        family_id_to_index[family_id.replace('\n', '')] = i
+
+    return family_id_to_index
 
 
 def create_pfam_df(family_accessions,
@@ -86,6 +90,8 @@ def create_pfam_df(family_accessions,
                    gcs_bucket='sequin-public'):
     """Processes Pfam data into a featurized dataframe with samples many entries per family."""
 
+    family_id_to_index = get_family_id_to_index()
+    
     if test:
         pfam_df = read_all_shards(partition='test',
                                   data_dir=data_partitions_dirpath,
