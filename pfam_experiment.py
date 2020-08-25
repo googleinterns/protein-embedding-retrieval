@@ -384,7 +384,6 @@ def main(_):
         layers=layers)
 
     if FLAGS.load_model:
-
         optimizer = checkpoints.restore_checkpoint(ckpt_dir=os.path.join(
             'gs://' + FLAGS.gcs_bucket, FLAGS.load_model_dir),
                                                    target=optimizer,
@@ -394,6 +393,12 @@ def main(_):
 
         embedding_model = parameter_update(model=embedding_model,
                                            params=trained_params)
+
+    if FLAGS.save_model:
+        checkpoints.save_checkpoint(ckpt_dir=os.path.join(
+            'gs://' + FLAGS.gcs_bucket, FLAGS.save_model_dir),
+                                    target=optimizer,
+                                    step=FLAGS.load_model_step)
 
     for i in range(FLAGS.measurements):
 
@@ -464,17 +469,17 @@ def main(_):
                     shuffle_seed=FLAGS.knn_shuffle_seed,
                     sample_random_state=FLAGS.knn_sample_random_state))
 
-    if FLAGS.save_model:
-        checkpoints.save_checkpoint(ckpt_dir=os.path.join(
-            'gs://' + FLAGS.gcs_bucket, FLAGS.save_model_dir),
-                                    target=optimizer,
-                                    step=FLAGS.load_model_step + FLAGS.epochs)
-
     print(datum)
     df = pd.DataFrame([datum])
     with gcsfs.open(os.path.join(FLAGS.results_save_dir, FLAGS.label + '.csv'),
                     'w') as gcs_file:
         df.to_csv(gcs_file, index=False)
+
+    if FLAGS.save_model:
+        checkpoints.save_checkpoint(ckpt_dir=os.path.join(
+            'gs://' + FLAGS.gcs_bucket, FLAGS.save_model_dir),
+                                    target=optimizer,
+                                    step=FLAGS.load_model_step + FLAGS.epochs)
 
 
 if __name__ == '__main__':
