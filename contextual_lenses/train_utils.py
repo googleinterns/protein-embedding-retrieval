@@ -23,7 +23,6 @@ import numpy as np
 import functools
 
 
-
 # Data batching.
 def create_data_iterator(df,
                          input_col,
