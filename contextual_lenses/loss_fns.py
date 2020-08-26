@@ -5,7 +5,8 @@ Jax loss functions for computing gradient updates.
 
 import jax
 import jax.numpy as jnp
-
+from jax.config import config
+config.enable_omnistaging()
 
 
 def mse_loss(Y, Y_hat):
