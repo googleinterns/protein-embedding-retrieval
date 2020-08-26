@@ -339,7 +339,8 @@ def main(_):
         reduce_fn=reduce_fn,
         reduce_fn_kwargs=reduce_fn_kwargs,
         layers=layers,
-        output='embedding')
+        output='embedding',
+        random_key=FLAGS.random_key)
 
     datum.update(
         measure_nearest_neighbor_performance(
@@ -380,7 +381,8 @@ def main(_):
                          output='prediction',
                          encoder_fn_params=encoder_fn_params,
                          reduce_fn_params=reduce_fn_params,
-                         predict_fn_params=predict_fn_params)
+                         predict_fn_params=predict_fn_params,
+                         random_key=FLAGS.random_key)
 
     optimizer = create_optimizer(
         model=model,
