@@ -49,8 +49,8 @@ def mod_family_accession(family_accession):
     return family_accession[:family_accession.index('.')]
 
 
-# Padding.
-pfam_protein_domain = domains.VariableLengthDiscreteDomain(
+# Pfam protein_lm domain.
+PFAM_PROTEIN_DOMAIN = domains.VariableLengthDiscreteDomain(
     vocab=domains.ProteinVocab(include_anomalous_amino_acids=True,
                                include_bos=True,
                                include_eos=True,
@@ -58,13 +58,15 @@ pfam_protein_domain = domains.VariableLengthDiscreteDomain(
                                include_mask=True),
     length=512)
 
-pfam_num_categories = 27
+
+# Number of categories for one-hot encoding.
+PFAM_NUM_CATEGORIES = 27
 
 
 def residues_to_one_hot_inds(seq):
     """Converts amino acid residues to one hot indices."""
 
-    one_hot_inds = pfam_protein_domain.encode([seq])[0]
+    one_hot_inds = PFAM_PROTEIN_DOMAIN.encode([seq])[0]
 
     return one_hot_inds
 
