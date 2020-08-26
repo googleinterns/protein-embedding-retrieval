@@ -136,7 +136,8 @@ def create_model(use_transformer,
                  output='prediction',
                  encoder_fn_params=None,
                  reduce_fn_params=None,
-                 predict_fn_params=None):
+                 predict_fn_params=None,
+                 random_key=0):
     """Creates representation model (encoder --> lens --> predictor) architecture."""
 
     family_ids = get_family_ids()
@@ -152,9 +153,9 @@ def create_model(use_transformer,
         if encoder_fn_params is not None:
             pretrained_transformer_params = encoder_fn_params
         else:
-            if FLAGS.restore_transformer_dir is not None:
+            if restore_transformer_dir is not None:
                 pretrained_transformer_params = load_transformer_params(
-                    FLAGS.restore_transformer_dir, model_cls)
+                    restore_transformer_dir, model_cls)
             else:
                 pretrained_transformer_params = None
 
@@ -164,9 +165,9 @@ def create_model(use_transformer,
             reduce_fn_kwargs=reduce_fn_kwargs,
             num_categories=pfam_num_categories,
             output_features=num_families,
-            bidirectional=FLAGS.use_bert,
+            bidirectional=use_bert,
             output=output,
-            key=random.PRNGKey(FLAGS.random_key),
+            key=random.PRNGKey(random_key),
             encoder_fn_params=pretrained_transformer_params,
             reduce_fn_params=reduce_fn_params,
             predict_fn_params=predict_fn_params)
@@ -180,7 +181,7 @@ def create_model(use_transformer,
             num_categories=pfam_num_categories,
             output_features=num_families,
             output=output,
-            key=random.PRNGKey(FLAGS.random_key),
+            key=random.PRNGKey(random_key),
             encoder_fn_params=encoder_fn_params,
             reduce_fn_params=reduce_fn_params,
             predict_fn_params=predict_fn_params)

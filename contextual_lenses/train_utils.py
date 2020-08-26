@@ -22,6 +22,8 @@ import numpy as np
 
 import functools
 
+from google_research.protein_lm import domains, models
+
 
 # Data batching.
 def create_data_iterator(df,
