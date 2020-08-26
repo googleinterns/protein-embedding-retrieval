@@ -125,6 +125,32 @@ flags.DEFINE_string('save_model_dir', '',
 flags.DEFINE_string('label', '', 'Label used to save experiment results.')
 
 
+def get_model_kwargs(encoder_fn_name, encoder_fn_kwargs_path, reduce_fn_name,
+                     reduce_fn_kwargs_path):
+    """Determines model components using string names."""
+
+    encoder_fn = encoder_fn_name_to_fn(encoder_fn_name)
+    encoder_fn_kwargs = json.load(
+        open(
+            resource_filename(
+                'contextual_lenses.resources',
+                os.path.join('encoder_fn_kwargs_resources',
+                             encoder_fn_kwargs_path + '.json'))))
+
+    reduce_fn = reduce_fn_name_to_fn(reduce_fn_name)
+    reduce_fn_kwargs = json.load(
+        open(
+            resource_filename(
+                'contextual_lenses.resources',
+                os.path.join('reduce_fn_kwargs_resources',
+                             reduce_fn_kwargs_path + '.json'))))
+
+    layers, trainable_encoder = architecture_to_layers(encoder_fn_name,
+                                                       reduce_fn_name)
+
+    return encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs, layers
+
+
 def create_model(use_transformer,
                  use_bert,
                  restore_transformer_dir,
@@ -189,6 +215,20 @@ def create_model(use_transformer,
     return model
 
 
+def set_model_parameters(model, params):
+    """Updates a model's parameters using a parameters dictionary."""
+
+    params = copy.deepcopy(params)
+
+    assert (
+        model.params.keys() == params.keys()), 'Model parameters do not match!'
+
+    for layer in model.params.keys():
+        model.params[layer] = params[layer]
+
+    return model
+
+
 def measure_nearest_neighbor_performance(accuracy_label, encoder,
                                          family_accessions, batch_size,
                                          train_samples, shuffle_seed,
@@ -210,20 +250,6 @@ def measure_nearest_neighbor_performance(accuracy_label, encoder,
     accuracy_dict = {accuracy_label: accuracy}
 
     return accuracy_dict
-
-
-def set_model_parameters(model, params):
-    """Updates a model's parameters using a parameters dictionary."""
-
-    params = copy.deepcopy(params)
-
-    assert (
-        model.params.keys() == params.keys()), 'Model parameters do not match!'
-
-    for layer in model.params.keys():
-        model.params[layer] = params[layer]
-
-    return model
 
 
 # Train lens and measure performance of lens and nearest neighbors classifier.
@@ -311,24 +337,11 @@ def main(_):
         family_name = 'PF%05d' % _
         knn_test_family_accessions.append(family_name)
 
-    encoder_fn = encoder_fn_name_to_fn(FLAGS.encoder_fn_name)
-    encoder_fn_kwargs = json.load(
-        open(
-            resource_filename(
-                'contextual_lenses.resources',
-                os.path.join('encoder_fn_kwargs_resources',
-                             FLAGS.encoder_fn_kwargs_path + '.json'))))
-
-    reduce_fn = reduce_fn_name_to_fn(FLAGS.reduce_fn_name)
-    reduce_fn_kwargs = json.load(
-        open(
-            resource_filename(
-                'contextual_lenses.resources',
-                os.path.join('reduce_fn_kwargs_resources',
-                             FLAGS.reduce_fn_kwargs_path + '.json'))))
-
-    layers, trainable_encoder = architecture_to_layers(FLAGS.encoder_fn_name,
-                                                       FLAGS.reduce_fn_name)
+    encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs, layers = get_model_kwargs(
+        encoder_fn_name=FLAGS.encoder_fn_name,
+        encoder_fn_kwargs_path=FLAGS.encoder_fn_kwargs_path,
+        reduce_fn_name=FLAGS.reduce_fn_name,
+        reduce_fn_kwargs_path=FLAGS.reduce_fn_kwargs_path)
 
     embedding_model = create_model(
         use_transformer=FLAGS.use_transformer,
