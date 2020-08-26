@@ -10,6 +10,8 @@ import jax
 from jax import lax
 import jax.nn
 import jax.numpy as jnp
+from jax.config import config
+config.enable_omnistaging()
 
 import numpy as np
 

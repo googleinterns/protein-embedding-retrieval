@@ -13,6 +13,8 @@ import jax
 from jax import random
 import jax.nn
 import jax.numpy as jnp
+from jax.config import config
+config.enable_omnistaging()
 
 import tensorflow as tf
 
@@ -65,13 +67,12 @@ def create_data_iterator(df,
   batches = tf.data.Dataset.zip((inputs, outputs)).shuffle(buffer_size=buffer_size, seed=seed)
   batches = batches.repeat(epochs).batch(batch_size=batch_size, drop_remainder=drop_remainder).as_numpy_iterator()
 
+
 def path_inclusion_filter_fn(path, param, layer):
     """Returns whether or not layer name is contained in path."""
 
     return layer in path
 
-def create_optimizer(model, learning_rate, weight_decay):
-  """Instantiates Adam optimizer."""
 
 def create_optimizer(model, learning_rate, weight_decay, layers=None):
     """Instantiates Adam multi-optimizer."""
@@ -168,7 +169,6 @@ def train(model,
     if save_dir is not None:
         state = optimizer.state
         if type(state) == list:
-            # step = state[0].step
             step = [sub_state.step for sub_state in state]
         else:
             step = state.step
