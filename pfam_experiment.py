@@ -41,7 +41,7 @@ from contextual_lenses.encoders import encoder_fn_name_to_fn
 
 from contextual_lenses.loss_fns import cross_entropy_loss
 
-from contextual_lenses.pfam_utils import family_ids, pfam_num_categories, \
+from contextual_lenses.pfam_utils import get_family_ids, pfam_num_categories, \
 pfam_evaluate, create_pfam_batches, pfam_nearest_neighbors_classification
 
 from contextual_lenses.load_transformer import load_transformer_params
@@ -139,6 +139,7 @@ def create_model(use_transformer,
                  predict_fn_params=None):
     """Creates representation model (encoder --> lens --> predictor) architecture."""
 
+    family_ids = get_family_ids()
     num_families = len(family_ids)
 
     if use_transformer:
@@ -295,6 +296,7 @@ def main(_):
 
     knn_train_samples_ = [1, 5, 10, 50]
 
+    family_ids = get_family_ids()
     num_families = len(family_ids)
     loss_fn_kwargs = {'num_classes': num_families}
 
