@@ -41,7 +41,7 @@ from contextual_lenses.encoders import encoder_fn_name_to_fn
 
 from contextual_lenses.loss_fns import cross_entropy_loss
 
-from contextual_lenses.pfam_utils import get_family_ids, pfam_num_categories, \
+from contextual_lenses.pfam_utils import get_family_ids, PFAM_NUM_CATEGORIES, \
 pfam_evaluate, create_pfam_batches, pfam_nearest_neighbors_classification
 
 from contextual_lenses.load_transformer import load_transformer_params
@@ -163,7 +163,7 @@ def create_model(use_transformer,
             transformer_kwargs=encoder_fn_kwargs,
             reduce_fn=reduce_fn,
             reduce_fn_kwargs=reduce_fn_kwargs,
-            num_categories=pfam_num_categories,
+            num_categories=PFAM_NUM_CATEGORIES,
             output_features=num_families,
             bidirectional=use_bert,
             output=output,
@@ -178,7 +178,7 @@ def create_model(use_transformer,
             encoder_fn_kwargs=encoder_fn_kwargs,
             reduce_fn=reduce_fn,
             reduce_fn_kwargs=reduce_fn_kwargs,
-            num_categories=pfam_num_categories,
+            num_categories=PFAM_NUM_CATEGORIES,
             output_features=num_families,
             output=output,
             key=random.PRNGKey(random_key),
