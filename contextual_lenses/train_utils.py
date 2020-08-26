@@ -22,7 +22,9 @@ import numpy as np
 
 import functools
 
-from google_research.protein_lm import domains, models
+import copy
+
+from google_research.protein_lm import models
 
 
 # Data batching.
