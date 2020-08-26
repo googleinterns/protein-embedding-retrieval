@@ -64,9 +64,6 @@ def create_data_iterator(df,
 
     return batches
 
-  batches = tf.data.Dataset.zip((inputs, outputs)).shuffle(buffer_size=buffer_size, seed=seed)
-  batches = batches.repeat(epochs).batch(batch_size=batch_size, drop_remainder=drop_remainder).as_numpy_iterator()
-
 
 def path_inclusion_filter_fn(path, param, layer):
     """Returns whether or not layer name is contained in path."""
