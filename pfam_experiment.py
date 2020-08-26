@@ -92,7 +92,7 @@ flags.DEFINE_integer('knn_shuffle_seed', 1,
                      'Random seed used for KNN data batching.')
 flags.DEFINE_integer('knn_sample_random_state', 1,
                      'Random state used for KNN data sampling.')
-flags.DEFINE_integer('random_key', 0,
+flags.DEFINE_integer('model_random_key', 0,
                      'Random key used for model instantiation.')
 
 flags.DEFINE_boolean('use_transformer', False,
@@ -273,7 +273,7 @@ def main(_):
         'lens_sample_random_state': FLAGS.lens_sample_random_state,
         'knn_shuffle_seed': FLAGS.knn_shuffle_seed,
         'knn_sample_random_state': FLAGS.knn_sample_random_state,
-        'random_key': FLAGS.random_key,
+        'model_random_key': FLAGS.model_random_key,
         'use_transformer': FLAGS.use_transformer,
         'use_bert': FLAGS.use_bert,
         'restore_transformer_dir': FLAGS.restore_transformer_dir,
@@ -340,7 +340,7 @@ def main(_):
         reduce_fn_kwargs=reduce_fn_kwargs,
         layers=layers,
         output='embedding',
-        random_key=FLAGS.random_key)
+        random_key=FLAGS.model_random_key)
 
     datum.update(
         measure_nearest_neighbor_performance(
@@ -382,7 +382,7 @@ def main(_):
                          encoder_fn_params=encoder_fn_params,
                          reduce_fn_params=reduce_fn_params,
                          predict_fn_params=predict_fn_params,
-                         random_key=FLAGS.random_key)
+                         random_key=FLAGS.model_random_key)
 
     optimizer = create_optimizer(
         model=model,
