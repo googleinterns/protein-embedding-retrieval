@@ -6,7 +6,7 @@ import tensorflow as tf
 
 import gin
 
-from protein_lm import data, models
+from google_research.protein_lm import data, models
 
 
 def load_transformer_model(ckpt_dir, model_cls, domain=None):
