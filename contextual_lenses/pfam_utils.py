@@ -69,6 +69,15 @@ def residues_to_one_hot_inds(seq):
     return one_hot_inds
 
 
+def get_family_ids():
+    """Pfam family ids."""
+
+    family_ids = open(
+        resource_filename('contextual_lenses.resources', 'pfam_family_ids.txt'),
+        'r').readlines()
+
+    return family_ids
+
 def get_family_id_to_index():
     """Dictionary mapping family id to index."""
    
