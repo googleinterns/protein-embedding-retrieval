@@ -2,5 +2,5 @@
 	path = google-research
 	url = https://github.com/google-research/google-research.git
 [submodule "google_research"]
-	path = google-research
+	path = google_research
 	url = https://github.com/google-research/google-research.git
