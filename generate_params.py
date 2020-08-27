@@ -978,6 +978,7 @@ def main():
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'cnn_' + str(i)))
 
+    for i in range(7):
         params += create_params(
             encoder_lrs=[0.0],
             lens_lrs=[1e-4],
