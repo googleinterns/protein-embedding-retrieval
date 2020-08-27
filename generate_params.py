@@ -998,6 +998,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
+            restore_transformer_dir=
+            'gs://sequin-public/transformer_models/small_trembl_bert/',
             gcs_bucket='sequin-public',
             model_random_keys=[i],
             save_model=True,
