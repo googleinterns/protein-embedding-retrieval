@@ -977,6 +977,31 @@ def main():
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
                                         'cnn_' + str(i)))
+
+        params += create_params(
+            encoder_lrs=[0.0],
+            lens_lrs=[1e-4],
+            predictor_lrs=[1e-3],
+            encoder_wds=[0.0],
+            lens_wds=[0.1],
+            predictor_wds=[0.0],
+            reduce_fn_kwargs_paths=['linear_pool_1024'],
+            lens_train_samples=[50],
+            train_families=10000,
+            epochs=10,
+            measurements=1,
+            encoder_fn_name='transformer',
+            encoder_fn_kwargs_path='small_transformer_kwargs',
+            reduce_fn_name='linear_max_pool',
+            lens_batch_size=64,
+            knn_batch_size=64,
+            use_transformer=True,
+            use_bert=True,
+            gcs_bucket='sequin-public',
+            model_random_keys=[i],
+            save_model=True,
+            save_model_dir=os.path.join('pfam_experiment_optimizers',
+                                        'small_' + str(i+7)))
     
 
     frozen_param_dict_to_label = {}
