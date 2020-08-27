@@ -847,7 +847,7 @@ def main():
                                         'large_7_' + str(i)))
 
 
-    # 10000 train families save best models
+    # 10000 train families random key sweep and save best models
     for i in range(7):
         params += create_params(
             encoder_lrs=[0.0],
