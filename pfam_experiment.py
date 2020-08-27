@@ -151,15 +151,15 @@ def get_model_kwargs(encoder_fn_name, encoder_fn_kwargs_path, reduce_fn_name,
     return encoder_fn, encoder_fn_kwargs, reduce_fn, reduce_fn_kwargs, layers
 
 
-def create_model(use_transformer,
-                 use_bert,
-                 restore_transformer_dir,
-                 encoder_fn,
+def create_model(encoder_fn,
                  encoder_fn_kwargs,
                  reduce_fn,
                  reduce_fn_kwargs,
                  layers,
                  output='prediction',
+                 use_transformer=False,
+                 use_bert=False,
+                 restore_transformer_dir=None,
                  encoder_fn_params=None,
                  reduce_fn_params=None,
                  predict_fn_params=None,
@@ -344,15 +344,15 @@ def main(_):
         reduce_fn_kwargs_path=FLAGS.reduce_fn_kwargs_path)
 
     embedding_model = create_model(
-        use_transformer=FLAGS.use_transformer,
-        use_bert=FLAGS.use_bert,
-        restore_transformer_dir=FLAGS.restore_transformer_dir,
         encoder_fn=encoder_fn,
         encoder_fn_kwargs=encoder_fn_kwargs,
         reduce_fn=reduce_fn,
         reduce_fn_kwargs=reduce_fn_kwargs,
         layers=layers,
         output='embedding',
+        use_transformer=FLAGS.use_transformer,
+        use_bert=FLAGS.use_bert,
+        restore_transformer_dir=FLAGS.restore_transformer_dir,
         random_key=FLAGS.model_random_key)
 
     datum.update(
@@ -379,22 +379,15 @@ def main(_):
                 shuffle_seed=FLAGS.knn_shuffle_seed,
                 sample_random_state=FLAGS.knn_sample_random_state))
 
-    encoder_fn_params = None
-    reduce_fn_params = None
-    predict_fn_params = None
-
-    model = create_model(use_transformer=FLAGS.use_transformer,
-                         use_bert=FLAGS.use_bert,
-                         restore_transformer_dir=FLAGS.restore_transformer_dir,
-                         encoder_fn=encoder_fn,
+    model = create_model(encoder_fn=encoder_fn,
                          encoder_fn_kwargs=encoder_fn_kwargs,
                          reduce_fn=reduce_fn,
                          reduce_fn_kwargs=reduce_fn_kwargs,
                          layers=layers,
                          output='prediction',
-                         encoder_fn_params=encoder_fn_params,
-                         reduce_fn_params=reduce_fn_params,
-                         predict_fn_params=predict_fn_params,
+                         use_transformer=FLAGS.use_transformer,
+                         use_bert=FLAGS.use_bert,
+                         restore_transformer_dir=FLAGS.restore_transformer_dir,
                          random_key=FLAGS.model_random_key)
 
     optimizer = create_optimizer(
