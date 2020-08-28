@@ -14,6 +14,9 @@ Protein database search tools such as BLAST are instrumental for research in the
 - Linear-Mean/Max-Pool: learnable
 - GatedConvolution: learnable and self-attentive
 
+### Downstream Task
+The downstream task we use to train embeddings is Pfam family classification. We pick an encoder and a lens and train the architecture to predict a protein's family using only its primary sequence. We train on 10000 families in the data set. We then take the embeddings from this trained model and use them to do family prediction on 1000 holdout families with KNN (using 1 neighbor). This test allows us to assess the extent of transfer learning by seeing how much the embeddings have learned about the holdout families from the train families. In theory, a perfect model would map all proteins that are members of the same family to a single vector. To test for this we run our KNN classification with 1 sample (where the KNN classifier only sees 1 protein per family), 5 samples, 10 samples, and 50 samples. 
+
 ## Source Code Headers
 
 Every file containing source code must include copyright and license
