@@ -9,6 +9,11 @@ Protein database search tools such as BLAST are instrumental for research in the
 - CNN: learnable
 - Transformer: learnable and pretrainable
 
+### Lenses
+- Mean/Max-Pool: non-learnable
+- Linear-Mean/Max-Pool: learnable
+- GatedConvolution: learnable and self-attentive
+
 ## Source Code Headers
 
 Every file containing source code must include copyright and license
