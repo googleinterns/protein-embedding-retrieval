@@ -69,7 +69,7 @@ In the table below we show the accuracies achieved using KNN on the model embedd
 
 Below we show plots of the top 10 n-Sample Test KNN Accuracies vs. Lens Accuracies for different models and for n = 1, 5, 10, 50.
 
-![1-sample](/figures/1-sample_test_knn_accuracy.png)
+<div align="center">![1-sample](/figures/1-sample_test_knn_accuracy.png)</div>
 
 ![5-sample](/figures/5-sample_test_knn_accuracy.png)
 
