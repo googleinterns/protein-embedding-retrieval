@@ -46,6 +46,21 @@ The downstream task we use to train embeddings is Pfam family classification. We
 ### Pretraining
 We also measure the effect that pretraining has on the performance of a language model encoder. There has been a great deal of interest in measuring the degree to which pretraining protein language models improves their performance on downstream tasks. TAPE investigates this and proposes baselines. Our results indicate that pretraining offers a substantial boost in performance on the family classification task. We use transformer language models, specifically BERT models similar to to the the [ProGen model](https://www.biorxiv.org/content/10.1101/2020.03.07.982272v2.full.pdf) and the [models used by FAIR](https://www.biorxiv.org/content/10.1101/622803v2.full.pdf). Our [models](https://github.com/google-research/google-research/tree/master/protein_lm) are implemented in jax/flax and pretrained on the [TrEMBL protein corpus](https://www.uniprot.org/statistics/TrEMBL).
 
+## Results
+| Model                                    | 1-Sample Accuracy | 5-Sample Accuracy | 10-Sample Accuracy | 50-Sample Accuracy |
+|------------------------------------------|-------------------|-------------------|--------------------|--------------------|
+| BLAST                                    | 0.860750          | 0.978355          | 0.991342           | 0.996392           |
+| 2-layer CNN                              | 0.687815          | 0.870944          | 0.914924           | 0.956741           |
+| Small Transformer                        | 0.769286          | 0.920692          | 0.952415           | 0.974045           |
+| Pretrained Small Transformer             | 0.873828          | 0.968998          | 0.979813           | 0.992790           |
+| Large Transformer                        | 0.749820          | 0.894737          | 0.937996           | 0.970440           |
+| Pretrained Large Transformer             | 0.865898          | 0.974045          | 0.984859           | 0.995674           |
+| Medium Transformer                       | 0.778659          | 0.921413          | 0.956741           | 0.981255           |
+| Pretrained Medium Transformer            | 0.863775          | 0.968277          | 0.984859           | 0.994232           |
+| Blundell Lens-Family CNN                 | 0.877345          | 0.980519          | 0.992063           | 0.993506           |
+| Blundell Full-Family CNN*                | 0.923521          | 0.984848          | 0.992785           | 0.995671           |
+| Blundell Full-Family CNN* w/ Whitening** | 0.940837          | 0.988456          | 0.996392           | 0.996392           |
+
 ## Quickstart
 The first step is to install [Caliban](https://github.com/google/caliban). We use Caliban for running individual jobs and parallelizing many jobs on GCP (Google Cloud Platform).
 
