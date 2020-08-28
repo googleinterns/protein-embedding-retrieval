@@ -20,7 +20,7 @@ More specifically, we are aiming to learn fixed-length protein embeddings using 
 [TAPE](https://arxiv.org/pdf/1906.08230.pdf) proposes two protein engineering tasks: fluorescence prediction and stability prediction. We implement our lens architectures on these tasks in a [Google Colab notebook](https://github.com/amirshane/protein-embedding-retrieval/blob/master/tape_contextual_lenses.ipynb). We find that for the fluorescence task both linear regression on the one-hot encodings and 1-layer convolution compete with and outperform the best pretrained language models in TAPE. Likewise, we find that for the stability task 3-layer convolution competes with and outperforms TAPE's models. See below for a table of our results compared to TAPE's results.
 
 ### Fluorescence
-rho represents Spearmna's rank correlation coefficient.
+rho represents Spearman's rank correlation coefficient.
 | Model Type | Model | Full Test Set (MSE, rho) | Bright Mode (MSE, rho) | Dark Mode (MSE, rho) |
 | ---------- | ----- | :----------------------: | :--------------------: | :------------------: |
 | Baseline | Linear Regression | (0.353, **0.691**) | (0.088, **0.681**) | (0.329, 0.052) |
@@ -30,7 +30,7 @@ rho represents Spearmna's rank correlation coefficient.
 
 
 ### Stability
-rho represents Spearmna's rank correlation coefficient. The letters A and B represent the alpha and beta topologies, respectively.
+rho represents Spearman's rank correlation coefficient. The letters A and B represent the alpha and beta topologies, respectively.
 | Model Type | Model | Full Test Set (rho, Accuracy) | AAA (rho, Accuracy) | ABBA (rho, Accuracy) | BABB (rho, Accuracy) | BBABB (rho, Accuracy) |
 | ---------- | ----- | :---------------------------: | :-----------------: | :------------------: | :------------------: | :-------------------: |
 | Baseline | Linear Regression | (0.49, 0.60) | (0.21, 0.66) | (-0.03, 0.6) | (0.51, 0.64) | (0.38, 0.61) |
