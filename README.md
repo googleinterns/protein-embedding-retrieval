@@ -40,7 +40,13 @@ Finally, run
 ```
 caliban cloud --experiment_config demo.json pfam_experiment.py
 ```
+The demo takes ~3 hours with an Nvidia Tesla P100 GPU (the Caliban default)
 
+## Reproducing our Results
+To reproduce our results connect to a GCP project, ideally with a large number of GPUs, and run
+```
+caliban cloud --experiment_config params_combinations.json pfam_experiment.py
+```
 
 ## Source Code Headers
 
