@@ -28,7 +28,7 @@ For a simple demo on your machine (recommended only if it is equipped with a GPU
 caliban run --experiment_config demo.json pfam_experiment.py
 ```
 
-To run on cloud first connect to a GCP project (equippied with GPU resources) by running
+To run on cloud first connect to a GCP project (equipped with GPU resources) by running
 ```
 gcloud init
 ```
