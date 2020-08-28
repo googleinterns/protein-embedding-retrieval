@@ -61,6 +61,11 @@ We also measure the effect that pretraining has on the performance of a language
 | Blundell Full-Family CNN*                | 0.923521          | 0.984848          | 0.992785           | 0.995671           |
 | Blundell Full-Family CNN* w/ Whitening** | 0.940837          | 0.988456          | 0.996392           | 0.996392           |
 
+* The Full-Family Blundell CNN is not performing transfer learning. It was trained on families that appear in the KNN task.
+
+** Whitened embeddings are obtained by performing PCA on the embeddings of all Pfam seed sequences and applying the corresponding whitening transformation to the knn train and test sequences.
+
+
 ## Quickstart
 The first step is to install [Caliban](https://github.com/google/caliban). We use Caliban for running individual jobs and parallelizing many jobs on GCP (Google Cloud Platform).
 
