@@ -47,7 +47,7 @@ The downstream task we use to train embeddings is Pfam family classification. We
 We also measure the effect that pretraining has on the performance of a language model encoder. There has been a great deal of interest in measuring the degree to which pretraining protein language models improves their performance on downstream tasks. TAPE investigates this and proposes baselines. Our results indicate that pretraining offers a substantial boost in performance on the family classification task. We use transformer language models, specifically BERT models similar to to the the [ProGen model](https://www.biorxiv.org/content/10.1101/2020.03.07.982272v2.full.pdf) and the [models used by FAIR](https://www.biorxiv.org/content/10.1101/622803v2.full.pdf). Our [models](https://github.com/google-research/google-research/tree/master/protein_lm) are implemented in jax/flax and pretrained on the [TrEMBL protein corpus](https://www.uniprot.org/statistics/TrEMBL).
 
 ## Results
-In the table below we show the accuracies achieved using KNN on the model embeddings as well as KNN using BLAST's weighted edit distance. We show a simple 2-layer CNN, 3 different size language models both with and without pretraining, and the [Blundell CNN model](https://www.biorxiv.org/content/10.1101/626507v4.full.pdf). All bolded numbers represent better performance compared to BLAST. Key takeways are the performance of pretrained language models on 1-sample classification and the substantial performance boost from pretraining said models. 
+In the table below we show the accuracies achieved using KNN on the model embeddings as well as KNN using BLAST's weighted edit distance. We show a simple 2-layer CNN, 3 different size language models both with and without pretraining, and the [Blundell CNN model](https://www.biorxiv.org/content/10.1101/626507v4.full.pdf). All bolded numbers represent better performance compared to BLAST. The key takeways are the performance of pretrained language models on 1-sample classification and the substantial performance boost from pretraining said models. 
 
 | Model                                      | 1-Sample Accuracy | 5-Sample Accuracy | 10-Sample Accuracy | 50-Sample Accuracy |
 |--------------------------------------------|:-----------------:|:-----------------:|:------------------:|:------------------:|
@@ -67,7 +67,7 @@ In the table below we show the accuracies achieved using KNN on the model embedd
 
 *** Whitened embeddings are obtained by performing PCA on the embeddings of all Pfam seed sequences and applying the corresponding whitening transformation to the KNN train and test sequences.
 
-Below we show plots of the top 10 n-Sample Test KNN Accuracies vs. Lens Accuracies for different models and for n = 1, 5, 10, 50.
+Below we show plots of the top 10 n-Sample Test KNN Accuracies vs. Lens Accuracies for different models and for n = 1, 5, 10, 50. The key takeaways are the noticable boost pretraining the language models provides and the fact that Lens Accuracy is not a perfect predictor of Test KNN Accuracy.
 
 ![1-sample](/figures/1-sample_test_knn_accuracy.png)
 
