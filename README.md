@@ -30,10 +30,15 @@ rho represents Spearmna's rank correlation coefficient.
 
 
 ### Stability
-| Model Type | Model | Full Test Set (rho, Accuracy) | 
-| :----------: | :-----: |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
+rho represents Spearmna's rank correlation coefficient. The letters A and B represent the alpha and beta topologies, respectively.
+| Model Type | Model | Full Test Set (rho, Accuracy) | AAA (rho, Accuracy) | ABBA (rho, Accuracy) | BABB (rho, Accuracy) | BBABB (rho, Accuracy) |
+| ---------- | ----- | :---------------------------: | :-----------------: | :------------------: | :------------------: | :-------------------: |
+| Baseline | Linear Regression | (0.49, 0.60) | (0.21, 0.66) | (-0.03, 0.6) | (0.51, 0.64) | (0.38, 0.61) |
+| Lens Architecture  | 3-Layer CNN + MaxPool | (0.76, 0.75) | (0.69, **0.71**) | (0.37, 0.7) | (0.5, 0.72) | (0.6, 0.68) |
+| Lens Architecture  | 3-Layer CNN + LinearMaxPool | (0.71, **0.77**) | (0.59, 0.69) | (**0.52**, 0.77) | (0.55, **0.73**) | (0.6, **0.7**) |
+| Lens Architecture  | Ensemble (Average) of above CNN models | (**0.775**, **0.77**) | (0.65, **0.71**) | (0.49, 0.75) | (0.58, **0.73**) | (0.6, **0.7**) |
+| TAPE | Best of all models | (0.73, 0.7) | (**0.72**, 0.7) | (0.48, **0.79**) | (**0.68**, 0.71) | (**0.67**, **0.7**) |
+
 
 ## Downstream Task
 The downstream task we use to train embeddings is Pfam family classification. We pick an encoder and a lens and train the architecture to predict a protein's family using only its primary sequence. We train on 10000 families in the data set. We then take the embeddings from this trained model and use them to do family prediction on 1000 holdout families with KNN (using 1 neighbor). This test allows us to assess the extent of transfer learning by seeing how much the embeddings have learned about the holdout families from the train families. In theory, a perfect model would map all proteins that are members of the same family to a single vector. To test for this we run our KNN classification with 1 sample (where the KNN classifier only sees 1 protein per family), 5 samples, 10 samples, and 50 samples. 
