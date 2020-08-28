@@ -2,7 +2,77 @@
 
 **This is not an officially supported Google product.**
 
-Protein database search tools such as BLAST are instrumental for research in the life sciences. However, they are slow and are based on surface-level sequence similarity. We are exploring using neural networks to improve the speed and accuracy of finding relevant sequences from these databases.
+Protein database search tools such as [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi) are instrumental for research in the life sciences. However, they are slow and are based on surface-level sequence similarity. We are exploring using neural networks to improve the speed and accuracy of finding relevant sequences from these databases. 
+
+More specifically, we are aiming to learn fixed-length protein embeddings using [contextual lenses](https://arxiv.org/pdf/2002.08866.pdf). Generally speaking, a sequence level protein representation, such as a one-hot encoding, is an array of the the form (sequence_length, n) where n is the amino acid embedding dimension. A contextual lens is a (learnable) map from the (sequence_length, n)-array to an (m,)-vector where m is independent of sequence_length. Embeddings are constructed using an encoder function followed by a contextual lens. To learn these embeddings a downstream prediction task is performed using a single dense layer. Gradients are backpropagated through all 3 components of the architecture (encoder, lens, predictor) using the Adam optimizer with variable (potentially zero) learning rates per component.
+
+### Encoders
+- [One-hot](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/contextual_lenses/encoders.py#L21): non-learnable
+- [CNN](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/contextual_lenses/encoders.py#L46): learnable
+- [Transformer](https://github.com/google-research/google-research/blob/master/protein_lm/models.py#L870): learnable and pretrainable
+
+### Lenses
+- [Mean/Max-Pool](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/contextual_lenses/contextual_lenses.py#L21): non-learnable
+- [Linear-Mean/Max-Pool](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/contextual_lenses/contextual_lenses.py#L46): learnable
+- [GatedConvolution](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/contextual_lenses/contextual_lenses.py#L125): learnable and self-attentive
+
+## TAPE Protein Engineering Tasks
+[TAPE](https://arxiv.org/pdf/1906.08230.pdf) proposes two protein engineering tasks: fluorescence prediction and stability prediction. We implement our lens architectures on these tasks in a [Google Colab notebook](https://github.com/amirshane/protein-embedding-retrieval/blob/master/tape_contextual_lenses.ipynb). We find that for the fluorescence task both linear regression on the one-hot encodings and 1-layer convolution compete with and outperform the best pretrained language models in TAPE. Likewise, we find that for the stability task 3-layer convolution competes with and outperforms TAPE's models. See below for a table of our results compared to TAPE's results.
+
+### Fluorescence
+rho represents Spearman's rank correlation coefficient.
+| Model Type | Model | Full Test Set (MSE, rho) | Bright Mode (MSE, rho) | Dark Mode (MSE, rho) |
+| ---------- | ----- | :----------------------: | :--------------------: | :------------------: |
+| Baseline | Linear Regression | (0.353, **0.691**) | (0.088, **0.681**) | (0.329, 0.052) |
+| Lens Architecture  | 1-Layer CNN + MaxPool | (0.262, 0.687) | (0.092, 0.65) | (0.262, 0.051) |
+| Lens Architecture  | 1-Layer CNN + LinearMaxPool | (0.228, **0.691**) | (0.115, 0.659) | (0.281, **0.053**) |
+| TAPE | Best of all models | (**0.19**, 0.68) | (**0.07**, 0.63) | (**0.22**, 0.05)|
+
+
+### Stability
+rho represents Spearman's rank correlation coefficient. The letters A and B represent the alpha and beta topologies, respectively.
+| Model Type | Model | Full Test Set (rho, Accuracy) | AAA (rho, Accuracy) | ABBA (rho, Accuracy) | BABB (rho, Accuracy) | BBABB (rho, Accuracy) |
+| ---------- | ----- | :---------------------------: | :-----------------: | :------------------: | :------------------: | :-------------------: |
+| Baseline | Linear Regression | (0.49, 0.60) | (0.21, 0.66) | (-0.03, 0.6) | (0.51, 0.64) | (0.38, 0.61) |
+| Lens Architecture  | 3-Layer CNN + MaxPool | (0.76, 0.75) | (0.69, **0.71**) | (0.37, 0.7) | (0.5, 0.72) | (0.6, 0.68) |
+| Lens Architecture  | 3-Layer CNN + LinearMaxPool | (0.71, **0.77**) | (0.59, 0.69) | (**0.52**, 0.77) | (0.55, **0.73**) | (0.6, **0.7**) |
+| Lens Architecture  | Ensemble (Average) of above CNN models | (**0.775**, **0.77**) | (0.65, **0.71**) | (0.49, 0.75) | (0.58, **0.73**) | (0.6, **0.7**) |
+| TAPE | Best of all models | (0.73, 0.7) | (**0.72**, 0.7) | (0.48, **0.79**) | (**0.68**, 0.71) | (**0.67**, **0.7**) |
+
+
+## Downstream Task
+The downstream task we use to train embeddings is Pfam family classification. We pick an encoder and a lens and train the architecture to predict a protein's family using only its primary sequence. We train on 10000 families in the data set. We then take the embeddings from this trained model and use them to do family prediction on 1000 holdout families with KNN (using 1 neighbor). This test allows us to assess the extent of transfer learning by seeing how much the embeddings have learned about the holdout families from the train families. In theory, a perfect model would map all proteins that are members of the same family to a single vector. To test for this we run our KNN classification with 1 sample (where the KNN classifier only sees 1 protein per family), 5 samples, 10 samples, and 50 samples. 
+
+### Pretraining
+We also measure the effect that pretraining has on the performance of a language model encoder. There has been a great deal of interest in measuring the degree to which pretraining protein language models improves their performance on downstream tasks. TAPE investigates this and proposes baselines. Our results indicate that pretraining offers a substantial boost in performance on the family classification task. We use transformer language models, specifically BERT models similar to to the the [ProGen model](https://www.biorxiv.org/content/10.1101/2020.03.07.982272v2.full.pdf) and the [models used by FAIR](https://www.biorxiv.org/content/10.1101/622803v2.full.pdf). Our [models](https://github.com/google-research/google-research/tree/master/protein_lm) are implemented in jax/flax and pretrained on the [TrEMBL protein corpus](https://www.uniprot.org/statistics/TrEMBL).
+
+## Quickstart
+The first step is to install [Caliban](https://github.com/google/caliban). We use Caliban for running individual jobs and parallelizing many jobs on GCP (Google Cloud Platform).
+
+For a simple demo on your machine (recommended only if it is equipped with a GPU) run
+```
+caliban run --experiment_config demo.json pfam_experiment.py
+```
+
+To run on cloud first connect to a GCP project (equipped with GPU resources) by running
+```
+gcloud init
+```
+If your GCP project is named MY_PROJECT run
+```
+export PROJECT_ID=MY_PROJECT
+```
+Finally, run
+```
+caliban cloud --experiment_config demo.json pfam_experiment.py
+```
+The demo takes ~3 hours with an Nvidia Tesla P100 GPU (the Caliban default)
+
+## Reproducing our Results
+To reproduce our results connect to a GCP project, ideally with a large number of GPUs, and run
+```
+caliban cloud --experiment_config params_combinations.json pfam_experiment.py
+```
 
 ## Source Code Headers
 

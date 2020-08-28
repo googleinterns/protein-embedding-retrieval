@@ -2,8 +2,8 @@
 
 Example usage:
 blast_baseline.py \
---train_file=/tmp/formatted_knn_data/5-samples_train_knn_data_families_15001-16000.csv \
---test_file=/tmp/formatted_knn_data/test_knn_data_families_15001-16000.csv
+--train_file=./resources/knn_data/5-samples_train_knn_data_families_15001-16000.csv \
+--test_file=./resources/knn_data/test_knn_data_families_15001-16000.csv
 """
 
 import os
