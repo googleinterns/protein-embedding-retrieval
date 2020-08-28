@@ -22,10 +22,10 @@ More specifically, we are aiming to learn fixed-length protein embeddings using 
 ### Fluorescence
 | Model Type | Model | Full Test Set (MSE, Spearman's rho) | Bright Mode Only (MSE, Spearman's rho) | Dark Mode Only (MSE, Spearman's rho) |
 | ---------- | ----- | ----------------------------------- | -------------------------------------- | ------------------------------------ |
-| Baseline | Linear Regression | (0.353, 0.691) | (0.088, 0.681) | (0.329, 0.052) |
+| Baseline | Linear Regression | (0.353, **0.691**) | (0.088, **0.681**) | (0.329, 0.052) |
 | Lens Architecture  | 1-Layer CNN + MaxPool | (0.262, 0.687) | (0.092, 0.65) | (0.262, 0.051) |
-| Lens Architecture  | 1-Layer CNN + LinearMaxPool | (0.228, 0.691) | (0.115, 0.659) | (0.281, 0.053) |
-| TAPE | Best of all models | (0.19, 0.68) | (0.07, 0.63) | (0.22, 0.05)|
+| Lens Architecture  | 1-Layer CNN + LinearMaxPool | (0.228, **0.691**) | (0.115, 0.659) | (0.281, **0.053**) |
+| TAPE | Best of all models | (**0.19**, 0.68) | (**0.07**, 0.63) | (**0.22**, 0.05)|
 
 
 ### Stability
