@@ -2,7 +2,7 @@
 
 **This is not an officially supported Google product.**
 
-Protein database search tools such as BLAST are instrumental for research in the life sciences. However, they are slow and are based on surface-level sequence similarity. We are exploring using neural networks to improve the speed and accuracy of finding relevant sequences from these databases. More specifically, we are aiming to learn fixed-length protein embeddings using contextual lenses (https://arxiv.org/pdf/2002.08866.pdf).
+Protein database search tools such as BLAST are instrumental for research in the life sciences. However, they are slow and are based on surface-level sequence similarity. We are exploring using neural networks to improve the speed and accuracy of finding relevant sequences from these databases. More specifically, we are aiming to learn fixed-length protein embeddings using contextual lenses (https://arxiv.org/pdf/2002.08866.pdf). Generally speaking, a sequence level protein representation such as a one-hot encoding is of the form (sequence_length, n) where n is the amino acid embedding dimension.
 
 ## Source Code Headers
 
