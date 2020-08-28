@@ -20,8 +20,27 @@ The downstream task we use to train embeddings is Pfam family classification. We
 ### Pretraining
 We also measure the effect that pretraining has on the performance of a language model encoder. There has been a great deal of interest in measuring the degree to which pretraining protein language models improves their performance on downstream tasks (https://arxiv.org/pdf/1906.08230.pdf). Our results indicate that pretraining offers a substantial boost in performance on the family classification task.
 
-## Caliban
-For parallelizing jobs on GCP (Google Cloud Platform) we ues Caliban (https://github.com/google/caliban, https://caliban.readthedocs.io/en/latest/).
+## Quickstart
+The first step is to install Caliban (https://github.com/google/caliban, https://caliban.readthedocs.io/en/latest/). We use Caliban for running individual jobs and parallelizing many jobs on GCP (Google Cloud Platform).
+
+For a simple demo on your machine (recommended only if it is equipped with a GPU) run
+```
+caliban run --experiment_config demo.json pfam_experiment.py
+```
+
+To run on cloud first connect to a GCP project (equippied with GPU resources) by running
+```
+gcloud init
+```
+If your GCP project is named MY_PROJECT run
+```
+export PROJECT_ID=MY_PROJECT
+```
+Finally, run
+```
+caliban cloud --experiment_config demo.json pfam_experiment.py
+```
+
 
 ## Source Code Headers
 
