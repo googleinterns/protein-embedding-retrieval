@@ -58,12 +58,12 @@ We also measure the effect that pretraining has on the performance of a language
 | Medium Transformer                       | 0.778659          | 0.921413          | 0.956741           | 0.981255           |
 | Pretrained Medium Transformer            | 0.863775          | 0.968277          | 0.984859           | 0.994232           |
 | Blundell Lens-Family CNN                 | 0.877345          | 0.980519          | 0.992063           | 0.993506           |
-| Blundell Full-Family CNN*                | 0.923521          | 0.984848          | 0.992785           | 0.995671           |
-| Blundell Full-Family CNN* w/ Whitening** | 0.940837          | 0.988456          | 0.996392           | 0.996392           |
+| Blundell Full-Family CNN**                | 0.923521          | 0.984848          | 0.992785           | 0.995671           |
+| Blundell Full-Family CNN** w/ Whitening*** | 0.940837          | 0.988456          | 0.996392           | 0.996392           |
 
-* The Full-Family Blundell CNN is not performing transfer learning. It was trained on families that appear in the KNN task.
+** The Full-Family Blundell CNN is not performing transfer learning. It was trained on families that appear in the KNN task.
 
-** Whitened embeddings are obtained by performing PCA on the embeddings of all Pfam seed sequences and applying the corresponding whitening transformation to the knn train and test sequences.
+*** Whitened embeddings are obtained by performing PCA on the embeddings of all Pfam seed sequences and applying the corresponding whitening transformation to the knn train and test sequences.
 
 
 ## Quickstart
