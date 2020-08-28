@@ -21,6 +21,7 @@ More specifically, we are aiming to learn fixed-length protein embeddings using 
 
 ### Fluorescence
 |             |       | Full Test Set | Bright Mode Only | Dark Mode Only |
+| ----------- | ----- | ------------- | ---------------- | -------------- |
 | Model Type  | Model | 
 | ----------- | ----- |
 | Content Cell  | Content Cell  |
