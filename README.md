@@ -67,7 +67,7 @@ In the table below we show the accuracies achieved using KNN on the model embedd
 
 *** Whitened embeddings are obtained by performing PCA on the embeddings of all Pfam seed sequences and applying the corresponding whitening transformation to the KNN train and test sequences.
 
-Below we show plots of the top 10 n-Sample Test KNN Accuracies vs. Lens Accuracies for different models and for n = 1, 5, 10, 50. The key takeaways are the noticable boost pretraining the language models provides and the fact that Lens Accuracy is not a perfect predictor of Test KNN Accuracy.
+Below we show plots of the top 10 n-Sample Test KNN Accuracies vs. Lens Accuracies for different models and for n = 1, 5, 10, 50. The key takeaways are the noticable boost pretraining the language models provides, the fact that Lens Accuracy is not a perfect predictor of Test KNN Accuracy, and the independence of performance and transformer size.
 
 ![1-sample](/figures/1-sample_test_knn_accuracy.png)
 
