@@ -68,8 +68,14 @@ In the table below we show the accuracies achieved using KNN on the model embedd
 *** Whitened embeddings are obtained by performing PCA on the embeddings of all Pfam seed sequences and applying the corresponding whitening transformation to the KNN train and test sequences.
 
 Below we show plots of the top 10 n-Sample Test KNN Accuracies vs. Lens Accuracies for different models and for n = 1, 5, 10, 50.
-![GitHub Logo](/figures/1-sample_test_knn_accuracy.png)
 
+![1-sample](/figures/1-sample_test_knn_accuracy.png)
+
+![5-sample](/figures/5-sample_test_knn_accuracy.png)
+
+![10-sample](/figures/10-sample_test_knn_accuracy.png)
+
+![50-sample](/figures/50-sample_test_knn_accuracy.png)
 
 ## Quickstart
 The first step is to install [Caliban](https://github.com/google/caliban). We use Caliban for running individual jobs and parallelizing many jobs on GCP (Google Cloud Platform).
