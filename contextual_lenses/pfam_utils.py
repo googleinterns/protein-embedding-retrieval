@@ -36,7 +36,7 @@ def read_all_shards(partition, data_dir, bucket_name):
 
     shards = []
 
-    if bucket_name is not None
+    if bucket_name is not None:
         gcsfs = GCSFS(bucket_name)
         for fn in gcsfs.listdir(os.path.join(data_dir, partition)):
             with gcsfs.open(os.path.join(data_dir, partition, fn)) as f:
