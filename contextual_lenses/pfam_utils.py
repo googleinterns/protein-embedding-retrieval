@@ -43,6 +43,8 @@ def read_all_shards(partition, data_dir, bucket_name):
                 shards.append(pd.read_csv(f, index_col=None))
     
     else:
+        print(os.path.join(data_dir, partition))
+        print(os.listdir(os.path.join(data_dir, partition)))
         for fn in os.listdir(os.path.join(data_dir, partition)):
             print(fn)
             print(os.path.join(data_dir, partition, fn))
