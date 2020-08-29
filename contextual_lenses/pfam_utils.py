@@ -35,24 +35,11 @@ def read_all_shards(partition, data_dir, bucket_name):
     """Combines different CSVs into a single dataframe."""
 
     shards = []
-
-    if bucket_name is not None:
-        gcsfs = GCSFS(bucket_name)
-        for fn in gcsfs.listdir(os.path.join(data_dir, partition)):
-            with gcsfs.open(os.path.join(data_dir, partition, fn)) as f:
-                shards.append(pd.read_csv(f, index_col=None))
-    
-    print(os.path.join(data_dir, partition))
-    print(os.listdir(os.path.join(data_dir, partition)))
-    else:
-        print(os.path.join(data_dir, partition))
-        print(os.listdir(os.path.join(data_dir, partition)))
-        for fn in os.listdir(os.path.join(data_dir, partition)):
-            print(fn)
-            print(os.path.join(data_dir, partition, fn))
-            with open(os.path.join(data_dir, partition, fn)) as f:
-                shards.append(pd.read_csv(f, index_col=None))
-
+    gcsfs = GCSFS(bucket_name)
+    for fn in gcsfs.listdir(os.path.join(data_dir, partition)):
+        with gcsfs.open(os.path.join(data_dir, partition, fn)) as f:
+            shards.append(pd.read_csv(f, index_col=None))
+            
     return pd.concat(shards)
 
 
