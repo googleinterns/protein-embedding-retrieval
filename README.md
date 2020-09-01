@@ -30,7 +30,7 @@ MSE is mean squared error and rho represents Spearman's rank correlation coeffic
 
 
 ### Stability
-Accuracy (Acc0 is measured using the parent protein as a decision boundary and labeling mutations as beneficial if predicted stability is greater than predicted parent stability. rho represents Spearman's rank correlation coefficient. The letters A and B represent the alpha and beta topologies, respectively.
+Accuracy (Acc) is measured using the parent protein as a decision boundary and labeling mutations as beneficial if predicted stability is greater than predicted parent stability. rho represents Spearman's rank correlation coefficient. The letters A and B represent the alpha and beta topologies, respectively.
 | Model Type | Model | Full Test Set (rho, Acc) | AAA (rho, Acc) | ABBA (rho, Acc) | BABB (rho, Acc) | BBABB (rho, Acc) |
 | ---------- | ----- | :---------------------------: | :-----------------: | :------------------: | :------------------: | :-------------------: |
 | Baseline | Linear Regression | (0.49, 0.60) | (0.21, 0.66) | (-0.03, 0.6) | (0.51, 0.64) | (0.38, 0.61) |
