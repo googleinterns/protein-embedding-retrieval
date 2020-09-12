@@ -28,14 +28,22 @@ def one_hot_encoder(batch_inds, num_categories):
 
 class CNN(nn.Module):
     """A simple 1D CNN model."""
-    def apply(self, x, n_layers, n_features, n_kernel_sizes):
+    def apply(self, x, n_layers, n_features, n_kernel_sizes,
+              n_kernel_dilations):
+
+        if n_kernel_dilations is None:
+            n_kernel_dilations = [1] * n_layers
 
         x = jnp.expand_dims(x, axis=2)
 
         for layer in range(n_layers):
             features = n_features[layer]
             kernel_size = (n_kernel_sizes[layer], 1)
-            x = nn.Conv(x, features=features, kernel_size=kernel_size)
+            kernel_dilation = (n_kernel_dilations[layer], 1)
+            x = nn.Conv(x,
+                        features=features,
+                        kernel_size=kernel_size,
+                        kernel_dilation=kernel_dilation)
             x = nn.relu(x)
 
         x = jnp.squeeze(x, axis=2)
@@ -43,12 +51,17 @@ class CNN(nn.Module):
         return x
 
 
-def cnn_one_hot_encoder(batch_inds, num_categories, n_layers, n_features,
-                        n_kernel_sizes):
+def cnn_one_hot_encoder(batch_inds,
+                        num_categories,
+                        n_layers,
+                        n_features,
+                        n_kernel_sizes,
+                        n_kernel_dilations=None):
     """Applies one-hot encoding followed by 1D CNN."""
 
     one_hots = one_hot_encoder(batch_inds, num_categories)
-    cnn_one_hots = CNN(one_hots, n_layers, n_features, n_kernel_sizes)
+    cnn_one_hots = CNN(one_hots, n_layers, n_features, n_kernel_sizes,
+                       n_kernel_dilations)
 
     return cnn_one_hots
 
