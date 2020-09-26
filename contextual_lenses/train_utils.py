@@ -24,7 +24,7 @@ import functools
 
 import copy
 
-from protein_lm import models
+from google_research.protein_lm import models
 
 
 # Data batching.
