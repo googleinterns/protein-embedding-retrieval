@@ -79,12 +79,18 @@ Below we show plots of the top 10 n-Sample Test KNN Accuracies vs. Lens Accuraci
 ![50-sample](/figures/50-sample_test_knn_accuracy.png)
 
 ## Quickstart
-The first step is to install [Caliban](https://github.com/google/caliban). We use Caliban for running individual jobs and parallelizing many jobs on GCP (Google Cloud Platform).
+To clone this project run
+```
+git clone --recurse-submodules https://github.com/googleinterns/protein-embedding-retrieval.git
+```
+
+Once the project is cloned, the first step is to install [Caliban](https://github.com/google/caliban). We use Caliban for running individual jobs and parallelizing many jobs on GCP (Google Cloud Platform).
 
 For a simple demo on your machine (recommended only if it is equipped with a GPU) run
 ```
 caliban run --experiment_config demo.json pfam_experiment.py
 ```
+The demo takes ~3 hours with an Nvidia Tesla P100 GPU (the Caliban default). By default this will load data from and save data to the 'neuralblast_public' GCS bucket. You can change this by modifying the values of 'load_gcs_bucket' and 'save_gcs_bucket' in demo.json.
 
 To run on cloud first connect to a GCP project (equipped with GPU resources) by running
 ```
@@ -98,10 +104,10 @@ Finally, run
 ```
 caliban cloud --experiment_config demo.json pfam_experiment.py
 ```
-The demo takes ~3 hours with an Nvidia Tesla P100 GPU (the Caliban default)
+
 
 ## Reproducing our Results
-To reproduce our results connect to a GCP project, ideally with a large number of GPUs, and run
+To reproduce our results you first need to connect to a GCP project, ideally one with a large number of GPUs, and clone the project. Then take the [generate_params.py](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/generate_params.py) script, and modify the variable 'save_gcs_bucket' in the call to main() using the GCS bucket you wish to save to (and potentially do the same for the one you want to load from 'load_gcs_bucket'). Run the script to generate the appropriate parameter combinations and run
 ```
 caliban cloud --experiment_config params_combinations.json pfam_experiment.py
 ```
