@@ -4,7 +4,7 @@
 
 Protein database search tools such as [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi) are instrumental for research in the life sciences. However, they are slow and are based on surface-level sequence similarity. We are exploring using neural networks to improve the speed and accuracy of finding relevant sequences from these databases. 
 
-More specifically, we are aiming to learn fixed-length protein embeddings using [contextual lenses](https://arxiv.org/pdf/2002.08866.pdf). Generally speaking, a sequence level protein representation, such as a one-hot encoding, is an array of the the form (sequence_length, n) where n is the amino acid embedding dimension. A contextual lens is a (learnable) map from the (sequence_length, n)-array to an (m,)-vector where m is independent of sequence_length. Embeddings are constructed using an encoder function followed by a contextual lens. To learn these embeddings a downstream prediction task is performed using a single dense layer. Gradients are backpropagated through all 3 components of the architecture (encoder, lens, predictor) using the Adam optimizer with variable (potentially zero) learning rates per component.
+More specifically, we are aiming to learn fixed-length protein embeddings using [contextual lenses](https://arxiv.org/pdf/2002.08866.pdf). Generally speaking, a sequence level protein representation, such as a one-hot encoding, is an array of the the form (sequence_length, n) where n is the amino acid embedding dimension. A contextual lens is a (learnable) map from the (sequence_length, n)-array to an (m,)-vector where m is independent of sequence_length. Embeddings are constructed using an encoder function followed by a contextual lens. To learn these embeddings a downstream prediction task is performed using a single dense layer. Gradients are backpropagated through all 3 components of the architecture (encoder, lens, predictor) using the Adam optimizer with variable (potentially zero) learning rates and weight decays per component.
 
 ### Encoders
 - [One-hot](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/contextual_lenses/encoders.py#L21): non-learnable
@@ -23,10 +23,10 @@ More specifically, we are aiming to learn fixed-length protein embeddings using 
 MSE is mean squared error and rho represents Spearman's rank correlation coefficient.
 | Model Type | Model | Full Test Set (MSE, rho) | Bright Mode (MSE, rho) | Dark Mode (MSE, rho) |
 | ---------- | ----- | :----------------------: | :--------------------: | :------------------: |
-| Baseline | Linear Regression | (0.353, **0.691**) | (0.088, **0.681**) | (0.329, 0.052) |
-| Lens Architecture  | 1-Layer CNN + MaxPool | (0.262, 0.687) | (0.092, 0.65) | (0.262, 0.051) |
-| Lens Architecture  | 1-Layer CNN + LinearMaxPool | (0.228, **0.691**) | (0.115, 0.659) | (0.281, **0.053**) |
-| TAPE | Best of all models | (**0.19**, 0.68) | (**0.07**, 0.63) | (**0.22**, 0.05)|
+| Baseline | Linear Regression | (0.35, **0.69**) | (0.088, **0.68**) | (0.329, **0.05**) |
+| Lens Architecture  | 1-Layer CNN + MaxPool | (0.26, **0.69**) | (0.09, 0.65) | (0.26, **0.05**) |
+| Lens Architecture  | 1-Layer CNN + LinearMaxPool | (0.23, **0.69**) | (0.12, 0.66) | (0.28, **0.05**) |
+| TAPE | Best of all models | (**0.19**, 0.68) | (**0.07**, 0.63) | (**0.22**, **0.05**)|
 
 
 ### Stability
@@ -35,8 +35,9 @@ Accuracy (Acc) is measured using the parent protein as a decision boundary and l
 | ---------- | ----- | :---------------------------: | :-----------------: | :------------------: | :------------------: | :-------------------: |
 | Baseline | Linear Regression | (0.49, 0.60) | (0.21, 0.66) | (-0.03, 0.6) | (0.51, 0.64) | (0.38, 0.61) |
 | Lens Architecture  | 3-Layer CNN + MaxPool | (0.76, 0.75) | (0.69, **0.71**) | (0.37, 0.70) | (0.50, 0.72) | (0.60, 0.68) |
+| Lens Architecture  | Dilated 3-Layer CNN + MaxPool | (0.75, 0.73) | (0.67, 0.69) | (0.49, 0.69) | (0.61, 0.70) | (0.53, 0.64) |
 | Lens Architecture  | 3-Layer CNN + LinearMaxPool | (0.71, **0.77**) | (0.59, 0.69) | (**0.52**, 0.77) | (0.55, **0.73**) | (0.60, **0.70**) |
-| Lens Architecture  | Ensemble (Average) of above CNN models | (**0.775**, **0.77**) | (0.65, **0.71**) | (0.49, 0.75) | (0.58, **0.73**) | (0.60, **0.70**) |
+| Lens Architecture  | Ensemble (Average) of above CNN models | (**0.79**, **0.77**) | (0.67, **0.71**) | (**0.53**, 0.75) | (0.65, **0.74**) | (0.60, **0.70**) |
 | TAPE | Best of all models | (0.73, 0.70) | (**0.72**, 0.70) | (0.48, **0.79**) | (**0.68**, 0.71) | (**0.67**, **0.70**) |
 
 
