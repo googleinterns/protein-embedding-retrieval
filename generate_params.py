@@ -33,8 +33,9 @@ def create_params(encoder_lrs,
                   model_random_keys=[0],
                   first_test_family=15000,
                   last_test_family=16000,
-                  gcs_bucket='sequin-public',
+                  load_gcs_bucket='neuralblast_public',
                   data_partitions_dirpath='random_split/',
+                  save_gcs_bucket='sequin-public',
                   results_save_dir='pfam_experiment_data',
                   lens_shuffle_seed=0,
                   lens_sample_random_state=0,
@@ -78,8 +79,9 @@ def create_params(encoder_lrs,
             'model_random_key': model_random_key,
             'use_transformer': use_transformer,
             'use_bert': use_bert,
-            'gcs_bucket': gcs_bucket,
+            'load_gcs_bucket': load_gcs_bucket,
             'data_partitions_dirpath': data_partitions_dirpath,
+            'save_gcs_bucket': save_gcs_bucket,
             'results_save_dir': results_save_dir,
             'load_model': load_model,
             'load_model_dir': load_model_dir,
@@ -97,7 +99,7 @@ def create_params(encoder_lrs,
 
 
 # Generate parameters from different sets of parameter combinations.
-def main():
+def main(load_gcs_bucket, save_gcs_bucket):
 
     params = []
 
@@ -122,7 +124,8 @@ def main():
         use_transformer=True,
         use_bert=True,
         restore_transformer_dir=None,
-        gcs_bucket='sequin-public')
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(
         encoder_lrs=[0.0],
@@ -145,7 +148,8 @@ def main():
         use_bert=True,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/medium_trembl_bert/',
-        gcs_bucket='sequin-public')
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(
         encoder_lrs=[1e-3, 5e-4, 1e-4, 5e-5, 1e-5],
@@ -167,7 +171,8 @@ def main():
         use_transformer=False,
         use_bert=False,
         restore_transformer_dir=None,
-        gcs_bucket='sequin-public')
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket)
 
     # 10000 train families sweep
     params += create_params(encoder_lrs=[0.0],
@@ -189,7 +194,8 @@ def main():
                             use_transformer=True,
                             use_bert=True,
                             restore_transformer_dir=None,
-                            gcs_bucket='sequin-public')
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(
         encoder_lrs=[0.0],
@@ -212,7 +218,8 @@ def main():
         use_bert=True,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/medium_trembl_bert/',
-        gcs_bucket='sequin-public')
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(encoder_lrs=[1e-3, 1e-4, 1e-5],
                             lens_lrs=[1e-3, 1e-4, 1e-5],
@@ -233,7 +240,8 @@ def main():
                             use_transformer=False,
                             use_bert=False,
                             restore_transformer_dir=None,
-                            gcs_bucket='sequin-public')
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-4, 5e-5, 1e-5],
@@ -254,7 +262,8 @@ def main():
                             use_transformer=True,
                             use_bert=True,
                             restore_transformer_dir=None,
-                            gcs_bucket='sequin-public')
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(
         encoder_lrs=[0.0],
@@ -277,7 +286,8 @@ def main():
         use_bert=True,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/medium_trembl_bert/',
-        gcs_bucket='sequin-public')
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(encoder_lrs=[1e-3, 5e-4, 1e-4],
                             lens_lrs=[1e-4, 5e-5, 1e-5],
@@ -298,7 +308,8 @@ def main():
                             use_transformer=False,
                             use_bert=False,
                             restore_transformer_dir=None,
-                            gcs_bucket='sequin-public')
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(encoder_lrs=[1e-3, 5e-4, 1e-4, 5e-5],
                             lens_lrs=[5e-5, 1e-5, 5e-6],
@@ -319,7 +330,8 @@ def main():
                             use_transformer=False,
                             use_bert=False,
                             restore_transformer_dir=None,
-                            gcs_bucket='sequin-public')
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket)
 
     # 10000 train families medium transformer random keys sweep
     params += create_params(encoder_lrs=[0.0],
@@ -340,7 +352,8 @@ def main():
                             knn_batch_size=64,
                             use_transformer=True,
                             use_bert=True,
-                            gcs_bucket='sequin-public',
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket,
                             model_random_keys=range(10))
 
     params += create_params(
@@ -364,7 +377,8 @@ def main():
         use_bert=True,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/medium_trembl_bert/',
-        gcs_bucket='sequin-public',
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket,
         model_random_keys=range(10))
 
     params += create_params(encoder_lrs=[0.0],
@@ -385,7 +399,8 @@ def main():
                             knn_batch_size=64,
                             use_transformer=True,
                             use_bert=True,
-                            gcs_bucket='sequin-public',
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket,
                             model_random_keys=range(10))
 
     params += create_params(
@@ -409,7 +424,8 @@ def main():
         use_bert=True,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/medium_trembl_bert/',
-        gcs_bucket='sequin-public',
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket,
         model_random_keys=range(10))
 
     # 10000 train families small transformer random keys sweep
@@ -431,7 +447,8 @@ def main():
                             knn_batch_size=64,
                             use_transformer=True,
                             use_bert=True,
-                            gcs_bucket='sequin-public')
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(
         encoder_lrs=[0.0],
@@ -454,7 +471,8 @@ def main():
         use_bert=True,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/small_trembl_bert/',
-        gcs_bucket='sequin-public')
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket)
 
     params += create_params(encoder_lrs=[0.0],
                             lens_lrs=[1e-4],
@@ -474,7 +492,8 @@ def main():
                             knn_batch_size=64,
                             use_transformer=True,
                             use_bert=True,
-                            gcs_bucket='sequin-public',
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket,
                             model_random_keys=range(10))
 
     params += create_params(
@@ -496,7 +515,8 @@ def main():
         knn_batch_size=64,
         use_transformer=True,
         use_bert=True,
-        gcs_bucket='sequin-public',
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         model_random_keys=range(10))
@@ -519,7 +539,8 @@ def main():
                             knn_batch_size=64,
                             use_transformer=True,
                             use_bert=True,
-                            gcs_bucket='sequin-public',
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket,
                             model_random_keys=range(10))
 
     params += create_params(
@@ -541,7 +562,8 @@ def main():
         knn_batch_size=64,
         use_transformer=True,
         use_bert=True,
-        gcs_bucket='sequin-public',
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         model_random_keys=range(10))
@@ -564,7 +586,8 @@ def main():
                             knn_batch_size=64,
                             use_transformer=True,
                             use_bert=True,
-                            gcs_bucket='sequin-public',
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket,
                             model_random_keys=range(10))
 
     params += create_params(
@@ -586,7 +609,8 @@ def main():
         knn_batch_size=64,
         use_transformer=True,
         use_bert=True,
-        gcs_bucket='sequin-public',
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         model_random_keys=range(10))
@@ -609,7 +633,8 @@ def main():
                             knn_batch_size=64,
                             use_transformer=True,
                             use_bert=True,
-                            gcs_bucket='sequin-public',
+                            load_gcs_bucket=load_gcs_bucket,
+                            save_gcs_bucket=save_gcs_bucket,
                             model_random_keys=range(10))
 
     params += create_params(
@@ -631,7 +656,8 @@ def main():
         knn_batch_size=64,
         use_transformer=True,
         use_bert=True,
-        gcs_bucket='sequin-public',
+        load_gcs_bucket=load_gcs_bucket,
+        save_gcs_bucket=save_gcs_bucket,
         restore_transformer_dir=
         'gs://sequin-public/transformer_models/small_trembl_bert/',
         model_random_keys=range(10))
@@ -657,7 +683,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -684,7 +711,8 @@ def main():
             use_bert=True,
             restore_transformer_dir=
             'gs://sequin-public/transformer_models/large_bert/',
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -709,7 +737,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -736,7 +765,8 @@ def main():
             use_bert=True,
             restore_transformer_dir=
             'gs://sequin-public/transformer_models/large_bert/',
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -761,7 +791,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -786,7 +817,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             restore_transformer_dir=
             'gs://sequin-public/transformer_models/large_bert/',
             model_random_keys=[i],
@@ -813,7 +845,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -838,7 +871,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             restore_transformer_dir=
             'gs://sequin-public/transformer_models/large_bert/',
             model_random_keys=[i],
@@ -868,7 +902,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -895,7 +930,8 @@ def main():
             use_bert=True,
             restore_transformer_dir=
             'gs://sequin-public/transformer_models/medium_trembl_bert/',
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -920,7 +956,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -947,7 +984,8 @@ def main():
             use_bert=True,
             restore_transformer_dir=
             'gs://sequin-public/transformer_models/small_trembl_bert/',
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -972,7 +1010,8 @@ def main():
             knn_batch_size=512,
             use_transformer=False,
             use_bert=False,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -998,7 +1037,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -1026,7 +1066,8 @@ def main():
             use_bert=True,
             restore_transformer_dir=
             'gs://sequin-public/transformer_models/small_trembl_bert/',
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -1051,7 +1092,8 @@ def main():
             knn_batch_size=64,
             use_transformer=True,
             use_bert=True,
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -1078,7 +1120,8 @@ def main():
             use_bert=True,
             restore_transformer_dir=
             'gs://sequin-public/transformer_models/medium_trembl_bert/',
-            gcs_bucket='sequin-public',
+            load_gcs_bucket=load_gcs_bucket,
+            save_gcs_bucket=save_gcs_bucket,
             model_random_keys=[i],
             save_model=True,
             save_model_dir=os.path.join('pfam_experiment_optimizers',
@@ -1120,4 +1163,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(load_gcs_bucket='neuralblast_public',
+         save_gcs_bucket='sequin-public')
