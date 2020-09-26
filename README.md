@@ -107,7 +107,7 @@ caliban cloud --experiment_config demo.json pfam_experiment.py
 
 
 ## Reproducing our Results
-To reproduce our results you first need to connect to a GCP project, ideally one with a large number of GPUs, and clone the project. Then take the [generate_params.py](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/generate_params.py) script, and modify the variable 'save_gcs_bucket' in the call to main() using the GCS bucket you wish to save to (and potentially do the same for the one you want to load from 'load_gcs_bucket'). Run the script to generate appropriate the parameter combinations and run
+To reproduce our results you first need to connect to a GCP project, ideally one with a large number of GPUs, and clone the project. Then take the [generate_params.py](https://github.com/googleinterns/protein-embedding-retrieval/blob/master/generate_params.py) script, and modify the variable 'save_gcs_bucket' in the call to main() using the GCS bucket you wish to save to (and potentially do the same for the one you want to load from 'load_gcs_bucket'). Run the script to generate the appropriate parameter combinations and run
 ```
 caliban cloud --experiment_config params_combinations.json pfam_experiment.py
 ```
