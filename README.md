@@ -23,8 +23,8 @@ More specifically, we are aiming to learn fixed-length protein embeddings using 
 MSE is mean squared error and rho represents Spearman's rank correlation coefficient.
 | Model Type | Model | Full Test Set (MSE, rho) | Bright Mode (MSE, rho) | Dark Mode (MSE, rho) |
 | ---------- | ----- | :----------------------: | :--------------------: | :------------------: |
-| Baseline | Linear Regression | (0.35, **0.69**) | (0.088, **0.68**) | (0.329, **0.05**) |
-| Lens Architecture  | 1-Layer CNN + MaxPool | (0.26, **0.69**) | (0.09, 0.65) | (0.26, **0.05**) |
+| Baseline | Linear Regression | (0.35, **0.69**) | (0.09, **0.68**) | (0.33, **0.05**) |
+| Lens Architecture  | 1-Layer CNN + MaxPool | (0.26, **0.69**) | (0.09, 0.65) | (0.29, **0.05**) |
 | Lens Architecture  | 1-Layer CNN + LinearMaxPool | (0.23, **0.69**) | (0.12, 0.66) | (0.28, **0.05**) |
 | TAPE | Best of all models | (**0.19**, 0.68) | (**0.07**, 0.63) | (**0.22**, **0.05**)|
 
