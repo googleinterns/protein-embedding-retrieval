@@ -102,25 +102,28 @@ flags.DEFINE_boolean('use_bert', False,
 flags.DEFINE_string('restore_transformer_dir', None,
                     'Directory to load pretrained transformer from.')
 
-flags.DEFINE_string('gcs_bucket', 'sequin-public',
-                    'GCS bucket to save to and load from.')
+flags.DEFINE_string('load_gcs_bucket', 'neuralblast_public',
+                    'GCS bucket to load from.')
 flags.DEFINE_string('data_partitions_dirpath', 'random_split/',
-                    'Location of Pfam data in GCS bucket.')
+                    'Location of Pfam data in load GCS bucket.')
 
+flags.DEFINE_string('save_gcs_bucket', 'sequin-public',
+                    'GCS bucket to save to.')
 flags.DEFINE_string('results_save_dir', '',
-                    'Directory in GCS bucket to save to.')
+                    'Directory in save GCS bucket to save to.')
 
 flags.DEFINE_boolean('load_model', False,
                      'Whether or not to load a trained model.')
 flags.DEFINE_string('load_model_dir', '',
-                    'Directory in GCS bucket to load trained optimizer from.')
+                    'Directory in load GCS bucket to load trained optimizer from.')
 flags.DEFINE_integer(
     'load_model_step', 0,
     'Number of steps optimizer to be loaded has been trained for.')
+
 flags.DEFINE_boolean('save_model', False,
                      'Whether or not to save trained model.')
 flags.DEFINE_string('save_model_dir', '',
-                    'Directory in GCS bucket to save trained optimizer to.')
+                    'Directory in save GCS bucket to save trained optimizer to.')
 
 flags.DEFINE_string('label', '', 'Label used to save experiment results.')
 
@@ -243,7 +246,7 @@ def measure_nearest_neighbor_performance(accuracy_label, encoder,
         shuffle_seed=shuffle_seed,
         sample_random_state=sample_random_state,
         data_partitions_dirpath=FLAGS.data_partitions_dirpath,
-        gcs_bucket=FLAGS.gcs_bucket)[0]
+        gcs_bucket=FLAGS.load_gcs_bucket)[0]
 
     accuracy = results['1-nn accuracy']
 
@@ -303,8 +306,9 @@ def main(_):
         'use_transformer': FLAGS.use_transformer,
         'use_bert': FLAGS.use_bert,
         'restore_transformer_dir': FLAGS.restore_transformer_dir,
-        'gcs_bucket': FLAGS.gcs_bucket,
+        'load_gcs_bucket': FLAGS.load_gcs_bucket,
         'data_partitions_dirpath': FLAGS.data_partitions_dirpath,
+        'save_gcs_bucket': FLAGS.save_gcs_bucket,
         'results_save_dir': FLAGS.results_save_dir,
         'load_model': FLAGS.load_model,
         'load_model_dir': FLAGS.load_model_dir,
@@ -313,7 +317,7 @@ def main(_):
         'save_model_dir': FLAGS.save_model_dir
     }
 
-    gcsfs = GCSFS(FLAGS.gcs_bucket)
+    gcsfs = GCSFS(FLAGS.save_gcs_bucket)
 
     print(datum)
     df = pd.DataFrame([datum])
@@ -398,7 +402,7 @@ def main(_):
 
     if FLAGS.load_model:
         optimizer = checkpoints.restore_checkpoint(ckpt_dir=os.path.join(
-            'gs://' + FLAGS.gcs_bucket, FLAGS.load_model_dir),
+            'gs://' + FLAGS.load_gcs_bucket, FLAGS.load_model_dir),
                                                    target=optimizer,
                                                    step=FLAGS.load_model_step)
 
@@ -408,7 +412,7 @@ def main(_):
 
     if FLAGS.save_model:
         checkpoints.save_checkpoint(ckpt_dir=os.path.join(
-            'gs://' + FLAGS.gcs_bucket, FLAGS.save_model_dir),
+            'gs://' + FLAGS.save_gcs_bucket, FLAGS.save_model_dir),
                                     target=optimizer,
                                     step=FLAGS.load_model_step)
 
@@ -441,7 +445,7 @@ def main(_):
             loss_fn_kwargs=loss_fn_kwargs,
             batch_size=FLAGS.lens_batch_size,
             data_partitions_dirpath=FLAGS.data_partitions_dirpath,
-            gcs_bucket=FLAGS.gcs_bucket)
+            gcs_bucket=FLAGS.load_gcs_bucket)
 
         lens_accuracy = results['accuracy']
         datum['lens_accuracy' + '_measurement_' + str(i)] = lens_accuracy
@@ -488,7 +492,7 @@ def main(_):
 
     if FLAGS.save_model:
         checkpoints.save_checkpoint(ckpt_dir=os.path.join(
-            'gs://' + FLAGS.gcs_bucket, FLAGS.save_model_dir),
+            'gs://' + FLAGS.save_gcs_bucket, FLAGS.save_model_dir),
                                     target=optimizer,
                                     step=FLAGS.load_model_step + FLAGS.epochs)
 

@@ -34,12 +34,12 @@ from contextual_lenses.loss_fns import cross_entropy_loss
 def read_all_shards(partition, data_dir, bucket_name):
     """Combines different CSVs into a single dataframe."""
 
-    gcsfs = GCSFS(bucket_name)
-
     shards = []
-    for fn in gcsfs.listdir(data_dir + partition):
+    gcsfs = GCSFS(bucket_name)
+    for fn in gcsfs.listdir(os.path.join(data_dir, partition)):
         with gcsfs.open(os.path.join(data_dir, partition, fn)) as f:
             shards.append(pd.read_csv(f, index_col=None))
+            
     return pd.concat(shards)
 
 
@@ -98,7 +98,7 @@ def create_pfam_df(family_accessions,
                    samples=None,
                    random_state=0,
                    data_partitions_dirpath='random_split/',
-                   gcs_bucket='sequin-public'):
+                   gcs_bucket='neuralblast_public'):
     """Processes Pfam data into a featurized dataframe with samples many entries per family."""
 
     family_id_to_index = get_family_id_to_index()
@@ -140,7 +140,7 @@ def create_pfam_seq_batches(family_accessions,
                             shuffle_seed=0,
                             sample_random_state=0,
                             data_partitions_dirpath='random_split/',
-                            gcs_bucket='sequin-public',
+                            gcs_bucket='neuralblast_public',
                             as_numpy=False):
     """Creates iterable object of Pfam sequences."""
 
@@ -175,7 +175,7 @@ def create_pfam_batches(family_accessions,
                         shuffle_seed=0,
                         sample_random_state=0,
                         data_partitions_dirpath='random_split/',
-                        gcs_bucket='sequin-public',
+                        gcs_bucket='neuralblast_public',
                         as_numpy=True):
     """Creates iterable object of Pfam data batches."""
 
@@ -208,7 +208,7 @@ def pfam_evaluate(predict_fn,
                   loss_fn_kwargs,
                   batch_size=512,
                   data_partitions_dirpath='random_split/',
-                  gcs_bucket='sequin-public'):
+                  gcs_bucket='neuralblast_public'):
     """Computes predicted family ids and measures performance in cross entropy and accuracy."""
 
     test_batches, test_indexes = create_pfam_batches(
@@ -271,7 +271,7 @@ def pfam_nearest_neighbors_classification(
         shuffle_seed=0,
         sample_random_state=0,
         data_partitions_dirpath='random_split/',
-        gcs_bucket='sequin-public'):
+        gcs_bucket='neuralblast_public'):
     """Nearest neighbors classification on Pfam families using specified encoder."""
 
     train_batches, train_indexes = create_pfam_batches(
